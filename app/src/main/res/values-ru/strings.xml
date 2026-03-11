@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IKollect</string>
+    <string name="navigation_albums">Альбомы</string>
+    <string name="navigation_photocards">Фотокарты</string>
+    <string name="navigation_account">Аккаунт</string>
+</resources>
