@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.data.remote
+package com.vbshkn.ikollect.data.remote.api
 
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse
 import com.vbshkn.ikollect.data.remote.dao.ReleaseDetailsResponse

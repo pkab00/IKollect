@@ -1,7 +1,7 @@
 package com.vbshkn.ikollect.di
 
 import com.vbshkn.ikollect.BuildConfig
-import com.vbshkn.ikollect.data.remote.DiscogsApi
+import com.vbshkn.ikollect.data.remote.api.DiscogsApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
