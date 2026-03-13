@@ -18,8 +18,8 @@ data class AlbumFullDetail(
     )
     val artists: List<ArtistEntity>,
     @Relation(
-        parentColumn = "komcaNumber",
-        entityColumn = "albumId"
+        parentColumn = "albumId",
+        entityColumn = "photocardId"
     )
     val photocards: List<PhotocardEntity>
 )

@@ -31,7 +31,7 @@ interface AlbumDao {
     fun getAllWithFullDetail(): Flow<List<AlbumFullDetail>>
 
     @Transaction
-    @Query("SELECT * FROM ArtistEntity WHERE id == :artistId")
+    @Query("SELECT * FROM ArtistEntity WHERE artistId == :artistId")
     fun getAllByArtist(artistId: Long): Flow<ArtistWithAlbums?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -47,7 +47,7 @@ interface AlbumDao {
     ) {
         insertAlbum(albumEntity)
         val links = artistIds.map { artistId ->
-            AlbumArtistCrossRef(albumId = albumEntity.komcaNumber, artistId = artistId)
+            AlbumArtistCrossRef(albumId = albumEntity.albumId, artistId = artistId)
         }
         insertArtistLinks(links)
     }

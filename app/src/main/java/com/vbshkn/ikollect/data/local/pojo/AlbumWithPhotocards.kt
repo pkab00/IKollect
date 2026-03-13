@@ -9,8 +9,8 @@ data class AlbumWithPhotocards(
     @Embedded
     val album: AlbumEntity,
     @Relation(
-        parentColumn = "komcaNumber",
-        entityColumn = "albumId"
+        parentColumn = "albumId",
+        entityColumn = "photocardId"
     )
     val photocards: List<PhotocardEntity>
 )

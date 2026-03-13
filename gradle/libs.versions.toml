@@ -20,6 +20,7 @@ roomRuntime = "2.8.4"
 android_gradle_plugin = "9.1.0"
 devtools_ksp = "2.3.6"
 uiTextGoogleFonts = "1.10.4"
+secretsGradle = "2.0.1"
 
 [libraries]
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
@@ -30,6 +31,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterKotlinxSerialization" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
@@ -57,4 +59,4 @@ builtin_kotlin = { id = "com.android.built-in-kotlin", version.ref = "android_gr
 kotlin_compose_compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 devtools_ksp = { id = "com.google.devtools.ksp", version.ref = "devtools_ksp" }
 dagger_hilt_android =  { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
-
+secrets_gradle = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradle" }

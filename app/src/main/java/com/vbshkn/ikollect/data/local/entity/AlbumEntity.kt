@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 class AlbumEntity(
     @PrimaryKey(autoGenerate = false)
-    val komcaNumber: Int,
+    val albumId: Int, // KOMCA
     val barcodeNumber: Int,
     val name: String,
     val version: String?,

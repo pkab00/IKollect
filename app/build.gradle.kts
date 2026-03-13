@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.builtin.kotlin)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.secrets.gradle)
 }
 
 android {
@@ -37,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -62,6 +64,7 @@ dependencies {
     implementation(libs.converter.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.logging.interceptor)
+    implementation(libs.converter.gson)
 
     // --- ROOM ---
     implementation(libs.androidx.room.runtime)

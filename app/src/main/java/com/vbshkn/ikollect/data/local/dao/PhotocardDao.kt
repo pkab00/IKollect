@@ -21,7 +21,7 @@ interface PhotocardDao {
     fun getAllWithArtists(): Flow<List<PhotocardWithArtists>>
 
     @Transaction
-    @Query("SELECT * FROM ArtistEntity WHERE id = :artistId")
+    @Query("SELECT * FROM ArtistEntity WHERE artistId = :artistId")
     fun getAllByArtist(artistId: Long): Flow<ArtistWithPhotocards?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -37,7 +37,7 @@ interface PhotocardDao {
     ) {
         insertPhotocard(photocardEntity)
         val links = artistIds.map { artistId ->
-            PhotocardArtistCrossRef(photocardId = photocardEntity.id, artistId = artistId)
+            PhotocardArtistCrossRef(photocardId = photocardEntity.photocardId, artistId = artistId)
         }
         insertArtistLinks(links)
     }

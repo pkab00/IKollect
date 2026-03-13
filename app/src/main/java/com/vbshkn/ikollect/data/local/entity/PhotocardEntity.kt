@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(foreignKeys = [
     ForeignKey(
         entity = AlbumEntity::class,
-        parentColumns = ["komcaNumber"],
+        parentColumns = ["albumId"],
         childColumns = ["albumId"],
         onUpdate = ForeignKey.CASCADE,
         onDelete = ForeignKey.SET_NULL
@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey
 ])
 data class PhotocardEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    val photocardId: Long,
     val albumId: Int,
     val displayName: String,
     val isPob: Boolean,
