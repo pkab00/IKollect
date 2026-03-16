@@ -23,6 +23,10 @@ interface AlbumDao {
     fun getAllWithArtists(): Flow<List<AlbumWithArtists>>
 
     @Transaction
+    @Query("SELECT * FROM AlbumEntity WHERE barcodeNumber = :barcode")
+    fun getWithArtistsByBarcode(barcode: String): Flow<AlbumWithArtists>?
+
+    @Transaction
     @Query("SELECT * FROM AlbumEntity")
     fun getAllWithPhotocards(): Flow<List<AlbumWithPhotocards>>
 

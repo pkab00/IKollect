@@ -1,7 +1,9 @@
 package com.vbshkn.ikollect.data.remote.dao
 
 data class FullReleaseData(
+    val barcode: String,
     val searchResult: SearchResult,
-    val detailsResponse: ReleaseDetailsResponse,
-    val artists: List<ArtistDetailsResponse>
+    val releaseDetailsResponse: ReleaseDetailsResponse,
+    val artistDetailsResponses: List<ArtistDetailsResponse>,
+    val availableCovers: List<String>
 )

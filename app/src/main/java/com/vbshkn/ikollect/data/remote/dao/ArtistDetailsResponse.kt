@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class ArtistDetailsResponse(
     @SerializedName("id")
-    val id: Int,
+    val id: Long,
     @SerializedName("name")
     val name: String,
     @SerializedName("namevariations")

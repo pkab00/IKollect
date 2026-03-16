@@ -16,7 +16,12 @@ class AlbumRemoteDataSource @Inject constructor(
         if (searchResponse !is NetworkResult.Success) {
             return searchResponse as NetworkResult.Error
         }
-        val release = searchResponse.data.results.firstOrNull()
+        // собираем даннные обо всех версиях альбома в один список
+        val allAlbumFormats = searchResponse.data.results.flatMap { it.formats ?: emptyList() }
+        val allAlbumCovers = searchResponse.data.results.flatMap { listOf(it.coverImage) }
+        val release = searchResponse.data.results
+            .firstOrNull()
+            ?.copy(formats = allAlbumFormats)
             ?: return NetworkResult.Error(message = "Release not found")
 
         // 2. Запрос деталей релиза
@@ -36,9 +41,11 @@ class AlbumRemoteDataSource @Inject constructor(
 
         return NetworkResult.Success(
             FullReleaseData(
+                barcode = barcode,
                 searchResult = release,
-                detailsResponse = details,
-                artists = artists
+                releaseDetailsResponse = details,
+                artistDetailsResponses = artists,
+                availableCovers = allAlbumCovers
             )
         )
     }

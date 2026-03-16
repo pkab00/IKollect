@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class ArtistEntity(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     val artistId: Long,
     val name: String,
     val isGroup: Boolean,

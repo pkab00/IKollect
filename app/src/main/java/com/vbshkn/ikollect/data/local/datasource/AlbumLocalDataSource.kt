@@ -19,6 +19,10 @@ class AlbumLocalDataSource @Inject constructor(
         return dao.getAllWithArtists()
     }
 
+    fun getWithArtistsByBarcode(barcode: String): Flow<AlbumWithArtists>? {
+        return dao.getWithArtistsByBarcode(barcode)
+    }
+
     fun getAllWithPhotocards(): Flow<List<AlbumWithPhotocards>> {
         return dao.getAllWithPhotocards()
     }
