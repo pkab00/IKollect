@@ -6,9 +6,8 @@ data class AlbumCandidate(
     val barcodeNumber: String,
     val name: String,
     val artists: List<Artist>,
-    val versionOptions: List<String>,
+    val versionCandidates: List<VersionCandidate>,
     val releaseDate: String,
     val isFavorite: Boolean,
-    val imageOptions: List<String>,
     val userNote: String
 )

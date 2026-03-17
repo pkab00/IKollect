@@ -6,18 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -25,9 +20,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import com.vbshkn.ikollect.R
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.vbshkn.ikollect.presentation.navigation.AppDestinations
+import com.vbshkn.ikollect.presentation.navigation.AppNavHost
 import com.vbshkn.ikollect.presentation.theme.IKollectTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,58 +45,33 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun IKollectApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.ALBUMS) }
+    val navController = rememberNavController()
+    val bachStackEntity by navController.currentBackStackEntryAsState()
+    val currentDestination = bachStackEntity?.destination
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
-            AppDestinations.entries.forEach {
+            AppDestinations.entries.forEach { destination ->
                 item(
                     icon = {
                         Icon(
-                            imageVector = ImageVector.vectorResource(it.iconRes),
-                            contentDescription = stringResource(it.labelRes)
+                            imageVector = ImageVector.vectorResource(destination.iconRes),
+                            contentDescription = stringResource(destination.labelRes)
                         )
                     },
-                    label = { Text(stringResource(it.labelRes)) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    label = { Text(stringResource(destination.labelRes)) },
+                    selected = currentDestination?.hierarchy?.any {  it.route == destination.route } == true,
+                    onClick = {
+                        navController.navigate(destination.route) {
+                            popUpTo(navController.graph.findStartDestination().id)
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 )
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                currentScreen = stringResource(currentDestination.labelRes),
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
-    }
-}
-
-enum class AppDestinations(
-    val labelRes: Int,
-    val iconRes: Int,
-) {
-    ALBUMS(R.string.navigation_albums, R.drawable.ic_albums),
-    PHOTOCARDS(R.string.navigation_photocards, R.drawable.ic_photocards),
-    ACCOUNT(R.string.navigation_account, R.drawable.ic_account)
-}
-
-@Composable
-fun Greeting(currentScreen: String, modifier: Modifier = Modifier) {
-    Surface(
-        color = MaterialTheme.colorScheme.primary,
-        modifier = modifier.fillMaxSize()
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = "Привет из $currentScreen!",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.displayMedium
-            )
-        }
+        AppNavHost(navController)
     }
 }

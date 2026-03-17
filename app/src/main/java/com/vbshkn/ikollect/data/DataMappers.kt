@@ -3,10 +3,12 @@ package com.vbshkn.ikollect.data
 import com.vbshkn.ikollect.data.local.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse
+import com.vbshkn.ikollect.data.remote.dao.FormatDao
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
 import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import com.vbshkn.ikollect.domain.model.Artist
+import com.vbshkn.ikollect.domain.model.VersionCandidate
 
 object DataMappers {
     fun ArtistDetailsResponse.toDomain(): Artist {
@@ -27,12 +29,24 @@ object DataMappers {
             barcodeNumber = this.barcode,
             name = this.releaseDetailsResponse.title,
             artists = this.artistDetailsResponses.map { it.toDomain() },
-            versionOptions = this.searchResult.formats?.map { "${it.text} (${it.name})" } ?: emptyList(),
+            versionCandidates = mapVersionCandidates(this.availableVersions),
             releaseDate = this.searchResult.year,
             isFavorite = false,
-            imageOptions = this.availableCovers,
             userNote = ""
         )
+    }
+
+    private fun mapVersionCandidates(versions: List<Pair<String?, List<FormatDao>?>>): List<VersionCandidate> {
+        return versions.flatMap { (cover, formats) ->
+            formats?.map { dao ->
+                val versionName = dao.text ?: "No data"
+                val versionType = dao.name?.let { "($it)" } ?: ""
+                VersionCandidate(
+                    name = "$versionName $versionType",
+                    coverImage = cover
+                )
+            } ?: emptyList()
+        }
     }
 
     fun AlbumCandidate.toAlbum(

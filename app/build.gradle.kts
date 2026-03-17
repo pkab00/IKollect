@@ -74,6 +74,9 @@ dependencies {
     // --- NAVIGATION ---
     implementation(libs.androidx.navigation.compose)
 
+    // --- GOOGLE ML KIT ---
+    implementation(libs.play.services.code.scanner)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

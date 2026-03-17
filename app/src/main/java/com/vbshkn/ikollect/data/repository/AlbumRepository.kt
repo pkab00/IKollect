@@ -4,8 +4,10 @@ import com.vbshkn.ikollect.data.DataMappers.toDomain
 import com.vbshkn.ikollect.data.local.datasource.AlbumLocalDataSource
 import com.vbshkn.ikollect.data.local.datasource.ArtistLocalDataSource
 import com.vbshkn.ikollect.data.remote.NetworkResult
+import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
 import com.vbshkn.ikollect.data.remote.datasource.AlbumRemoteDataSource
 import com.vbshkn.ikollect.domain.model.Album
+import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -18,21 +20,38 @@ class AlbumRepository @Inject constructor(
     private val albumLocalDS: AlbumLocalDataSource,
     private val artistLocalDS: ArtistLocalDataSource
 ) {
-    fun getAlbumCandidate(barcode: String) = flow {
+    fun getAlbumCandidate(barcode: String): Flow<NetworkResult<AlbumCandidate>> = flow {
         emit(NetworkResult.Loading)
         when(val webResponse = albumRemoteDS.getFullReleaseData(barcode)) {
-            is NetworkResult.Success -> emit(webResponse.data.toDomain())
-            else -> emit(webResponse)
-        }
-
-        fun loadAllAlbums(): Flow<NetworkResult<List<Album>>> {
-            return albumLocalDS.getAllWithArtists()
-                .map { albumWithArtists ->
-                    val domainAlbums = albumWithArtists.map { it.toDomain() }
-                    NetworkResult.Success(domainAlbums)
+            is NetworkResult.Success -> {
+                if (validateStyles(webResponse.data)) {
+                    emit(NetworkResult.Success(webResponse.data.toDomain()))
                 }
-                .onStart { emit(NetworkResult.Loading) }
-                .catch { e -> emit(NetworkResult.Error(message = e.localizedMessage)) }
+                else {
+                    emit(NetworkResult.Error(message = "Invalid style"))
+                }
+            }
+            is NetworkResult.Error -> {
+                emit(NetworkResult.Error(webResponse.code, webResponse.message))
+            }
+            is NetworkResult.Loading -> {
+                emit(NetworkResult.Loading)
+            }
         }
+    }
+
+    private fun validateStyles(data: FullReleaseData): Boolean {
+        val validStyles = listOf("k-pop", "k-rock", "j-pop")
+        return data.masterDetailsResponse.styles.any { style -> validStyles.contains(style.lowercase()) }
+    }
+
+    fun loadAllAlbums(): Flow<NetworkResult<List<Album>>> {
+        return albumLocalDS.getAllWithArtists()
+            .map { albumWithArtists ->
+                val domainAlbums = albumWithArtists.map { it.toDomain() }
+                NetworkResult.Success(domainAlbums)
+            }
+            //.onStart { emit(NetworkResult.Loading) } <== FIX THIS
+            //.catch { e -> emit(NetworkResult.Error(message = e.localizedMessage)) }
     }
 }

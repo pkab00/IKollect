@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -59,5 +60,13 @@ object RemoteModule {
         retrofit: Retrofit
     ): DiscogsApi {
         return retrofit.create(DiscogsApi::class.java)
+    }
+
+    @Provides @Singleton
+    fun provideJson(): Json = Json {
+        prettyPrint = true
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+        isLenient = true
     }
 }

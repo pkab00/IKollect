@@ -17,11 +17,16 @@ class AlbumRemoteDataSource @Inject constructor(
             return searchResponse as NetworkResult.Error
         }
         // собираем даннные обо всех версиях альбома в один список
-        val allAlbumFormats = searchResponse.data.results.flatMap { it.formats ?: emptyList() }
-        val allAlbumCovers = searchResponse.data.results.flatMap { listOf(it.coverImage) }
+        val versions = searchResponse.data.results.map { result ->
+            if (result.coverImage.startsWith("https://i.discogs.com/")) {
+                result.coverImage to result.formats
+            }
+            else {
+                null to result.formats
+            }
+        }
         val release = searchResponse.data.results
             .firstOrNull()
-            ?.copy(formats = allAlbumFormats)
             ?: return NetworkResult.Error(message = "Release not found")
 
         // 2. Запрос деталей релиза
@@ -30,6 +35,12 @@ class AlbumRemoteDataSource @Inject constructor(
             return detailsResponse as NetworkResult.Error
         }
         val details = detailsResponse.data
+
+        val masterDetailsResponse = safeApiCall { api.getMasterDetails(release.masterId) }
+        if (masterDetailsResponse !is NetworkResult.Success) {
+            return masterDetailsResponse as NetworkResult.Error
+        }
+        val masterDetails = masterDetailsResponse.data
 
         // 3. Запрос деталей об исполнителях
         val artistsResponses = details.artists.map { artistDao ->
@@ -44,8 +55,9 @@ class AlbumRemoteDataSource @Inject constructor(
                 barcode = barcode,
                 searchResult = release,
                 releaseDetailsResponse = details,
+                masterDetailsResponse = masterDetails,
                 artistDetailsResponses = artists,
-                availableCovers = allAlbumCovers
+                availableVersions = versions
             )
         )
     }

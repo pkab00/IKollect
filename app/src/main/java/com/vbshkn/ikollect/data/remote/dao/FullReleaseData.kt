@@ -4,6 +4,7 @@ data class FullReleaseData(
     val barcode: String,
     val searchResult: SearchResult,
     val releaseDetailsResponse: ReleaseDetailsResponse,
+    val masterDetailsResponse: MasterDetailsResponse,
     val artistDetailsResponses: List<ArtistDetailsResponse>,
-    val availableCovers: List<String>
+    val availableVersions: List<Pair<String?, List<FormatDao>?>>
 )
