@@ -29,6 +29,9 @@ class ScanAlbumBarcodeUseCase @Inject constructor(
             onFailure = { e ->
                 trySend(NetworkResult.Error(AppError.ScanningFailed))
                 close()
+            },
+            onCanceled = {
+                close()
             }
         )
         awaitClose()

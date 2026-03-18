@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.secrets.gradle)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -54,6 +55,7 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.kotlinx.serialization.json)
 
     // --- HILT ---
     implementation(libs.hilt.android)

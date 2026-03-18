@@ -13,7 +13,8 @@ class BarcodeScannerService(context: Context) {
 
     fun startScanning(
         onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit
+        onFailure: (Exception) -> Unit,
+        onCanceled: () -> Unit
     ) {
         scanner.startScan()
             .addOnSuccessListener { barcode ->
@@ -21,6 +22,10 @@ class BarcodeScannerService(context: Context) {
             }
             .addOnFailureListener { exception ->
                 onFailure(exception)
+            }
+
+            .addOnCanceledListener {
+                onCanceled()
             }
     }
 }

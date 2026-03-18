@@ -22,6 +22,7 @@ android_gradle_plugin = "9.1.0"
 devtools_ksp = "2.3.6"
 uiTextGoogleFonts = "1.10.4"
 secretsGradle = "2.0.1"
+kotlinSerialization = "2.3.20"
 
 [libraries]
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
@@ -62,3 +63,4 @@ kotlin_compose_compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.
 devtools_ksp = { id = "com.google.devtools.ksp", version.ref = "devtools_ksp" }
 dagger_hilt_android =  { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 secrets_gradle = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradle" }
+kotlin_serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref="kotlinSerialization" }

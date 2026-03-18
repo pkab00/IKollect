@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,10 +39,20 @@ import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 
 @Composable
 fun AlbumsScreen(
-    viewModel: AlbumsViewModel
+    viewModel: AlbumsViewModel,
+    toAddAlbumRoute: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent: (AlbumsContract.Event) -> Unit = viewModel::onEvent
+
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when(effect) {
+                is AlbumsContract.Effect.NavigateToAlbum -> {}
+                is AlbumsContract.Effect.NavigateToSaveFlow -> toAddAlbumRoute()
+            }
+        }
+    }
 
     DialogHost(
         dialogState = uiState.dialogState,

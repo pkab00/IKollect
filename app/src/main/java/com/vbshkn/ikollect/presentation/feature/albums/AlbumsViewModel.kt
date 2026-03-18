@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,17 +44,18 @@ class AlbumsViewModel @Inject constructor(
                 sendEffect(NavigateToAlbum(event.id))
             }
             is AlbumsContract.Event.OnStartScanningClicked -> viewModelScope.launch {
-                scanAlbumBarcodeUseCase().collect { result ->
+                scanAlbumBarcodeUseCase()
+                    .onCompletion {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                    .collect { result ->
                     when(result) {
                         is NetworkResult.Loading -> {
                             _uiState.update { it.copy(isLoading = true) }
                         }
                         is NetworkResult.Success -> {
                             _uiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    scannedCandidate = result.data
-                                )
+                                it.copy(scannedCandidate = result.data)
                             }
                             showDialog(
                                 ScanningResultDialog(
@@ -61,7 +63,6 @@ class AlbumsViewModel @Inject constructor(
                             )
                         }
                         is NetworkResult.Error -> {
-                            _uiState.update { it.copy(isLoading = false) }
                             showDialog(
                                 ScanningErrorDialog(
                                     handleErrors(result.error)
