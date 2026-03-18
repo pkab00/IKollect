@@ -5,10 +5,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.vbshkn.ikollect.presentation.screen.AccountScreen
-import com.vbshkn.ikollect.presentation.screen.AlbumsScreen
-import com.vbshkn.ikollect.presentation.screen.PhotocardsScreen
-import com.vbshkn.ikollect.presentation.viewmodel.AlbumsViewModel
+import androidx.navigation.navigation
+import com.vbshkn.ikollect.presentation.feature.account.AccountScreen
+import com.vbshkn.ikollect.presentation.feature.albums.AlbumsScreen
+import com.vbshkn.ikollect.presentation.feature.photocards.PhotocardsScreen
+import com.vbshkn.ikollect.presentation.feature.albums.AlbumsViewModel
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -25,6 +26,21 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable(AppDestinations.ACCOUNT.route) {
             AccountScreen()
+        }
+
+        navigation(
+            startDestination = AddAlbumFlow.DETAILS,
+            route = AddAlbumFlow.ROOT
+        ) {
+            composable(AddAlbumFlow.DETAILS) {
+
+            }
+            composable(AddAlbumFlow.SELECT_VERSION) {
+
+            }
+            composable(AddAlbumFlow.ADD_NOTES) {
+
+            }
         }
     }
 }

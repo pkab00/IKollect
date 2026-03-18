@@ -14,7 +14,8 @@ object DataMappers {
     fun ArtistDetailsResponse.toDomain(): Artist {
         return Artist(
             artistId = this.id,
-            name = this.nameVariations.first(),
+            name = if (this.nameVariations.isNullOrEmpty()) this.name
+                   else this.nameVariations.first(),
             isGroup = this.members.isNotEmpty(),
             members = null,
             isFavorite = false,

@@ -4,4 +4,17 @@
     <string name="navigation_albums">Альбомы</string>
     <string name="navigation_photocards">Фотокарты</string>
     <string name="navigation_account">Аккаунт</string>
+    <string name="dialog_ok">ОК</string>
+    <string name="dialog_dismiss">Отмена</string>
+    <string name="error_title_scanning">Ошибка при сканировании</string>
+    <string name="error_body_connection_failed">Проверьте подключение к сети и попробуйте снова.</string>
+    <string name="error_body_invalid_album_style">Кажется, этот штрих-код не относится к k-pop или j-pop альбому.</string>
+    <string name="error_body_release_not_found">Альбом не найден. Поднесите камеру ближе и попробуйте снова.</string>
+    <string name="error_body_scanning_failed">Не удалось отсканировать штрих-код. Попробуйте снова.</string>
+    <string name="error_body_unknown">Неизвестная ошибка. Попробуйте снова.</string>
+    <string name="dialog_title_album_detected">Обнаружен альбом</string>
+    <string name="dialog_action_next">Далее</string>
+    <string name="error_loading_albums">Не удалось ззагрузить ваши альбомы.</string>
+    <string name="message_no_albums_found">Нет отсканированных альбомов. Нажмите на иконку сканнера на верхней панели, чтобы добавить ваш первый альбом!</string>
+    <string name="screen_title_albums">Альбомы</string>
 </resources>

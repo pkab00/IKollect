@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.screen
+package com.vbshkn.ikollect.presentation.feature.account
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

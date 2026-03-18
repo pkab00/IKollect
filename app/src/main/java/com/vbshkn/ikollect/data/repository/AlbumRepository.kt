@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.data.repository
 
+import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.DataMappers.toDomain
 import com.vbshkn.ikollect.data.local.datasource.AlbumLocalDataSource
 import com.vbshkn.ikollect.data.local.datasource.ArtistLocalDataSource
@@ -9,6 +10,8 @@ import com.vbshkn.ikollect.data.remote.datasource.AlbumRemoteDataSource
 import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -20,6 +23,9 @@ class AlbumRepository @Inject constructor(
     private val albumLocalDS: AlbumLocalDataSource,
     private val artistLocalDS: ArtistLocalDataSource
 ) {
+    private var _activeCandidate = MutableStateFlow<AlbumCandidate?>(null)
+    val activeCandidate = _activeCandidate.asStateFlow()
+
     fun getAlbumCandidate(barcode: String): Flow<NetworkResult<AlbumCandidate>> = flow {
         emit(NetworkResult.Loading)
         when(val webResponse = albumRemoteDS.getFullReleaseData(barcode)) {
@@ -28,16 +34,24 @@ class AlbumRepository @Inject constructor(
                     emit(NetworkResult.Success(webResponse.data.toDomain()))
                 }
                 else {
-                    emit(NetworkResult.Error(message = "Invalid style"))
+                    emit(NetworkResult.Error(AppError.InvalidAlbumStyle))
                 }
             }
             is NetworkResult.Error -> {
-                emit(NetworkResult.Error(webResponse.code, webResponse.message))
+                emit(NetworkResult.Error(webResponse.error))
             }
             is NetworkResult.Loading -> {
                 emit(NetworkResult.Loading)
             }
         }
+    }
+
+    fun setCandidate(candidate: AlbumCandidate) {
+        _activeCandidate.value = candidate
+    }
+
+    fun clearCandidate() {
+        _activeCandidate.value = null
     }
 
     private fun validateStyles(data: FullReleaseData): Boolean {
@@ -49,9 +63,9 @@ class AlbumRepository @Inject constructor(
         return albumLocalDS.getAllWithArtists()
             .map { albumWithArtists ->
                 val domainAlbums = albumWithArtists.map { it.toDomain() }
-                NetworkResult.Success(domainAlbums)
+                NetworkResult.Success(domainAlbums) as NetworkResult<List<Album>>
             }
-            //.onStart { emit(NetworkResult.Loading) } <== FIX THIS
-            //.catch { e -> emit(NetworkResult.Error(message = e.localizedMessage)) }
+            .onStart { emit(NetworkResult.Loading) }
+            .catch { emit(NetworkResult.Error(AppError.LocalDataLoadingError(it.localizedMessage ?: ""))) }
     }
 }

@@ -3,4 +3,17 @@
     <string name="navigation_albums">Albums</string>
     <string name="navigation_photocards">Photocards</string>
     <string name="navigation_account">Account</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_dismiss">Dismiss</string>
+    <string name="error_title_scanning">Scanning failed</string>
+    <string name="error_body_connection_failed">Please check your network connection and try again.</string>
+    <string name="error_body_invalid_album_style">The barcode you are trying to scan doesn\'t seem to belong to a k-pop or j-pop album.</string>
+    <string name="error_body_release_not_found">Album not found. Move the camera closer to the barcode and try again.</string>
+    <string name="error_body_scanning_failed">Failed scanning the given barcode. Please try again.</string>
+    <string name="error_body_unknown">Unknown error. Please try again.</string>
+    <string name="dialog_title_album_detected">Album detected</string>
+    <string name="dialog_action_next">Next</string>
+    <string name="error_loading_albums">Failed to load your albums.</string>
+    <string name="message_no_albums_found">No scanned albums found. Tap the scanner icon on the top bar to scan your first album!</string>
+    <string name="screen_title_albums">Albums</string>
 </resources>

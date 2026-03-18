@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.domain.usecase
 
+import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.service.BarcodeScannerService
@@ -20,14 +21,13 @@ class ScanAlbumBarcodeUseCase @Inject constructor(
             onSuccess = { code ->
                 launch {
                     albumRepository.getAlbumCandidate(code).collect { result ->
-                        // тут в будущем будет проверка на то, является ли альбом к-поп или нет
                         trySend(result)
                         if (result !is NetworkResult.Loading) close()
                     }
                 }
             },
             onFailure = { e ->
-                trySend(NetworkResult.Error(message = "SCANNING ERROR: ${e.localizedMessage}"))
+                trySend(NetworkResult.Error(AppError.ScanningFailed))
                 close()
             }
         )

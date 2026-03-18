@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.data.remote.datasource
 
+import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.api.DiscogsApi
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse
@@ -27,7 +28,7 @@ class AlbumRemoteDataSource @Inject constructor(
         }
         val release = searchResponse.data.results
             .firstOrNull()
-            ?: return NetworkResult.Error(message = "Release not found")
+            ?: return NetworkResult.Error(AppError.ReleaseNotFound)
 
         // 2. Запрос деталей релиза
         val detailsResponse = safeApiCall { api.getReleaseDetails(release.id) }
