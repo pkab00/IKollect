@@ -9,9 +9,9 @@ sealed interface Route {
     @Serializable data object Account : Route
     @Serializable data object AddAlbumRoute : Route
     @Serializable sealed class AddAlbumFlow : Route {
-        @Serializable data object SeeDetails : AddAlbumFlow()
+        @Serializable data object SeeInfo : AddAlbumFlow()
         @Serializable data object SelectVersion : AddAlbumFlow()
-        @Serializable data object AddNotes : AddAlbumFlow()
+        @Serializable data object AddDetails : AddAlbumFlow()
     }
 
     companion object {

@@ -16,4 +16,13 @@
     <string name="error_loading_albums">Failed to load your albums.</string>
     <string name="message_no_albums_found">No scanned albums found. Tap the scanner icon on the top bar to scan your first album!</string>
     <string name="screen_title_albums">Albums</string>
+    <string name="wizard_action_back">Back</string>
+    <string name="wizard_action_next">Next</string>
+    <string name="wizard_action_finish">Finish</string>
+    <string name="wizard_title_info">Album info</string>
+    <string name="wizard_title_version">Select version</string>
+    <string name="wizard_title_details">Add details</string>
+    <string name="dialog_action_yes">Yes</string>
+    <string name="dialog_title_exit">Are you sure?</string>
+    <string name="dialog_body_unsaved_data">The current album data will be lost. You will need to scan the barcode again to save it.</string>
 </resources>

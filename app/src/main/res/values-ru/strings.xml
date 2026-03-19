@@ -17,4 +17,13 @@
     <string name="error_loading_albums">Не удалось ззагрузить ваши альбомы.</string>
     <string name="message_no_albums_found">Нет отсканированных альбомов. Нажмите на иконку сканнера на верхней панели, чтобы добавить ваш первый альбом!</string>
     <string name="screen_title_albums">Альбомы</string>
+    <string name="wizard_action_back">Назад</string>
+    <string name="wizard_action_next">Далее</string>
+    <string name="wizard_action_finish">Завершить</string>
+    <string name="wizard_title_info">Об альбоме</string>
+    <string name="wizard_title_version">Выберите версию</string>
+    <string name="wizard_title_details">Добавьте детали</string>
+    <string name="dialog_action_yes">Да</string>
+    <string name="dialog_title_exit">Выйти?</string>
+    <string name="dialog_body_unsaved_data">Данные альбома будут потеряны. Чтобы сохранить их, вам понадобится отсканировать штрих-код заново.</string>
 </resources>
