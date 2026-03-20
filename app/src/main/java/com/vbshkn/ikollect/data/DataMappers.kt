@@ -40,7 +40,7 @@ object DataMappers {
     private fun mapVersionCandidates(versions: List<Pair<String?, List<FormatDao>?>>): List<VersionCandidate> {
         return versions.flatMap { (cover, formats) ->
             formats?.map { dao ->
-                val versionName = dao.text ?: "No data"
+                val versionName = dao.text ?: "Main"
                 val versionType = dao.name?.let { "($it)" } ?: ""
                 VersionCandidate(
                     name = "$versionName $versionType",

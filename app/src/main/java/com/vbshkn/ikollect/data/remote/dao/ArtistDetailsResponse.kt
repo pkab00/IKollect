@@ -8,11 +8,11 @@ data class ArtistDetailsResponse(
     @SerializedName("name")
     val name: String,
     @SerializedName("namevariations")
-    val nameVariations: List<String>,
+    val nameVariations: List<String>?,
     @SerializedName("images")
     val images: List<ImageDao>,
     @SerializedName("members")
-    val members: List<ArtistDao>
+    val members: List<ArtistDao>?
 )
 
 data class ImageDao(

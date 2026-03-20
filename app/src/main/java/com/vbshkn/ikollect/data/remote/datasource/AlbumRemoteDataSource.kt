@@ -39,12 +39,6 @@ class AlbumRemoteDataSource @Inject constructor(
         }
         val details = detailsResponse.data
 
-        val masterDetailsResponse = safeApiCall { api.getMasterDetails(release.masterId) }
-        if (masterDetailsResponse !is NetworkResult.Success) {
-            return masterDetailsResponse as NetworkResult.Error
-        }
-        val masterDetails = masterDetailsResponse.data
-
         // 3. Запрос деталей об исполнителях
         val artistsResponses = details.artists.map { artistDao ->
             safeApiCall { api.getArtistDetails(artistDao.id) }
@@ -58,7 +52,6 @@ class AlbumRemoteDataSource @Inject constructor(
                 barcode = barcode,
                 searchResult = release,
                 releaseDetailsResponse = details,
-                masterDetailsResponse = masterDetails,
                 artistDetailsResponses = artists,
                 availableVersions = versions
             )

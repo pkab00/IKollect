@@ -23,9 +23,6 @@ class AlbumRepository @Inject constructor(
     private val albumLocalDS: AlbumLocalDataSource,
     private val artistLocalDS: ArtistLocalDataSource
 ) {
-    private var _activeCandidate = MutableStateFlow<AlbumCandidate?>(null)
-    val activeCandidate = _activeCandidate.asStateFlow()
-
     fun getAlbumCandidate(barcode: String): Flow<NetworkResult<AlbumCandidate>> = flow {
         emit(NetworkResult.Loading)
         when(val webResponse = albumRemoteDS.getFullReleaseData(barcode)) {
@@ -46,17 +43,9 @@ class AlbumRepository @Inject constructor(
         }
     }
 
-    fun setCandidate(candidate: AlbumCandidate) {
-        _activeCandidate.value = candidate
-    }
-
-    fun clearCandidate() {
-        _activeCandidate.value = null
-    }
-
     private fun validateStyles(data: FullReleaseData): Boolean {
         val validStyles = listOf("k-pop", "k-rock", "j-pop")
-        return data.masterDetailsResponse.styles.any { style -> validStyles.contains(style.lowercase()) }
+        return data.releaseDetailsResponse.styles.any { style -> validStyles.contains(style.lowercase()) }
     }
 
     fun loadAllAlbums(): Flow<NetworkResult<List<Album>>> {

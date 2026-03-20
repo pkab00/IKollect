@@ -6,7 +6,9 @@ data class ReleaseDetailsResponse(
     @SerializedName("title")
     val title: String,
     @SerializedName("artists")
-    val artists: List<ArtistDao>
+    val artists: List<ArtistDao>,
+    @SerializedName("styles")
+    val styles: List<String>
 )
 
 data class ArtistDao(

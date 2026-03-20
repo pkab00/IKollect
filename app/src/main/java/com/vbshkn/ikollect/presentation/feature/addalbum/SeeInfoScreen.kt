@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.addalbum
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,11 @@ fun SeeInfoScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val candidate = uiState.albumCandidate
+
+    BackHandler(enabled = true) {
+        viewModel.showDialog(AddAlbumDialogState.ConfirmExitDialog)
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +62,7 @@ fun SeeInfoScreen(
             ) }
             item { DataItem(
                 label = UiText.StringResource(R.string.see_info_discogs_id),
-                data = masterId.toString()
+                data = albumId.toString()
             ) }
         }
     }

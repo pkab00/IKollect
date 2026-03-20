@@ -19,7 +19,9 @@ data class SearchResult(
     @SerializedName("cover_image")
     val coverImage: String,
     @SerializedName("formats")
-    val formats: List<FormatDao>?
+    val formats: List<FormatDao>?,
+    @SerializedName("style")
+    val styles: List<String>?
 )
 
 data class FormatDao(

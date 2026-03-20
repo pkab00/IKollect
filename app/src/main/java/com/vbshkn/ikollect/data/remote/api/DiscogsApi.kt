@@ -1,7 +1,6 @@
 package com.vbshkn.ikollect.data.remote.api
 
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse
-import com.vbshkn.ikollect.data.remote.dao.MasterDetailsResponse
 import com.vbshkn.ikollect.data.remote.dao.ReleaseDetailsResponse
 import com.vbshkn.ikollect.data.remote.dao.SearchResponse
 import retrofit2.Response
@@ -19,11 +18,6 @@ interface DiscogsApi {
     suspend fun getReleaseDetails(
         @Path("release_id") releaseId: Int
     ): Response<ReleaseDetailsResponse>
-
-    @GET("masters/{master_id}")
-    suspend fun getMasterDetails(
-        @Path("master_id") masterId: Int
-    ): Response<MasterDetailsResponse>
 
     @GET("artists/{artist_id}")
     suspend fun getArtistDetails(
