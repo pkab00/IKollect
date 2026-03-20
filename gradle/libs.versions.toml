@@ -1,5 +1,6 @@
 [versions]
 agp = "9.0.1"
+coilCompose = "3.4.0"
 converterKotlinxSerialization = "3.0.0"
 coreKtx = "1.17.0"
 hiltAndroid = "2.59.2"
@@ -33,6 +34,8 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterKotlinxSerialization" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }

@@ -92,7 +92,9 @@ fun WizardWrapper(
                 }
             }
         },
-        content = content
+        content = { paddingValues ->
+            content(paddingValues)
+        }
     )
 }
 

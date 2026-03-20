@@ -22,10 +22,12 @@ class AlbumRemoteDataSource @Inject constructor(
             if (result.coverImage.startsWith("https://i.discogs.com/")) {
                 result.coverImage to result.formats
             }
-            else {
-                null to result.formats
-            }
+            else { null to result.formats }
         }
+            // избавляемся от дублей
+            .sortedByDescending { it.first != null }
+            .distinctBy { it.second }
+
         val release = searchResponse.data.results
             .firstOrNull()
             ?: return NetworkResult.Error(AppError.ReleaseNotFound)

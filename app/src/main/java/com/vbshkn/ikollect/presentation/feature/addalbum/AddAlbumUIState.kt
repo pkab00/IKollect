@@ -6,7 +6,7 @@ import com.vbshkn.ikollect.presentation.navigation.Route
 
 data class AddAlbumUIState(
     val currentRoute: Route.AddAlbumFlow = Route.AddAlbumFlow.SeeInfo,
-    val albumCandidate: AlbumCandidate? = null,
+    val albumCandidate: AlbumCandidate,
     val versionCandidate: VersionCandidate? = null,
     val dialogState: AddAlbumDialogState = AddAlbumDialogState.None
 )

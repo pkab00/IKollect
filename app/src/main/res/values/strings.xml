@@ -25,4 +25,9 @@
     <string name="dialog_action_yes">Yes</string>
     <string name="dialog_title_exit">Are you sure?</string>
     <string name="dialog_body_unsaved_data">The current album data will be lost. You will need to scan the barcode again to save it.</string>
+    <string name="see_info_name">Name:</string>
+    <string name="see_info_artist">Atrist:</string>
+    <string name="see_info_release_year">Release year:</string>
+    <string name="see_info_barcode">Barcode:</string>
+    <string name="see_info_discogs_id" translatable="false">Discogs ID:</string>
 </resources>

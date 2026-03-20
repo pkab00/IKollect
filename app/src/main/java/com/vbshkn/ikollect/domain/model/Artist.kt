@@ -1,5 +1,8 @@
 package com.vbshkn.ikollect.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Artist(
     val artistId: Long,
     val name: String,

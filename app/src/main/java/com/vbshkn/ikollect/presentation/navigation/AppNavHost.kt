@@ -1,7 +1,9 @@
 package com.vbshkn.ikollect.presentation.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -9,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import com.vbshkn.ikollect.presentation.feature.account.AccountScreen
 import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
 import com.vbshkn.ikollect.presentation.feature.addalbum.AddDetailsScreen
@@ -18,6 +21,7 @@ import com.vbshkn.ikollect.presentation.feature.addalbum.WizardWrapper
 import com.vbshkn.ikollect.presentation.feature.albums.AlbumsScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.PhotocardsScreen
 import com.vbshkn.ikollect.presentation.feature.albums.AlbumsViewModel
+import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -29,7 +33,7 @@ fun AppNavHost(navController: NavHostController) {
             val viewModel = hiltViewModel<AlbumsViewModel>()
             AlbumsScreen(
                 viewModel = viewModel,
-                toAddAlbumRoute = { navController.navigate(Route.AddAlbumRoute) }
+                toAddAlbumRoute = { navController.navigate(Route.AddAlbumRoute(it)) }
             )
         }
         composable<Route.Photocards> {
@@ -40,7 +44,8 @@ fun AppNavHost(navController: NavHostController) {
         }
 
         navigation<Route.AddAlbumRoute>(
-            startDestination = Route.AddAlbumFlow.SeeInfo
+            startDestination = Route.AddAlbumFlow.SeeInfo,
+            typeMap = mapOf(typeOf<AlbumCandidate>() to AlbumCandidateType)
         ) {
             val onExit: () -> Unit = { navController.popBackStack<Route.AddAlbumRoute>(inclusive = true) }
             composable<Route.AddAlbumFlow.SeeInfo> { backStackEntity ->
@@ -56,8 +61,8 @@ fun AppNavHost(navController: NavHostController) {
                     currentRoute = Route.AddAlbumFlow.SeeInfo,
                     viewModel = viewModel,
                     onExit = onExit,
-                ) {
-                    SeeInfoScreen(viewModel)
+                ) { paddingValues ->
+                    SeeInfoScreen(viewModel, paddingValues)
                 }
             }
             composable<Route.AddAlbumFlow.SelectVersion> { backStackEntity ->
@@ -73,8 +78,8 @@ fun AppNavHost(navController: NavHostController) {
                     currentRoute = Route.AddAlbumFlow.SelectVersion,
                     viewModel = viewModel,
                     onExit = onExit
-                ) {
-                    SelectVersionScreen(viewModel)
+                ) { paddingValues ->
+                    SelectVersionScreen(viewModel, paddingValues)
                 }
             }
             composable<Route.AddAlbumFlow.AddDetails> { backStackEntity ->

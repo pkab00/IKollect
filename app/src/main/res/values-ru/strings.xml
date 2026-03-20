@@ -26,4 +26,8 @@
     <string name="dialog_action_yes">Да</string>
     <string name="dialog_title_exit">Выйти?</string>
     <string name="dialog_body_unsaved_data">Данные альбома будут потеряны. Чтобы сохранить их, вам понадобится отсканировать штрих-код заново.</string>
+    <string name="see_info_name">Название:</string>
+    <string name="see_info_artist">Исполнитель:</string>
+    <string name="see_info_release_year">Год выхода:</string>
+    <string name="see_info_barcode">Штрих-код:</string>
 </resources>

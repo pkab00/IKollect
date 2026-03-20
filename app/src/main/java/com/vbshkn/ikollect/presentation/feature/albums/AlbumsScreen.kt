@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.domain.model.Album
+import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
@@ -40,7 +41,7 @@ import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 @Composable
 fun AlbumsScreen(
     viewModel: AlbumsViewModel,
-    toAddAlbumRoute: () -> Unit
+    toAddAlbumRoute: (AlbumCandidate) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent: (AlbumsContract.Event) -> Unit = viewModel::onEvent
@@ -49,7 +50,7 @@ fun AlbumsScreen(
         viewModel.effects.collect { effect ->
             when(effect) {
                 is AlbumsContract.Effect.NavigateToAlbum -> {}
-                is AlbumsContract.Effect.NavigateToSaveFlow -> toAddAlbumRoute()
+                is AlbumsContract.Effect.NavigateToSaveFlow -> toAddAlbumRoute(effect.candidate)
             }
         }
     }

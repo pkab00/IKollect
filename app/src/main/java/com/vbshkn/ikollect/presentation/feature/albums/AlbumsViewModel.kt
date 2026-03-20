@@ -7,7 +7,6 @@ import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.usecase.LoadAllAlbumsUseCase
 import com.vbshkn.ikollect.domain.usecase.ScanAlbumBarcodeUseCase
-import com.vbshkn.ikollect.domain.usecase.UpdateActiveCandidateUseCase
 import com.vbshkn.ikollect.presentation.feature.albums.AlbumsContract.Effect.*
 import com.vbshkn.ikollect.presentation.feature.albums.AlbumsDialogState.*
 import com.vbshkn.ikollect.util.UiText
@@ -25,7 +24,6 @@ import javax.inject.Inject
 class AlbumsViewModel @Inject constructor(
     private val loadAllAlbumsUseCase: LoadAllAlbumsUseCase,
     private val scanAlbumBarcodeUseCase: ScanAlbumBarcodeUseCase,
-    private val updateActiveCandidateUseCase: UpdateActiveCandidateUseCase
 ): ViewModel() {
     private val _uiState = MutableStateFlow(AlbumsUIState())
     val uiState = _uiState.asStateFlow()
@@ -75,9 +73,8 @@ class AlbumsViewModel @Inject constructor(
             AlbumsContract.Event.OnAlbumSavingConfirmed -> {
                 val candidate = uiState.value.scannedCandidate
                 if (candidate != null) {
-                    updateActiveCandidateUseCase(candidate)
                     dismissDialog()
-                    sendEffect(NavigateToSaveFlow)
+                    sendEffect(NavigateToSaveFlow(candidate))
                 }
             }
             AlbumsContract.Event.OnDismissDialogClicked -> {

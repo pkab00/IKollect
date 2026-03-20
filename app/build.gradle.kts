@@ -69,6 +69,10 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.converter.gson)
 
+    // --- COIL ---
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     // --- ROOM ---
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

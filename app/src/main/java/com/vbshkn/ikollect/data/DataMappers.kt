@@ -16,7 +16,7 @@ object DataMappers {
             artistId = this.id,
             name = if (this.nameVariations.isNullOrEmpty()) this.name
                    else this.nameVariations.first(),
-            isGroup = this.members.isNotEmpty(),
+            isGroup = !this.members.isNullOrEmpty(),
             members = null,
             isFavorite = false,
             profileImage = null

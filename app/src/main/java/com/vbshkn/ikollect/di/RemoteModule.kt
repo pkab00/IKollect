@@ -1,10 +1,18 @@
 package com.vbshkn.ikollect.di
 
+import android.content.Context
+import coil3.ImageLoader
+import coil3.disk.DiskCache
+import coil3.disk.DiskCache.*
+import coil3.disk.directory
+import coil3.memory.MemoryCache
+import coil3.request.crossfade
 import com.vbshkn.ikollect.BuildConfig
 import com.vbshkn.ikollect.data.remote.api.DiscogsApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
@@ -68,5 +76,25 @@ object RemoteModule {
         ignoreUnknownKeys = true
         coerceInputValues = true
         isLenient = true
+    }
+
+    @Provides @Singleton
+    fun provideImageLoader(
+        @ApplicationContext context: Context
+    ): ImageLoader {
+        return ImageLoader.Builder(context)
+            .memoryCache {
+                MemoryCache.Builder()
+                    .maxSizePercent(context, 0.25)
+                    .build()
+            }
+            .diskCache {
+                Builder()
+                    .directory(context.cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(100L * 1024 * 1024)
+                    .build()
+            }
+            .crossfade(true)
+            .build()
     }
 }
