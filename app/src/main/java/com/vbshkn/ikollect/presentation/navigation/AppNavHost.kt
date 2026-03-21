@@ -96,8 +96,8 @@ fun AppNavHost(navController: NavHostController) {
                     viewModel = viewModel,
                     onExit = onExit,
                     isLastScreen = true
-                ) {
-                    AddDetailsScreen(viewModel)
+                ) { paddingValues ->
+                    AddDetailsScreen(viewModel, paddingValues)
                 }
             }
         }

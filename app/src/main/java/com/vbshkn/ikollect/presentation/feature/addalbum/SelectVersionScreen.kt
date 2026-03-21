@@ -52,7 +52,7 @@ fun SelectVersionScreen(
             VersionPreview(
                 version = version,
                 selectedVersion = selectedVersion,
-                onClick = { viewModel.updateVersionCandidate(version) }
+                onEvent = viewModel::onEvent
             )
         }
     }
@@ -62,10 +62,10 @@ fun SelectVersionScreen(
 private fun VersionPreview(
     version: VersionCandidate,
     selectedVersion: VersionCandidate?,
-    onClick: () -> Unit
+    onEvent: (AddAlbumContract.Event) -> Unit
 ) {
     OutlinedCard(
-        onClick = onClick,
+        onClick = { onEvent(AddAlbumContract.Event.OnUpdateVersion(version)) },
         border = CardDefaults.outlinedCardBorder(enabled = version == selectedVersion),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if (version == selectedVersion)

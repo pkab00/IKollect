@@ -1,6 +1,10 @@
 package com.vbshkn.ikollect.presentation.feature.addalbum
 
-import androidx.activity.compose.BackHandler
+import android.Manifest
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,17 +25,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
+import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.navigation.Route
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun WizardWrapper(
     title: String,
@@ -44,18 +55,65 @@ fun WizardWrapper(
     content: @Composable ((PaddingValues) -> Unit)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val onEvent: (AddAlbumContract.Event) -> Unit = viewModel::onEvent
 
+    val context = LocalContext.current
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                context.contentResolver.takePersistableUriPermission(
+                    uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                viewModel.onEvent(AddAlbumContract.Event.OnUpdateCover(uri.toString()))
+            }
+        }
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when(effect) {
+                AddAlbumContract.Effect.Exit -> onExit()
+                AddAlbumContract.Effect.NavigateBack -> onBack()
+                AddAlbumContract.Effect.NavigateNext -> onNext()
+                AddAlbumContract.Effect.OpenGallery -> {
+                    galleryLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }
+                AddAlbumContract.Effect.TryOpenCamera -> {
+                    val status = cameraPermissionState.status
+                    when {
+                        status.isGranted -> {
+                            // OPEN CAMERA
+                        }
+                        status.shouldShowRationale -> {
+                            onEvent(AddAlbumContract.Event.OnShowCameraRationale)
+                        }
+                        else -> {
+                            cameraPermissionState.launchPermissionRequest()
+                        }
+                    }
+
+                }
+            }
+        }
+    }
     DialogHost(
         dialogState = uiState.dialogState,
-        onExitConfirmed = onExit,
-        onDismiss = { viewModel.dismissDialog() }
+        onEvent = viewModel::onEvent,
+        onRequestPermission = { cameraPermissionState.launchPermissionRequest() },
     )
     Scaffold(
         topBar = {
             LargeTopAppBar(
                 title = { Text(title) },
                 navigationIcon = {
-                    IconButton(onClick = { viewModel.showDialog(AddAlbumDialogState.ConfirmExitDialog) }) {
+                    IconButton(
+                        onClick = { onEvent(AddAlbumContract.Event.OnExitClicked) }
+                    ) {
                         Icon(Icons.Default.Close, contentDescription = null)
                     }
                 },
@@ -102,19 +160,29 @@ fun WizardWrapper(
 @Composable
 private fun DialogHost(
     dialogState: AddAlbumDialogState,
-    onExitConfirmed: () -> Unit,
-    onDismiss: () -> Unit
+    onEvent: (AddAlbumContract.Event) -> Unit,
+    onRequestPermission: () -> Unit
 ) {
     when(dialogState) {
-        AddAlbumDialogState.ConfirmExitDialog -> {
+        is AddAlbumDialogState.ConfirmExitDialog -> {
             ConfirmDialog(
-                onConfirm = onExitConfirmed,
-                onDismiss = onDismiss,
+                onConfirm = { onEvent(AddAlbumContract.Event.OnExitConfirmed) },
+                onDismiss = { onEvent(AddAlbumContract.Event.OnDismissDialog) },
                 title = stringResource(R.string.dialog_title_exit),
                 text = stringResource(R.string.dialog_body_unsaved_data),
                 action = stringResource(R.string.dialog_action_yes)
             )
         }
-        AddAlbumDialogState.None -> {}
+        is AddAlbumDialogState.CameraRationaleDialog -> {
+            InfoDialog(
+                title = stringResource(R.string.dialog_title_request_camera),
+                text = stringResource(R.string.dialog_body_request_camera),
+                onDismiss = {
+                    onEvent(AddAlbumContract.Event.OnDismissDialog)
+                    onRequestPermission()
+                }
+            )
+        }
+        is AddAlbumDialogState.None -> {}
     }
 }

@@ -30,4 +30,11 @@
     <string name="see_info_release_year">Release year:</string>
     <string name="see_info_barcode">Barcode:</string>
     <string name="see_info_discogs_id" translatable="false">Discogs ID:</string>
+    <string name="add_details_title_image">Image</string>
+    <string name="add_details_caption_has_cover">You can use a standard image or select your own picture.</string>
+    <string name="add_details_caption_no_cover">This album has no standard cover. Pleace select your own picture.</string>
+    <string name="add_details_select_picture">Select</string>
+    <string name="add_details_take_picture">Camera</string>
+    <string name="dialog_title_request_camera">Camera access</string>
+    <string name="dialog_body_request_camera">The application needs camera access to scan your albums. Please provide the requested permission.</string>
 </resources>

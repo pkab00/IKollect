@@ -33,7 +33,7 @@ fun SeeInfoScreen(
     val candidate = uiState.albumCandidate
 
     BackHandler(enabled = true) {
-        viewModel.showDialog(AddAlbumDialogState.ConfirmExitDialog)
+        viewModel.onEvent(AddAlbumContract.Event.OnExitClicked)
     }
 
     LazyColumn(

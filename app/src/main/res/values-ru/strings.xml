@@ -30,4 +30,11 @@
     <string name="see_info_artist">Исполнитель:</string>
     <string name="see_info_release_year">Год выхода:</string>
     <string name="see_info_barcode">Штрих-код:</string>
+    <string name="add_details_title_image">Изображение</string>
+    <string name="add_details_caption_has_cover">Вы можете использовать стандартное изображение или выбрать собственную фотографию.</string>
+    <string name="add_details_caption_no_cover">У этого альбома нет стандартной обложки. Пожалуйста, выберите собственную фотографию.</string>
+    <string name="add_details_select_picture">Выбрать</string>
+    <string name="add_details_take_picture">Камера</string>
+    <string name="dialog_title_request_camera">Доступ к камере</string>
+    <string name="dialog_body_request_camera">Для сканирования альбомов приложению необходим доступ к камере. Пожалуйста, предоставьте запрашиваемые разрешения.</string>
 </resources>
