@@ -1,18 +1,21 @@
 package com.vbshkn.ikollect.presentation.navigation
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.presentation.feature.camera.CameraScreen
 import com.vbshkn.ikollect.presentation.feature.account.AccountScreen
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
 import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
 import com.vbshkn.ikollect.presentation.feature.addalbum.AddDetailsScreen
 import com.vbshkn.ikollect.presentation.feature.addalbum.SeeInfoScreen
@@ -88,18 +91,39 @@ fun AppNavHost(navController: NavHostController) {
                 }
                 val viewModel = hiltViewModel<AddAlbumViewModel>(parentEntity)
 
+                val cameraResult by parentEntity.savedStateHandle
+                    .getStateFlow<String?>("camera_result", null)
+                    .collectAsStateWithLifecycle()
+
+                LaunchedEffect(cameraResult) {
+                    viewModel.onEvent(AddAlbumContract.Event.OnPictureCaptured(cameraResult))
+                    backStackEntity.savedStateHandle["camera_result"] = null
+                }
+
                 WizardWrapper(
                     title = stringResource(R.string.wizard_title_details),
                     onBack = { navController.popBackStack() },
-                    onNext = { /* Сохраняем данные в базу и покидаем роут */ },
+                    onNext = onExit,
+                    onExit = onExit,
+                    onCamera = { navController.navigate(Route.CameraScreen) },
                     currentRoute = Route.AddAlbumFlow.AddDetails,
                     viewModel = viewModel,
-                    onExit = onExit,
                     isLastScreen = true
                 ) { paddingValues ->
                     AddDetailsScreen(viewModel, paddingValues)
                 }
             }
+        }
+
+        composable<Route.CameraScreen> {
+            CameraScreen(
+                onPhotoTaken = { image ->
+                    navController.getBackStackEntry<Route.AddAlbumRoute>()
+                        .savedStateHandle
+                        .set("camera_result", image)
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

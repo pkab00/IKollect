@@ -37,4 +37,6 @@
     <string name="add_details_take_picture">Камера</string>
     <string name="dialog_title_request_camera">Доступ к камере</string>
     <string name="dialog_body_request_camera">Для сканирования альбомов приложению необходим доступ к камере. Пожалуйста, предоставьте запрашиваемые разрешения.</string>
+    <string name="dialog_title_failed_saving_photo">Ошибка сохранения</string>
+    <string name="dialog_body_failed_saving_photo">Не удалось сохранить изображение.</string>
 </resources>

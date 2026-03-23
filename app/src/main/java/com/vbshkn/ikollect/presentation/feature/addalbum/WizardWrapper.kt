@@ -27,6 +27,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -39,6 +42,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
+import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.navigation.Route
 
@@ -51,6 +55,7 @@ fun WizardWrapper(
     onBack: () -> Unit,
     onNext: () -> Unit,
     onExit: () -> Unit,
+    onCamera: () -> Unit = {},
     isLastScreen: Boolean = false,
     content: @Composable ((PaddingValues) -> Unit)
 ) {
@@ -59,6 +64,7 @@ fun WizardWrapper(
 
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    var cameraPending by rememberSaveable { mutableStateOf(false) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -67,10 +73,17 @@ fun WizardWrapper(
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                viewModel.onEvent(AddAlbumContract.Event.OnUpdateCover(uri.toString()))
+                viewModel.onEvent(AddAlbumContract.Event.OnExistingPhotoSelected(uri.toString()))
             }
         }
     )
+
+    LaunchedEffect(cameraPermissionState.status) {
+        if (cameraPermissionState.status.isGranted && cameraPending) {
+            cameraPending = false
+            onCamera()
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
@@ -87,16 +100,17 @@ fun WizardWrapper(
                     val status = cameraPermissionState.status
                     when {
                         status.isGranted -> {
-                            // OPEN CAMERA
+                            onCamera()
                         }
                         status.shouldShowRationale -> {
+                            cameraPending = true
                             onEvent(AddAlbumContract.Event.OnShowCameraRationale)
                         }
                         else -> {
+                            cameraPending = true
                             cameraPermissionState.launchPermissionRequest()
                         }
                     }
-
                 }
             }
         }
@@ -181,6 +195,13 @@ private fun DialogHost(
                     onEvent(AddAlbumContract.Event.OnDismissDialog)
                     onRequestPermission()
                 }
+            )
+        }
+        AddAlbumDialogState.CameraErrorDialog -> {
+            ErrorDialog(
+                title = stringResource(R.string.dialog_title_failed_saving_photo),
+                errorMessage = stringResource(R.string.dialog_body_failed_saving_photo),
+                onDismiss = { onEvent(AddAlbumContract.Event.OnDismissDialog) }
             )
         }
         is AddAlbumDialogState.None -> {}

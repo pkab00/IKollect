@@ -1,5 +1,7 @@
 package com.vbshkn.ikollect.presentation.feature.addalbum
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,11 +18,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.reflect.typeOf
+import androidx.core.net.toUri
+import java.io.File
 
 @HiltViewModel
 class AddAlbumViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
-): ViewModel() {
+) : ViewModel() {
     private val args = savedStateHandle.toRoute<Route.AddAlbumRoute>(
         typeMap = mapOf(typeOf<AlbumCandidate>() to AlbumCandidateType)
     )
@@ -28,6 +32,7 @@ class AddAlbumViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
     private val _effects = Channel<AddAlbumContract.Effect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
+
 
     fun onEvent(event: AddAlbumContract.Event) {
         when (event) {
@@ -55,31 +60,43 @@ class AddAlbumViewModel @Inject constructor(
             is AddAlbumContract.Event.OnShowCameraRationale -> {
                 showDialog(AddAlbumDialogState.CameraRationaleDialog)
             }
+            is AddAlbumContract.Event.OnPictureCaptured -> {
+                if (event.uri != null) {
+                    _uiState.update {
+                        it.copy(
+                            versionCandidate = it.versionCandidate?.copy(coverImage = event.uri),
+                            isCoverCached = true
+                        )
+                    }
+                }
+            }
             is AddAlbumContract.Event.OnUpdateVersion -> {
                 _uiState.update {
                     it.copy(versionCandidate = event.candidate)
                 }
             }
-            is AddAlbumContract.Event.OnUpdateCover -> {
+            is AddAlbumContract.Event.OnExistingPhotoSelected -> {
                 _uiState.value.versionCandidate?.let { candidate ->
                     _uiState.update {
-                        it.copy(versionCandidate = candidate.copy(coverImage = event.path))
+                        it.copy(
+                            versionCandidate = candidate.copy(coverImage = event.path),
+                            isCoverCached = false
+                        )
                     }
                 }
             }
         }
     }
 
-
     fun canNavigateBack(currentRoute: Route.AddAlbumFlow): Boolean {
-        return when(currentRoute) {
+        return when (currentRoute) {
             Route.AddAlbumFlow.SeeInfo -> false
             else -> true
         }
     }
 
     fun canNavigateNext(currentRoute: Route.AddAlbumFlow): Boolean {
-        return when(currentRoute) {
+        return when (currentRoute) {
             Route.AddAlbumFlow.SeeInfo -> true
             Route.AddAlbumFlow.SelectVersion -> _uiState.value.versionCandidate != null
             Route.AddAlbumFlow.AddDetails -> _uiState.value.versionCandidate?.coverImage != null
@@ -102,5 +119,24 @@ class AddAlbumViewModel @Inject constructor(
         viewModelScope.launch {
             _effects.send(effect)
         }
+    }
+
+    private fun saveImagePermanently(
+        context: Context,
+        cacheUriString: String
+    ): String {
+        val cacheUri = cacheUriString.toUri()
+        val cacheFile = File(cacheUri.path!!)
+
+        val permanentName = "cover_${System.currentTimeMillis()}.jpg"
+        val permanentFile = File(context.filesDir, permanentName)
+
+        cacheFile.inputStream().use { input ->
+            permanentFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        cacheFile.delete()
+        return Uri.fromFile(permanentFile).toString()
     }
 }

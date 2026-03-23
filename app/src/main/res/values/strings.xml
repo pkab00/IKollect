@@ -37,4 +37,6 @@
     <string name="add_details_take_picture">Camera</string>
     <string name="dialog_title_request_camera">Camera access</string>
     <string name="dialog_body_request_camera">The application needs camera access to scan your albums. Please provide the requested permission.</string>
+    <string name="dialog_title_failed_saving_photo">Saving failed</string>
+    <string name="dialog_body_failed_saving_photo">Failed saving the image.</string>
 </resources>

@@ -19,7 +19,8 @@ interface AddAlbumContract {
         object OnSelectPicture : Event
         object OnTakePicture : Event
         object OnShowCameraRationale : Event
+        data class OnPictureCaptured(val uri: String?) : Event
         data class OnUpdateVersion(val candidate: VersionCandidate) : Event
-        data class OnUpdateCover(val path: String) : Event
+        data class OnExistingPhotoSelected(val path: String) : Event
     }
 }

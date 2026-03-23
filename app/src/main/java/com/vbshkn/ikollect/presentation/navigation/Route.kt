@@ -5,22 +5,24 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Route {
-    @Serializable data object Albums : Route
-    @Serializable data object Photocards : Route
-    @Serializable data object Account : Route
-    @Serializable data class AddAlbumRoute(val candidate: AlbumCandidate) : Route
-    @Serializable sealed class AddAlbumFlow : Route {
-        @Serializable data object SeeInfo : AddAlbumFlow()
-        @Serializable data object SelectVersion : AddAlbumFlow()
-        @Serializable data object AddDetails : AddAlbumFlow()
-    }
+    @Serializable
+    data object Albums : Route
+    @Serializable
+    data object Photocards : Route
+    @Serializable
+    data object Account : Route
+    @Serializable
+    data class AddAlbumRoute(val candidate: AlbumCandidate) : Route
 
-    companion object {
-        fun shouldHideNavigationBar(currentDestination: Route?): Boolean {
-            return when(currentDestination) {
-                is AddAlbumRoute -> true
-                else -> false
-            }
-        }
+    @Serializable
+    data object CameraScreen : Route
+    @Serializable
+    sealed class AddAlbumFlow : Route {
+        @Serializable
+        data object SeeInfo : AddAlbumFlow()
+        @Serializable
+        data object SelectVersion : AddAlbumFlow()
+        @Serializable
+        data object AddDetails : AddAlbumFlow()
     }
 }
