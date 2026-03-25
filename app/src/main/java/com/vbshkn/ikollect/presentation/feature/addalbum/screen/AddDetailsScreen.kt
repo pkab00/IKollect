@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +52,7 @@ fun AddDetailsScreen(
     paddingValues: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val showVersionNameField = remember { uiState.versionCandidate?.name?.isBlank() == true }
 
     LazyColumn(
         modifier = Modifier
@@ -59,6 +61,19 @@ fun AddDetailsScreen(
             .padding(paddingValues)
             .padding(top = 16.dp)
     ) {
+        if (showVersionNameField) {
+            item {
+                WizardItemWrapper(stringResource(R.string.wizard_title_version_name)) {
+                    VersionNameField(
+                        value = uiState.versionCandidate!!.name,
+                        onValueChange = {
+                            viewModel.onEvent(AddAlbumContract.Event.OnVersionNameChanged(it))
+                        }
+                    )
+                }
+            }
+        }
+
         item {
             WizardItemWrapper(stringResource(R.string.add_details_title_image)) {
                 SelectImageItem(
@@ -67,6 +82,7 @@ fun AddDetailsScreen(
                 )
             }
         }
+
         item {
             WizardItemWrapper(
                 title = stringResource(R.string.add_details_title_komca),
@@ -84,6 +100,28 @@ fun AddDetailsScreen(
             }
         }
     }
+}
+
+@Composable
+fun VersionNameField(
+    value: String,
+    onValueChange: (String) -> Unit,
+) {
+    val limit = 100
+    val isError = value.isNotEmpty() && value.length >= limit
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = { if (it.length <= limit) onValueChange(it) },
+        placeholder = { Text("Digipack Ver. (CD)") },
+        supportingText = { Text(stringResource(R.string.supporting_text_version)) },
+        isError = isError,
+        singleLine = true,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(PaddingValues())
+    )
 }
 
 @Composable
@@ -119,7 +157,8 @@ fun KomcaNumberField(
             if (isError) {
                 Text(
                     text = stringResource(R.string.komca_textfield_number_too_short),
-                    color = MaterialTheme.colorScheme.error)
+                    color = MaterialTheme.colorScheme.error
+                )
             } else {
                 Text(stringResource(R.string.komca_textfield_supporting_text))
             }

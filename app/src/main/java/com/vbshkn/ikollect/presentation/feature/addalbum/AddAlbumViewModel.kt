@@ -87,6 +87,13 @@ class AddAlbumViewModel @Inject constructor(
                     }
                 }
             }
+            is AddAlbumContract.Event.OnVersionNameChanged -> {
+                _uiState.value.versionCandidate?.let { candidate ->
+                    _uiState.update {
+                        it.copy(versionCandidate = candidate.copy(name = event.newName))
+                    }
+                }
+            }
             is AddAlbumContract.Event.OnKomcaCodeChanged -> {
                 _uiState.update {
                     it.copy(komcaNumber = event.newCode)
@@ -116,7 +123,10 @@ class AddAlbumViewModel @Inject constructor(
         return when (currentRoute) {
             Route.AddAlbumFlow.SeeInfo -> true
             Route.AddAlbumFlow.SelectVersion -> _uiState.value.versionCandidate != null
-            Route.AddAlbumFlow.AddDetails -> _uiState.value.versionCandidate?.coverImage != null
+            Route.AddAlbumFlow.AddDetails -> {
+                val candidate = _uiState.value.versionCandidate
+                candidate?.coverImage != null && candidate.name.isNotBlank()
+            }
             Route.AddAlbumFlow.WrapUp -> true
         }
     }

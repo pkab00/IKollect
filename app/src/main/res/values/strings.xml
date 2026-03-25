@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IKollect</string>
+    <string name="app_name" translatable="false">IKollect</string>
     <string name="navigation_albums">Albums</string>
     <string name="navigation_photocards">Photocards</string>
     <string name="navigation_account">Account</string>
@@ -49,4 +49,7 @@
     <string name="wizard_title_wrapup">Wrapping up</string>
     <string name="wizard_title_notes">Notes</string>
     <string name="placeholder_notes">Add your notes about the album (optional)</string>
+    <string name="wizard_cant_find_version">Can\'t find my version...</string>
+    <string name="wizard_title_version_name">Version</string>
+    <string name="supporting_text_version">Enter your version name.</string>
 </resources>

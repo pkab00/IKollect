@@ -24,10 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.VersionCandidate
 import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
 import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
@@ -40,6 +42,7 @@ fun SelectVersionScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val versions = uiState.albumCandidate.versionCandidates
     val selectedVersion = uiState.versionCandidate
+    val blankVersionCandidate = VersionCandidate("", null)
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -50,7 +53,7 @@ fun SelectVersionScreen(
             .padding(paddingValues)
             .padding(vertical = 16.dp, horizontal = 8.dp)
     ) {
-        items(versions) { version ->
+        items(versions + blankVersionCandidate) { version ->
             VersionPreview(
                 version = version,
                 selectedVersion = selectedVersion,
@@ -81,7 +84,7 @@ private fun VersionPreview(
         ) {
             VersionImage(version.coverImage)
             Text(
-                text = version.name,
+                text = version.name.ifBlank { stringResource(R.string.wizard_cant_find_version) },
                 textAlign = TextAlign.Center,
                 maxLines = 3,
                 modifier = Modifier

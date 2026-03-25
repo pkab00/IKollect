@@ -25,6 +25,7 @@ interface AddAlbumContract {
         data class OnPictureCaptured(val uri: String) : Event
         data class OnUpdateVersion(val candidate: VersionCandidate) : Event
         data class OnExistingPhotoSelected(val path: String) : Event
+        data class OnVersionNameChanged(val newName: String) : Event
         data class OnKomcaCodeChanged(val newCode: String) : Event
         data class OnUserNotesChanged(val newValue: String) : Event
         object OnWrapUp : Event

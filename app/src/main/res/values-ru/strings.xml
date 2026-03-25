@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">IKollect</string>
     <string name="navigation_albums">Альбомы</string>
     <string name="navigation_photocards">Фотокарты</string>
     <string name="navigation_account">Аккаунт</string>
@@ -39,7 +38,7 @@
     <string name="dialog_body_request_camera">Для сканирования альбомов приложению необходим доступ к камере. Пожалуйста, предоставьте запрашиваемые разрешения.</string>
     <string name="dialog_title_failed_saving_photo">Ошибка сохранения</string>
     <string name="dialog_body_failed_saving_photo">Не удалось сохранить изображение.</string>
-    <string name="komca_scanner_tip">Наведите камеру на стикере KOMCA</string>
+    <string name="komca_scanner_tip">Наведите камеру на стикер KOMCA</string>
     <string name="komca_scanner_confirm">Подтвердить номер?</string>
     <string name="add_details_title_komca">Номер KOMCA</string>
     <string name="komca_textfield_supporting_text">8-12 цифр с наклейки</string>
@@ -49,4 +48,7 @@
     <string name="wizard_title_wrapup">Почти готово</string>
     <string name="wizard_title_notes">Заметки</string>
     <string name="placeholder_notes">Добавьте заметки об альбоме (необязательно)</string>
+    <string name="wizard_cant_find_version">Не вижу свою версию...</string>
+    <string name="wizard_title_version_name">Версия</string>
+    <string name="supporting_text_version">Введите название версии.</string>
 </resources>
