@@ -17,13 +17,15 @@ import com.vbshkn.ikollect.presentation.feature.camera.CameraScreen
 import com.vbshkn.ikollect.presentation.feature.account.AccountScreen
 import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
 import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddDetailsScreen
-import com.vbshkn.ikollect.presentation.feature.addalbum.SeeInfoScreen
-import com.vbshkn.ikollect.presentation.feature.addalbum.SelectVersionScreen
-import com.vbshkn.ikollect.presentation.feature.addalbum.WizardWrapper
+import com.vbshkn.ikollect.presentation.feature.addalbum.screen.AddDetailsScreen
+import com.vbshkn.ikollect.presentation.feature.addalbum.screen.SeeInfoScreen
+import com.vbshkn.ikollect.presentation.feature.addalbum.screen.SelectVersionScreen
+import com.vbshkn.ikollect.presentation.feature.addalbum.screen.WizardWrapper
+import com.vbshkn.ikollect.presentation.feature.addalbum.screen.WrapUpScreen
 import com.vbshkn.ikollect.presentation.feature.albums.AlbumsScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.PhotocardsScreen
 import com.vbshkn.ikollect.presentation.feature.albums.AlbumsViewModel
+import com.vbshkn.ikollect.presentation.feature.camera.KomcaScannerScreen
 import kotlin.reflect.typeOf
 
 @Composable
@@ -94,23 +96,53 @@ fun AppNavHost(navController: NavHostController) {
                 val cameraResult by parentEntity.savedStateHandle
                     .getStateFlow<String?>("camera_result", null)
                     .collectAsStateWithLifecycle()
+                val scannerResult by parentEntity.savedStateHandle
+                    .getStateFlow<String?>("scanner_result", null)
+                    .collectAsStateWithLifecycle()
 
-                LaunchedEffect(cameraResult) {
-                    viewModel.onEvent(AddAlbumContract.Event.OnPictureCaptured(cameraResult))
-                    backStackEntity.savedStateHandle["camera_result"] = null
+                LaunchedEffect(cameraResult, scannerResult) {
+                    if (cameraResult != null) {
+                        viewModel.onEvent(AddAlbumContract.Event.OnPictureCaptured(cameraResult!!))
+                        backStackEntity.savedStateHandle["camera_result"] = null
+                    }
+                    if (scannerResult != null) {
+                        viewModel.onEvent(AddAlbumContract.Event.OnKomcaCodeChanged(scannerResult!!))
+                        backStackEntity.savedStateHandle["scanner_result"] = null
+                    }
                 }
 
                 WizardWrapper(
                     title = stringResource(R.string.wizard_title_details),
                     onBack = { navController.popBackStack() },
-                    onNext = onExit,
+                    onNext = { navController.navigate(Route.AddAlbumFlow.WrapUp) },
                     onExit = onExit,
                     onCamera = { navController.navigate(Route.CameraScreen) },
+                    onScanner = { navController.navigate(Route.KomcaScanner) },
                     currentRoute = Route.AddAlbumFlow.AddDetails,
                     viewModel = viewModel,
-                    isLastScreen = true
                 ) { paddingValues ->
                     AddDetailsScreen(viewModel, paddingValues)
+                }
+            }
+            composable<Route.AddAlbumFlow.WrapUp> { backStackEntity ->
+                val parentEntity = remember(backStackEntity) {
+                    navController.getBackStackEntry<Route.AddAlbumRoute>()
+                }
+                val viewModel = hiltViewModel<AddAlbumViewModel>(parentEntity)
+
+                WizardWrapper(
+                    title = stringResource(R.string.wizard_title_wrapup),
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onNext = {
+                        viewModel.onEvent(AddAlbumContract.Event.OnWrapUp)
+                        onExit()
+                    },
+                    onExit = onExit,
+                    isLastScreen = true,
+                    currentRoute = Route.AddAlbumFlow.WrapUp
+                ) { paddingValues ->
+                    WrapUpScreen(viewModel, paddingValues)
                 }
             }
         }
@@ -119,8 +151,16 @@ fun AppNavHost(navController: NavHostController) {
             CameraScreen(
                 onPhotoTaken = { image ->
                     navController.getBackStackEntry<Route.AddAlbumRoute>()
-                        .savedStateHandle
-                        .set("camera_result", image)
+                        .savedStateHandle["camera_result"] = image
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<Route.KomcaScanner> {
+            KomcaScannerScreen(
+                onNumberRecognized = { number ->
+                    navController.getBackStackEntry<Route.AddAlbumRoute>()
+                        .savedStateHandle["scanner_result"] = number
                     navController.popBackStack()
                 }
             )

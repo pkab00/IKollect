@@ -9,9 +9,9 @@ data class SearchResponse(
 
 data class SearchResult(
     @SerializedName("id")
-    val id: Int,
+    val id: Long,
     @SerializedName("master_id")
-    val masterId: Int,
+    val masterId: Long,
     @SerializedName("title")
     val title: String, // Artist - Release
     @SerializedName("year")

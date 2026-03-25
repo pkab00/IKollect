@@ -39,7 +39,7 @@ interface AlbumDao {
     fun getAllByArtist(artistId: Long): Flow<ArtistWithAlbums?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAlbum(albumEntity: AlbumEntity)
+    suspend fun insertAlbum(albumEntity: AlbumEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertArtistLinks(links: List<AlbumArtistCrossRef>)
@@ -49,9 +49,9 @@ interface AlbumDao {
         albumEntity: AlbumEntity,
         artistIds: List<Long>
     ) {
-        insertAlbum(albumEntity)
+        val generatedId = insertAlbum(albumEntity)
         val links = artistIds.map { artistId ->
-            AlbumArtistCrossRef(albumId = albumEntity.albumId, artistId = artistId)
+            AlbumArtistCrossRef(albumId = generatedId, artistId = artistId)
         }
         insertArtistLinks(links)
     }

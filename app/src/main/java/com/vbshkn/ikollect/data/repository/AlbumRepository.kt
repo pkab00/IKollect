@@ -4,6 +4,7 @@ import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.DataMappers.toDomain
 import com.vbshkn.ikollect.data.local.datasource.AlbumLocalDataSource
 import com.vbshkn.ikollect.data.local.datasource.ArtistLocalDataSource
+import com.vbshkn.ikollect.data.local.entity.AlbumEntity
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
 import com.vbshkn.ikollect.data.remote.datasource.AlbumRemoteDataSource
@@ -20,8 +21,7 @@ import javax.inject.Inject
 
 class AlbumRepository @Inject constructor(
     private val albumRemoteDS: AlbumRemoteDataSource,
-    private val albumLocalDS: AlbumLocalDataSource,
-    private val artistLocalDS: ArtistLocalDataSource
+    private val albumLocalDS: AlbumLocalDataSource
 ) {
     fun getAlbumCandidate(barcode: String): Flow<NetworkResult<AlbumCandidate>> = flow {
         emit(NetworkResult.Loading)
@@ -56,5 +56,12 @@ class AlbumRepository @Inject constructor(
             }
             .onStart { emit(NetworkResult.Loading) }
             .catch { emit(NetworkResult.Error(AppError.LocalDataLoadingError(it.localizedMessage ?: ""))) }
+    }
+
+    suspend fun insertToDatabase(
+        album: AlbumEntity,
+        artistIds: List<Long>
+    ) {
+        albumLocalDS.insertAlbumWithArtists(album, artistIds)
     }
 }

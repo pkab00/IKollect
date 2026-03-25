@@ -17,6 +17,9 @@ sealed interface Route {
     @Serializable
     data object CameraScreen : Route
     @Serializable
+    data object KomcaScanner : Route
+
+    @Serializable
     sealed class AddAlbumFlow : Route {
         @Serializable
         data object SeeInfo : AddAlbumFlow()
@@ -24,5 +27,7 @@ sealed interface Route {
         data object SelectVersion : AddAlbumFlow()
         @Serializable
         data object AddDetails : AddAlbumFlow()
+        @Serializable
+        data object WrapUp : AddAlbumFlow()
     }
 }

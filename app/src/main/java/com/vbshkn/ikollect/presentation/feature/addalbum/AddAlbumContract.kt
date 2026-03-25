@@ -9,6 +9,7 @@ interface AddAlbumContract {
         object Exit : Effect
         object OpenGallery : Effect
         object TryOpenCamera : Effect
+        object TryOpenScanner : Effect
     }
     sealed interface Event {
         object OnBackClicked : Event
@@ -18,9 +19,14 @@ interface AddAlbumContract {
         object OnDismissDialog : Event
         object OnSelectPicture : Event
         object OnTakePicture : Event
+        object OnScanKomca : Event
         object OnShowCameraRationale : Event
-        data class OnPictureCaptured(val uri: String?) : Event
+        object OnShowKomcaHint : Event
+        data class OnPictureCaptured(val uri: String) : Event
         data class OnUpdateVersion(val candidate: VersionCandidate) : Event
         data class OnExistingPhotoSelected(val path: String) : Event
+        data class OnKomcaCodeChanged(val newCode: String) : Event
+        data class OnUserNotesChanged(val newValue: String) : Event
+        object OnWrapUp : Event
     }
 }

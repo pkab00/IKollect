@@ -1,9 +1,8 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum
+package com.vbshkn.ikollect.presentation.feature.addalbum.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
@@ -62,7 +63,7 @@ fun SeeInfoScreen(
             ) }
             item { DataItem(
                 label = UiText.StringResource(R.string.see_info_discogs_id),
-                data = albumId.toString()
+                data = discogsAlbumId.toString()
             ) }
         }
     }

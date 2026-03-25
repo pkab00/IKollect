@@ -9,6 +9,7 @@ import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import com.vbshkn.ikollect.domain.model.Artist
 import com.vbshkn.ikollect.domain.model.VersionCandidate
+import com.vbshkn.ikollect.util.TimeUtil.toDateString
 
 object DataMappers {
     fun ArtistDetailsResponse.toDomain(): Artist {
@@ -25,7 +26,7 @@ object DataMappers {
 
     fun FullReleaseData.toDomain(): AlbumCandidate {
         return AlbumCandidate(
-            albumId = this.searchResult.id,
+            discogsAlbumId = this.searchResult.id,
             masterId = this.searchResult.masterId,
             barcodeNumber = this.barcode,
             name = this.releaseDetailsResponse.title,
@@ -50,24 +51,6 @@ object DataMappers {
         }
     }
 
-    fun AlbumCandidate.toAlbum(
-        selectedVersion: String,
-        selectedCover: String
-    ): Album {
-        return Album(
-            albumId = this.albumId,
-            masterId = this.masterId,
-            barcodeNumber = this.barcodeNumber,
-            name = this.name,
-            artists = this.artists,
-            version = selectedVersion,
-            releaseDate = this.releaseDate,
-            isFavorite = this.isFavorite,
-            coverImage = selectedCover,
-            userNote = this.userNote
-        )
-    }
-
     fun AlbumWithArtists.toDomain(): Album {
         return Album(
             albumId = this.album.albumId,
@@ -79,7 +62,8 @@ object DataMappers {
             releaseDate = this.album.releaseDate ?: "No data",
             isFavorite = this.album.isFavorite,
             coverImage = this.album.imageUrl,
-            userNote = this.album.userNote ?: ""
+            userNote = this.album.userNote ?: "",
+            savingDate = this.album.timestamp.toDateString()
         )
     }
 
@@ -91,6 +75,18 @@ object DataMappers {
             members = null,
             isFavorite = this.isFavorite,
             profileImage = this.imageUrl
+        )
+
+    }
+
+    fun Artist.toEntity(): ArtistEntity {
+        return ArtistEntity(
+            artistId = this.artistId,
+            name = this.name,
+            isGroup = this.isGroup,
+            parentGroupId = null,
+            isFavorite = this.isFavorite,
+            imageUrl = this.profileImage
         )
     }
 }

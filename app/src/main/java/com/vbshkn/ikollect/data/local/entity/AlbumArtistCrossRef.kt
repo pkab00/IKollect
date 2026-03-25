@@ -4,6 +4,6 @@ import androidx.room.Entity
 
 @Entity(primaryKeys = ["albumId", "artistId"])
 data class AlbumArtistCrossRef(
-    val albumId: Int,
+    val albumId: Long,
     val artistId: Long
 )

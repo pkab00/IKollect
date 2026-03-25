@@ -42,10 +42,16 @@ android {
         buildConfig = true
     }
 }
+kotlin {
+    compilerOptions {
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
+}
 
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -85,6 +91,7 @@ dependencies {
 
     // --- GOOGLE ML KIT ---
     implementation(libs.play.services.code.scanner)
+    implementation(libs.play.services.mlkit.text.recognition)
 
     // --- CAMERAX ---
     implementation(libs.androidx.camera.core)

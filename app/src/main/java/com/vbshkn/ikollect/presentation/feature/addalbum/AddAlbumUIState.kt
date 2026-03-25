@@ -8,6 +8,7 @@ data class AddAlbumUIState(
     val currentRoute: Route.AddAlbumFlow = Route.AddAlbumFlow.SeeInfo,
     val albumCandidate: AlbumCandidate,
     val versionCandidate: VersionCandidate? = null,
+    val komcaNumber: String? = null,
     val dialogState: AddAlbumDialogState = AddAlbumDialogState.None,
     val isCoverCached: Boolean = false
 )

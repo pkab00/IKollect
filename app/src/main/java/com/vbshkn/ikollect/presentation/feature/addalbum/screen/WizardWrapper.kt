@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum
+package com.vbshkn.ikollect.presentation.feature.addalbum.screen
 
 import android.Manifest
 import android.content.Intent
@@ -44,6 +44,9 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumDialogState
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
 import com.vbshkn.ikollect.presentation.navigation.Route
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -56,6 +59,7 @@ fun WizardWrapper(
     onNext: () -> Unit,
     onExit: () -> Unit,
     onCamera: () -> Unit = {},
+    onScanner: () -> Unit = {},
     isLastScreen: Boolean = false,
     content: @Composable ((PaddingValues) -> Unit)
 ) {
@@ -64,7 +68,8 @@ fun WizardWrapper(
 
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
-    var cameraPending by rememberSaveable { mutableStateOf(false) }
+    var pending by rememberSaveable { mutableStateOf(PENDING.NONE) }
+
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -79,9 +84,18 @@ fun WizardWrapper(
     )
 
     LaunchedEffect(cameraPermissionState.status) {
-        if (cameraPermissionState.status.isGranted && cameraPending) {
-            cameraPending = false
-            onCamera()
+        if (cameraPermissionState.status.isGranted) {
+            when(pending) {
+                PENDING.CAMERA -> {
+                    pending = PENDING.NONE
+                    onCamera()
+                }
+                PENDING.SCANNER  -> {
+                    pending = PENDING.NONE
+                    onScanner()
+                }
+                else -> {}
+            }
         }
     }
 
@@ -103,11 +117,27 @@ fun WizardWrapper(
                             onCamera()
                         }
                         status.shouldShowRationale -> {
-                            cameraPending = true
+                            pending = PENDING.CAMERA
                             onEvent(AddAlbumContract.Event.OnShowCameraRationale)
                         }
                         else -> {
-                            cameraPending = true
+                            pending = PENDING.CAMERA
+                            cameraPermissionState.launchPermissionRequest()
+                        }
+                    }
+                }
+                AddAlbumContract.Effect.TryOpenScanner -> {
+                    val status = cameraPermissionState.status
+                    when {
+                        status.isGranted -> {
+                            onScanner()
+                        }
+                        status.shouldShowRationale -> {
+                            pending = PENDING.SCANNER
+                            onEvent(AddAlbumContract.Event.OnShowCameraRationale)
+                        }
+                        else -> {
+                            pending = PENDING.SCANNER
                             cameraPermissionState.launchPermissionRequest()
                         }
                     }
@@ -197,13 +227,24 @@ private fun DialogHost(
                 }
             )
         }
-        AddAlbumDialogState.CameraErrorDialog -> {
+        is AddAlbumDialogState.CameraErrorDialog -> {
             ErrorDialog(
                 title = stringResource(R.string.dialog_title_failed_saving_photo),
                 errorMessage = stringResource(R.string.dialog_body_failed_saving_photo),
                 onDismiss = { onEvent(AddAlbumContract.Event.OnDismissDialog) }
             )
         }
+        is AddAlbumDialogState.AboutKomcaDialog -> {
+            InfoDialog(
+                title = stringResource(R.string.dialog_about_komca_title),
+                text = stringResource(R.string.dialog_about_komca_body),
+                onDismiss = { onEvent(AddAlbumContract.Event.OnDismissDialog) }
+            )
+        }
         is AddAlbumDialogState.None -> {}
     }
+}
+
+private enum class PENDING {
+    CAMERA, SCANNER, NONE
 }

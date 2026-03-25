@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AlbumCandidate(
-    val albumId: Int,
-    val masterId: Int,
+    val discogsAlbumId: Long,
+    val masterId: Long,
     val barcodeNumber: String,
     val name: String,
     val artists: List<Artist>,

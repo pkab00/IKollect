@@ -1,6 +1,5 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum
+package com.vbshkn.ikollect.presentation.feature.addalbum.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,16 +24,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -44,8 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.presentation.composable.WizardItemWrapper
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -63,7 +60,7 @@ fun AddDetailsScreen(
             .padding(top = 16.dp)
     ) {
         item {
-            ItemWrapper(stringResource(R.string.add_details_title_image)) {
+            WizardItemWrapper(stringResource(R.string.add_details_title_image)) {
                 SelectImageItem(
                     imageUrl = uiState.versionCandidate!!.coverImage,
                     onEvent = viewModel::onEvent
@@ -71,12 +68,18 @@ fun AddDetailsScreen(
             }
         }
         item {
-            ItemWrapper("Номер KOMCA", true) {
-                val text = remember { mutableStateOf("") }
+            WizardItemWrapper(
+                title = stringResource(R.string.add_details_title_komca),
+                showHint = true,
+                onHint = { viewModel.onEvent(AddAlbumContract.Event.OnShowKomcaHint) }
+            ) {
+                val text = uiState.komcaNumber
                 KomcaNumberField(
-                    value = text.value,
-                    onValueChange = { text.value = it },
-                    onScanClick = {}
+                    value = text ?: "",
+                    onValueChange = {
+                        viewModel.onEvent(AddAlbumContract.Event.OnKomcaCodeChanged(it))
+                    },
+                    onEvent = viewModel::onEvent
                 )
             }
         }
@@ -87,7 +90,7 @@ fun AddDetailsScreen(
 fun KomcaNumberField(
     value: String,
     onValueChange: (String) -> Unit,
-    onScanClick: () -> Unit
+    onEvent: (AddAlbumContract.Event) -> Unit
 ) {
     val isError = value.isNotEmpty() && value.length < 8
 
@@ -105,7 +108,7 @@ fun KomcaNumberField(
         placeholder = { Text("12345678") },
         prefix = { Text("№ ") },
         trailingIcon = {
-            IconButton(onClick = onScanClick) {
+            IconButton(onClick = { onEvent(AddAlbumContract.Event.OnScanKomca) }) {
                 Icon(
                     painter = painterResource(R.drawable.ic_scanner),
                     contentDescription = null
@@ -114,9 +117,11 @@ fun KomcaNumberField(
         },
         supportingText = {
             if (isError) {
-                Text("Слишком короткий номер", color = MaterialTheme.colorScheme.error)
+                Text(
+                    text = stringResource(R.string.komca_textfield_number_too_short),
+                    color = MaterialTheme.colorScheme.error)
             } else {
-                Text("8–12 цифр с голографической наклейки")
+                Text(stringResource(R.string.komca_textfield_supporting_text))
             }
         },
         isError = isError,
@@ -127,43 +132,6 @@ fun KomcaNumberField(
         singleLine = true,
         shape = RoundedCornerShape(12.dp)
     )
-}
-
-@Composable
-private fun ItemWrapper(
-    title: String,
-    showHint: Boolean = false,
-    onHint: () -> Unit = {},
-    content: @Composable () -> Unit
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f)
-            )
-            Box(modifier = Modifier.size(24.dp)) {
-                if (showHint) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_info),
-                        contentDescription = null,
-                        modifier = Modifier.clickable { onHint() }
-                    )
-                }
-            }
-        }
-        content()
-    }
 }
 
 @Composable

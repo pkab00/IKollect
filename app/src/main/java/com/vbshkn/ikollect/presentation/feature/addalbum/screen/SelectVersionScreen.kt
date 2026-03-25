@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum
+package com.vbshkn.ikollect.presentation.feature.addalbum.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.domain.model.VersionCandidate
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
+import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
 
 @Composable
 fun SelectVersionScreen(

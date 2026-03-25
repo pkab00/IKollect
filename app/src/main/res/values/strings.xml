@@ -39,4 +39,14 @@
     <string name="dialog_body_request_camera">The application needs camera access to scan your albums. Please provide the requested permission.</string>
     <string name="dialog_title_failed_saving_photo">Saving failed</string>
     <string name="dialog_body_failed_saving_photo">Failed saving the image.</string>
+    <string name="komca_scanner_tip">Focus the camera on the KOMCA sticker</string>
+    <string name="komca_scanner_confirm">Confirm the number?</string>
+    <string name="add_details_title_komca">KOMCA Number</string>
+    <string name="komca_textfield_supporting_text">8-12 dights from the sticker</string>
+    <string name="dialog_about_komca_title">About KOMCA</string>
+    <string name="dialog_about_komca_body">Every copy of the music album produced in Korea has a KOMCA sticker on it. This yellow or white sticker contains your unique copy number. It\'s usually located on the back of the packaging. If your album doesn\'t have a KOMCA sticker, leave this field blank.</string>
+    <string name="komca_textfield_number_too_short">The number is too short.</string>
+    <string name="wizard_title_wrapup">Wrapping up</string>
+    <string name="wizard_title_notes">Notes</string>
+    <string name="placeholder_notes">Add your notes about the album (optional)</string>
 </resources>

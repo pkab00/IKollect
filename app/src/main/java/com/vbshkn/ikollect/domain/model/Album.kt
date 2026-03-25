@@ -1,8 +1,8 @@
 package com.vbshkn.ikollect.domain.model
 
 data class Album (
-    val albumId: Int,
-    val masterId: Int,
+    val albumId: Long,
+    val masterId: Long,
     val barcodeNumber: String,
     val name: String,
     val artists: List<Artist>,
@@ -10,5 +10,6 @@ data class Album (
     val releaseDate: String,
     val isFavorite: Boolean,
     val coverImage: String?,
-    val userNote: String
+    val userNote: String,
+    val savingDate: String
 )

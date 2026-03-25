@@ -30,6 +30,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.data.remote.NetworkResult
+import com.vbshkn.ikollect.presentation.composable.CameraPreview
 import java.io.File
 
 @Composable
@@ -71,23 +72,6 @@ fun CameraScreen(
             CameraPreview(controller, Modifier.fillMaxSize())
         }
     }
-}
-
-@Composable
-private fun CameraPreview(
-    controller: LifecycleCameraController,
-    modifier: Modifier = Modifier
-) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    AndroidView(
-        factory = {
-            PreviewView(it).apply {
-                this.controller = controller
-                controller.bindToLifecycle(lifecycleOwner)
-            }
-        },
-        modifier = modifier
-    )
 }
 
 private fun takePhoto(

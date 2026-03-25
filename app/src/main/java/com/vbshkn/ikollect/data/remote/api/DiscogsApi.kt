@@ -16,7 +16,7 @@ interface DiscogsApi {
 
     @GET("releases/{release_id}")
     suspend fun getReleaseDetails(
-        @Path("release_id") releaseId: Int
+        @Path("release_id") releaseId: Long
     ): Response<ReleaseDetailsResponse>
 
     @GET("artists/{artist_id}")
