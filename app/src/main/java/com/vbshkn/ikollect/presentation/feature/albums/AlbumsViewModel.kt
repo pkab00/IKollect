@@ -57,7 +57,7 @@ class AlbumsViewModel @Inject constructor(
                             }
                             showDialog(
                                 ScanningResultDialog(
-                                    "${result.data.artists.joinToString { it.name }} - ${result.data.name}")
+                                    "${result.data.artistCandidates.joinToString { it.name }} - ${result.data.name}")
                             )
                         }
                         is NetworkResult.Error -> {

@@ -8,7 +8,7 @@ import javax.inject.Inject
 class ArtistRemoteDataSource @Inject constructor(
     private val api: DiscogsApi
 ) {
-    suspend fun getArtistDetails(artistId: Int): Response<ArtistDetailsResponse> {
+    suspend fun getArtistDetails(artistId: Long): Response<ArtistDetailsResponse> {
         return api.getArtistDetails(artistId)
     }
 }

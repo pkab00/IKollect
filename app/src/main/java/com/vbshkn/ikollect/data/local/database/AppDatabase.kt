@@ -7,6 +7,7 @@ import com.vbshkn.ikollect.data.local.dao.ArtistDao
 import com.vbshkn.ikollect.data.local.dao.PhotocardDao
 import com.vbshkn.ikollect.data.local.entity.AlbumArtistCrossRef
 import com.vbshkn.ikollect.data.local.entity.AlbumEntity
+import com.vbshkn.ikollect.data.local.entity.ArtistArtistCrossRef
 import com.vbshkn.ikollect.data.local.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.entity.PhotocardArtistCrossRef
 import com.vbshkn.ikollect.data.local.entity.PhotocardEntity
@@ -17,7 +18,8 @@ import com.vbshkn.ikollect.data.local.entity.PhotocardEntity
         AlbumEntity::class,
         PhotocardEntity::class,
         AlbumArtistCrossRef::class,
-        PhotocardArtistCrossRef::class
+        PhotocardArtistCrossRef::class,
+        ArtistArtistCrossRef::class
     ],
     version = 1,
     exportSchema = false

@@ -2,6 +2,7 @@ package com.vbshkn.ikollect.data.local.datasource
 
 import com.vbshkn.ikollect.data.local.dao.ArtistDao
 import com.vbshkn.ikollect.data.local.entity.ArtistEntity
+import com.vbshkn.ikollect.data.local.pojo.GroupWithMembers
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -12,7 +13,22 @@ class ArtistLocalDataSource @Inject constructor(
         return dao.getAll()
     }
 
+    fun getById(id: Long): Flow<ArtistEntity?> {
+        return dao.getById(id)
+    }
+
+    fun getGroupWithMembers(groupId: Long): Flow<GroupWithMembers?> {
+        return dao.getGroupWithMembers(groupId)
+    }
+
     suspend fun insert(artistEntity: ArtistEntity) {
         dao.insert(artistEntity)
+    }
+
+    suspend fun insertAndLinkToGroup(
+        member: ArtistEntity,
+        groupId: Long
+    ) {
+        dao.insertAndLinkToGroup(member, groupId)
     }
 }

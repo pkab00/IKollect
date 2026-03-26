@@ -21,6 +21,6 @@ interface DiscogsApi {
 
     @GET("artists/{artist_id}")
     suspend fun getArtistDetails(
-        @Path("artist_id") artistId: Int
+        @Path("artist_id") artistId: Long
     ): Response<ArtistDetailsResponse>
 }

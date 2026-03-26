@@ -3,10 +3,11 @@ package com.vbshkn.ikollect.domain.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Artist(
+data class ArtistCandidate(
     val artistId: Long,
     val name: String,
     val isGroup: Boolean,
     val isFavorite: Boolean,
-    val profileImage: String?
+    val profileImage: String?,
+    val memberIds: List<Long>
 )

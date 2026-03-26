@@ -51,7 +51,7 @@ fun SeeInfoScreen(
             ) }
             item { DataItem(
                 label = UiText.StringResource(R.string.see_info_artist),
-                data = artists.joinToString { it.name }
+                data = artistCandidates.joinToString { it.name }
             ) }
             item { DataItem(
                 label = UiText.StringResource(R.string.see_info_release_year),

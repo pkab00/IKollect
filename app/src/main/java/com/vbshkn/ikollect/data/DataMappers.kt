@@ -8,19 +8,31 @@ import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
 import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import com.vbshkn.ikollect.domain.model.Artist
+import com.vbshkn.ikollect.domain.model.ArtistCandidate
 import com.vbshkn.ikollect.domain.model.VersionCandidate
+import com.vbshkn.ikollect.util.ArtistNameHelper
 import com.vbshkn.ikollect.util.TimeUtil.toDateString
 
 object DataMappers {
-    fun ArtistDetailsResponse.toDomain(): Artist {
-        return Artist(
+    fun ArtistDetailsResponse.toDomain(): ArtistCandidate {
+        return ArtistCandidate(
             artistId = this.id,
-            name = if (this.nameVariations.isNullOrEmpty()) this.name
-                   else this.nameVariations.first(),
+            name = ArtistNameHelper.pickBestNameOption(this.name, this.nameVariations),
             isGroup = !this.members.isNullOrEmpty(),
-            members = null,
             isFavorite = false,
-            profileImage = null
+            profileImage = this.images.first().uri,
+            memberIds = this.members?.map { it.id } ?: emptyList()
+        )
+    }
+
+    fun ArtistDetailsResponse.toEntity(): ArtistEntity {
+        return ArtistEntity(
+            artistId = this.id,
+            name = ArtistNameHelper.pickBestNameOption(this.name, this.nameVariations),
+            isGroup = !this.members.isNullOrEmpty(),
+            isFavorite = false,
+            imageUrl = if (this.images.isEmpty()) null
+                       else this.images.first().uri
         )
     }
 
@@ -30,7 +42,7 @@ object DataMappers {
             masterId = this.searchResult.masterId,
             barcodeNumber = this.barcode,
             name = this.releaseDetailsResponse.title,
-            artists = this.artistDetailsResponses.map { it.toDomain() },
+            artistCandidates = this.artistDetailsResponses.map { it.toDomain() },
             versionCandidates = mapVersionCandidates(this.availableVersions),
             releaseDate = this.searchResult.year,
             isFavorite = false,
@@ -72,19 +84,17 @@ object DataMappers {
             artistId = this.artistId,
             name = this.name,
             isGroup = this.isGroup,
-            members = null,
             isFavorite = this.isFavorite,
             profileImage = this.imageUrl
         )
 
     }
 
-    fun Artist.toEntity(): ArtistEntity {
+    fun ArtistCandidate.toEntity(): ArtistEntity {
         return ArtistEntity(
             artistId = this.artistId,
             name = this.name,
             isGroup = this.isGroup,
-            parentGroupId = null,
             isFavorite = this.isFavorite,
             imageUrl = this.profileImage
         )

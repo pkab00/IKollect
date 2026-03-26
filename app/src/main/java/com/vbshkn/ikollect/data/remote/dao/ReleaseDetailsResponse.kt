@@ -13,7 +13,7 @@ data class ReleaseDetailsResponse(
 
 data class ArtistDao(
     @SerializedName("id")
-    val id: Int,
+    val id: Long,
     @SerializedName("name")
     val name: String
 )

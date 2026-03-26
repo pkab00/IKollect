@@ -9,7 +9,6 @@ data class ArtistEntity(
     val artistId: Long,
     val name: String,
     val isGroup: Boolean,
-    val parentGroupId: Long?,
     val isFavorite: Boolean,
     val imageUrl: String?
 )

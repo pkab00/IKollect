@@ -8,7 +8,7 @@ data class AlbumCandidate(
     val masterId: Long,
     val barcodeNumber: String,
     val name: String,
-    val artists: List<Artist>,
+    val artistCandidates: List<ArtistCandidate>,
     val versionCandidates: List<VersionCandidate>,
     val releaseDate: String,
     val isFavorite: Boolean,
