@@ -3,6 +3,7 @@ package com.vbshkn.ikollect.data.local.datasource
 import com.vbshkn.ikollect.data.local.dao.ArtistDao
 import com.vbshkn.ikollect.data.local.model.ArtistOverview
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.GroupWithMembers
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -25,6 +26,11 @@ class ArtistLocalDataSource @Inject constructor(
     fun getArtistOverviews(): Flow<List<ArtistOverview>> {
         return dao.getArtistOverviews()
     }
+
+    fun getWithFullDetail(id: Long): Flow<ArtistFullDetail?> {
+        return dao.getWithFullDetail(id)
+    }
+
 
     suspend fun insert(artistEntity: ArtistEntity) {
         dao.insert(artistEntity)

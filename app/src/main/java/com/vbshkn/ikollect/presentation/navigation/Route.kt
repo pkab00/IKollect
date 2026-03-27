@@ -10,6 +10,8 @@ sealed interface Route {
     @Serializable data object CameraScreen : Route
     @Serializable data object KomcaScanner : Route
 
+    @Serializable data class ArtistProfile(val id: Long) : Route
+
     @Serializable data object ArtistsRoute : Route
     @Serializable sealed class ArtistsFlow : Route {
         @Serializable data object Main : ArtistsFlow()

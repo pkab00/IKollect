@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import com.vbshkn.ikollect.data.local.model.ArtistOverview
 import com.vbshkn.ikollect.data.local.model.entity.ArtistArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.GroupWithMembers
 import kotlinx.coroutines.flow.Flow
 
@@ -22,6 +23,10 @@ interface ArtistDao {
     @Transaction
     @Query("SELECT * FROM ArtistEntity WHERE artistId = :groupId")
     fun getGroupWithMembers(groupId: Long): Flow<GroupWithMembers?>
+
+    @Transaction
+    @Query("SELECT * FROM ArtistEntity WHERE artistId = :id")
+    fun getWithFullDetail(id: Long): Flow<ArtistFullDetail?>
 
     @Query("""
             SELECT *, 

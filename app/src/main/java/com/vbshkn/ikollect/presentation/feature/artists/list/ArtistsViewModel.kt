@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.artists
+package com.vbshkn.ikollect.presentation.feature.artists.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

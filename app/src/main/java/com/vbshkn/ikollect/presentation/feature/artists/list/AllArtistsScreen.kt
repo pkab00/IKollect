@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.artists
+package com.vbshkn.ikollect.presentation.feature.artists.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

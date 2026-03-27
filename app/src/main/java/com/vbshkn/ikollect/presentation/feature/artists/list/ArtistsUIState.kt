@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.artists
+package com.vbshkn.ikollect.presentation.feature.artists.list
 
 import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.local.model.ArtistOverview
