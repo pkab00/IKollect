@@ -3,16 +3,14 @@ package com.vbshkn.ikollect.data.repository
 import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.DataMappers.toDomain
 import com.vbshkn.ikollect.data.local.datasource.AlbumLocalDataSource
-import com.vbshkn.ikollect.data.local.datasource.ArtistLocalDataSource
-import com.vbshkn.ikollect.data.local.entity.AlbumEntity
+import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
 import com.vbshkn.ikollect.data.remote.datasource.AlbumRemoteDataSource
 import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -50,12 +48,9 @@ class AlbumRepository @Inject constructor(
 
     fun loadAllAlbums(): Flow<NetworkResult<List<Album>>> {
         return albumLocalDS.getAllWithArtists()
-            .map { albumWithArtists ->
-                val domainAlbums = albumWithArtists.map { it.toDomain() }
-                NetworkResult.Success(domainAlbums) as NetworkResult<List<Album>>
+            .asLocalResult { albums ->
+                albums.map { it.toDomain() }
             }
-            .onStart { emit(NetworkResult.Loading) }
-            .catch { emit(NetworkResult.Error(AppError.LocalDataLoadingError(it.localizedMessage ?: ""))) }
     }
 
     suspend fun insertToDatabase(

@@ -3,7 +3,7 @@ package com.vbshkn.ikollect.domain.usecase
 import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.DataMappers.toEntity
 import com.vbshkn.ikollect.data.local.database.AppDatabase
-import com.vbshkn.ikollect.data.local.entity.AlbumEntity
+import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.repository.ArtistRepository
 import com.vbshkn.ikollect.data.repository.ImageRepository

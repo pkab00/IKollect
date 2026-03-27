@@ -1,10 +1,10 @@
 package com.vbshkn.ikollect.data.local.datasource
 
 import com.vbshkn.ikollect.data.local.dao.AlbumDao
-import com.vbshkn.ikollect.data.local.entity.AlbumEntity
-import com.vbshkn.ikollect.data.local.pojo.AlbumFullDetail
-import com.vbshkn.ikollect.data.local.pojo.AlbumWithArtists
-import com.vbshkn.ikollect.data.local.pojo.AlbumWithPhotocards
+import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
+import com.vbshkn.ikollect.data.local.model.pojo.AlbumFullDetail
+import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
+import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithPhotocards
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

@@ -5,12 +5,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.vbshkn.ikollect.data.local.entity.AlbumArtistCrossRef
-import com.vbshkn.ikollect.data.local.entity.AlbumEntity
-import com.vbshkn.ikollect.data.local.pojo.AlbumFullDetail
-import com.vbshkn.ikollect.data.local.pojo.AlbumWithArtists
-import com.vbshkn.ikollect.data.local.pojo.AlbumWithPhotocards
-import com.vbshkn.ikollect.data.local.pojo.ArtistWithAlbums
+import com.vbshkn.ikollect.data.local.model.entity.AlbumArtistCrossRef
+import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
+import com.vbshkn.ikollect.data.local.model.pojo.AlbumFullDetail
+import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
+import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithPhotocards
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistWithAlbums
 import kotlinx.coroutines.flow.Flow
 
 @Dao

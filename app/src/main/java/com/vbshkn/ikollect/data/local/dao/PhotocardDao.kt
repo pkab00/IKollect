@@ -5,10 +5,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.vbshkn.ikollect.data.local.entity.PhotocardArtistCrossRef
-import com.vbshkn.ikollect.data.local.entity.PhotocardEntity
-import com.vbshkn.ikollect.data.local.pojo.ArtistWithPhotocards
-import com.vbshkn.ikollect.data.local.pojo.PhotocardWithArtists
+import com.vbshkn.ikollect.data.local.model.entity.PhotocardArtistCrossRef
+import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistWithPhotocards
+import com.vbshkn.ikollect.data.local.model.pojo.PhotocardWithArtists
 import kotlinx.coroutines.flow.Flow
 
 @Dao

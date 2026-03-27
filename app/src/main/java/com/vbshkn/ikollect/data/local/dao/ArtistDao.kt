@@ -5,9 +5,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.vbshkn.ikollect.data.local.entity.ArtistArtistCrossRef
-import com.vbshkn.ikollect.data.local.entity.ArtistEntity
-import com.vbshkn.ikollect.data.local.pojo.GroupWithMembers
+import com.vbshkn.ikollect.data.local.model.ArtistOverview
+import com.vbshkn.ikollect.data.local.model.entity.ArtistArtistCrossRef
+import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
+import com.vbshkn.ikollect.data.local.model.pojo.GroupWithMembers
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,6 +22,14 @@ interface ArtistDao {
     @Transaction
     @Query("SELECT * FROM ArtistEntity WHERE artistId = :groupId")
     fun getGroupWithMembers(groupId: Long): Flow<GroupWithMembers?>
+
+    @Query("""
+            SELECT *, 
+            (SELECT COUNT(*) FROM AlbumArtistCrossRef WHERE artistId = ArtistEntity.artistId) AS albumsCount,
+            (SELECT COUNT(*) FROM PhotocardArtistCrossRef WHERE artistId = ArtistEntity.artistId) AS photocardsCount
+            FROM ArtistEntity
+            """)
+    fun getArtistOverviews(): Flow<List<ArtistOverview>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(artistEntity: ArtistEntity)

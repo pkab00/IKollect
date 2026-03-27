@@ -2,7 +2,7 @@
 <resources>
     <string name="navigation_albums">Альбомы</string>
     <string name="navigation_photocards">Фотокарты</string>
-    <string name="navigation_account">Аккаунт</string>
+    <string name="navigation_artists">Артисты</string>
     <string name="dialog_ok">ОК</string>
     <string name="dialog_dismiss">Отмена</string>
     <string name="error_title_scanning">Ошибка при сканировании</string>
@@ -51,4 +51,11 @@
     <string name="wizard_cant_find_version">Не вижу свою версию...</string>
     <string name="wizard_title_version_name">Версия</string>
     <string name="supporting_text_version">Введите название версии.</string>
+    <string name="screen_title_artists">Артисты</string>
+    <string name="title_groups">Группы</string>
+    <string name="title_soloists">Солисты</string>
+    <string name="label_show_all">Показать всех</string>
+    <string name="filler_nothing_to_show">Здесь пока ничего нет.</string>
+    <string name="label_albums_count">Альбомов:</string>
+    <string name="label_photocards_count">Фотокарт:</string>
 </resources>

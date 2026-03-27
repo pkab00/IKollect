@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.data.local.entity
+package com.vbshkn.ikollect.data.local.model.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -9,5 +9,5 @@ enum class NavBarDestinations(
 ) {
     ALBUMS(R.string.navigation_albums, R.drawable.ic_albums, Route.Albums),
     PHOTOCARDS(R.string.navigation_photocards, R.drawable.ic_photocards, Route.Photocards),
-    ACCOUNT(R.string.navigation_account, R.drawable.ic_account, Route.Account)
+    ARTISTS(R.string.navigation_artists, R.drawable.ic_artists, Route.ArtistsRoute)
 }

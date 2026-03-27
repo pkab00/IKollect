@@ -1,12 +1,12 @@
-package com.vbshkn.ikollect.data.local.pojo
+package com.vbshkn.ikollect.data.local.model.pojo
 
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
-import com.vbshkn.ikollect.data.local.entity.AlbumArtistCrossRef
-import com.vbshkn.ikollect.data.local.entity.AlbumEntity
-import com.vbshkn.ikollect.data.local.entity.ArtistEntity
-import com.vbshkn.ikollect.data.local.entity.PhotocardEntity
+import com.vbshkn.ikollect.data.local.model.entity.AlbumArtistCrossRef
+import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
+import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
+import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 
 data class AlbumFullDetail(
     @Embedded

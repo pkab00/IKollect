@@ -1,7 +1,7 @@
 package com.vbshkn.ikollect.data
 
-import com.vbshkn.ikollect.data.local.entity.ArtistEntity
-import com.vbshkn.ikollect.data.local.pojo.AlbumWithArtists
+import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
+import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse
 import com.vbshkn.ikollect.data.remote.dao.FormatDao
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
