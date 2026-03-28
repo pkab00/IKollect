@@ -24,6 +24,7 @@ retrofit = "3.0.0"
 roomRuntime = "2.8.4"
 android_gradle_plugin = "9.1.0"
 devtools_ksp = "2.3.6"
+toolbarCompose = "2.3.5"
 uiTextGoogleFonts = "1.10.4"
 secretsGradle = "2.0.1"
 kotlinSerialization = "2.3.20"
@@ -71,6 +72,7 @@ play-services-mlkit-text-recognition = { module = "com.google.android.gms:play-s
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+toolbar-compose = { module = "me.onebone:toolbar-compose", version.ref = "toolbarCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
