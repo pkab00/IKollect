@@ -11,12 +11,20 @@ import androidx.room.PrimaryKey
         childColumns = ["albumId"],
         onUpdate = ForeignKey.CASCADE,
         onDelete = ForeignKey.SET_NULL
+    ),
+    ForeignKey(
+        entity = ArtistEntity::class,
+        parentColumns = ["artistId"],
+        childColumns = ["ownerId"],
+        onUpdate = ForeignKey.CASCADE,
+        onDelete = ForeignKey.CASCADE
     )
 ])
 data class PhotocardEntity(
     @PrimaryKey(autoGenerate = true)
     val photocardId: Long,
     val albumId: Int?,
+    val ownerId: Long,
     val displayName: String,
     val isPob: Boolean,
     val isFavorite: Boolean,

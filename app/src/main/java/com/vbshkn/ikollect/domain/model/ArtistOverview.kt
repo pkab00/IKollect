@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.data.local.model
+package com.vbshkn.ikollect.domain.model
 
 data class ArtistOverview(
     val artistId: Long,

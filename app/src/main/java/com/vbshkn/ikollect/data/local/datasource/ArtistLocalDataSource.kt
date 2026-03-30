@@ -1,7 +1,7 @@
 package com.vbshkn.ikollect.data.local.datasource
 
 import com.vbshkn.ikollect.data.local.dao.ArtistDao
-import com.vbshkn.ikollect.data.local.model.ArtistOverview
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistMinimalDetail
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.GroupWithMembers
@@ -23,7 +23,7 @@ class ArtistLocalDataSource @Inject constructor(
         return dao.getGroupWithMembers(groupId)
     }
 
-    fun getArtistOverviews(): Flow<List<ArtistOverview>> {
+    fun getArtistOverviews(): Flow<List<ArtistMinimalDetail>> {
         return dao.getArtistOverviews()
     }
 

@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.vbshkn.ikollect.data.local.model.ArtistOverview
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistMinimalDetail
 import com.vbshkn.ikollect.data.local.model.entity.ArtistArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
@@ -30,11 +30,18 @@ interface ArtistDao {
 
     @Query("""
             SELECT *, 
-            (SELECT COUNT(*) FROM AlbumArtistCrossRef WHERE artistId = ArtistEntity.artistId) AS albumsCount,
-            (SELECT COUNT(*) FROM PhotocardArtistCrossRef WHERE artistId = ArtistEntity.artistId) AS photocardsCount
+            (SELECT COUNT(*) FROM AlbumArtistCrossRef 
+                WHERE artistId = ArtistEntity.artistId) 
+                AS albumsCount,
+            (SELECT COUNT(*) FROM PhotocardEntity 
+                WHERE ownerId = ArtistEntity.artistId) 
+                AS photocardsOwnedCount,
+            (SELECT COUNT(*) FROM PhotocardArtistCrossRef 
+                WHERE artistId = ArtistEntity.artistId)
+                AS photocardsDepictedCount
             FROM ArtistEntity
             """)
-    fun getArtistOverviews(): Flow<List<ArtistOverview>>
+    fun getArtistOverviews(): Flow<List<ArtistMinimalDetail>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(artistEntity: ArtistEntity)

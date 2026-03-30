@@ -35,9 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.data.local.model.ArtistOverview
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistMinimalDetail
+import com.vbshkn.ikollect.domain.model.ArtistOverview
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
-import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsViewModel
 
 @Composable
 fun AccountScreen(

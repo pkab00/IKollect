@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.data.local.model.ArtistOverview
+import com.vbshkn.ikollect.domain.model.ArtistOverview
 
 @Composable
 fun AllArtistsScreen(

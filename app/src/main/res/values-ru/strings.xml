@@ -13,7 +13,7 @@
     <string name="error_body_unknown">Неизвестная ошибка. Попробуйте снова.</string>
     <string name="dialog_title_album_detected">Обнаружен альбом</string>
     <string name="dialog_action_next">Далее</string>
-    <string name="error_loading_albums">Не удалось ззагрузить ваши альбомы.</string>
+    <string name="error_loading_albums">Не удалось загрузить ваши альбомы.</string>
     <string name="message_no_albums_found">Нет отсканированных альбомов. Нажмите на иконку сканнера на верхней панели, чтобы добавить ваш первый альбом!</string>
     <string name="screen_title_albums">Альбомы</string>
     <string name="wizard_action_back">Назад</string>

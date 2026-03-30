@@ -3,6 +3,7 @@ package com.vbshkn.ikollect.data
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistMinimalDetail
 import com.vbshkn.ikollect.data.local.model.pojo.PhotocardWithArtists
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse
 import com.vbshkn.ikollect.data.remote.dao.FormatDao
@@ -11,6 +12,7 @@ import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import com.vbshkn.ikollect.domain.model.Artist
 import com.vbshkn.ikollect.domain.model.ArtistCandidate
+import com.vbshkn.ikollect.domain.model.ArtistOverview
 import com.vbshkn.ikollect.domain.model.ArtistProfileData
 import com.vbshkn.ikollect.domain.model.Photocard
 import com.vbshkn.ikollect.domain.model.VersionCandidate
@@ -108,8 +110,9 @@ object DataMappers {
         return Photocard(
             photocardId = this.photocard.photocardId,
             albumId = this.photocard.albumId,
+            ownerId = this.photocard.ownerId,
             displayName = this.photocard.displayName,
-            artists = this.artists.map { it.toDomain() },
+            depictedArtists = this.artists.map { it.toDomain() },
             isPob = this.photocard.isPob,
             isFavorite = this.photocard.isFavorite,
             imageUrl = this.photocard.imageUrl,
@@ -117,13 +120,37 @@ object DataMappers {
         )
     }
 
+    fun ArtistMinimalDetail.toDomain(): ArtistOverview {
+        return if (this.isGroup) {
+            ArtistOverview(
+                artistId = this.artistId,
+                name = this.name,
+                isGroup = true,
+                isFavorite = this.isFavorite,
+                imageUrl = this.imageUrl,
+                albumsCount = this.albumsCount,
+                photocardsCount = this.photocardsOwnedCount
+            )
+        }
+        else {
+            ArtistOverview(
+                artistId = this.artistId,
+                name = this.name,
+                isGroup = false,
+                isFavorite = this.isFavorite,
+                imageUrl = this.imageUrl,
+                albumsCount = this.albumsCount,
+                photocardsCount = this.photocardsDepictedCount
+            )
+        }
+    }
 
     fun ArtistFullDetail.toDomain(): ArtistProfileData {
         return if (this.artist.isGroup) {
             ArtistProfileData.GroupProfile(
                 artist = this.artist.toDomain(),
                 albums = this.albums.map { it.toDomain() },
-                photocards = this.photocards.map { it.toDomain() },
+                photocards = this.photocardsOwned.map { it.toDomain() },
                 members = this.members.map { it.toDomain() }
             )
         }
@@ -131,7 +158,7 @@ object DataMappers {
             ArtistProfileData.SoloistProfile(
                 artist = this.artist.toDomain(),
                 albums = this.albums.map { it.toDomain() },
-                photocards = this.photocards.map { it.toDomain() },
+                photocards = this.photocardsDepicted.map { it.toDomain() },
                 groups = this.groups.map { it.toDomain() }
             )
         }
