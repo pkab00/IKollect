@@ -22,6 +22,7 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.WizardItemWrapper
 import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
 import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
+import com.vbshkn.ikollect.util.UiText
 
 @Composable
 fun WrapUpScreen(
@@ -38,7 +39,7 @@ fun WrapUpScreen(
             .padding(top = 16.dp)
     ) {
         item {
-            WizardItemWrapper(title = stringResource(R.string.wizard_title_notes)) {
+            WizardItemWrapper(title = UiText.StringResource(R.string.wizard_title_notes)) {
                 UserNotesField(
                     value = uiState.albumCandidate.userNote,
                     onValueChange = {

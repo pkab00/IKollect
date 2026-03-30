@@ -11,5 +11,7 @@ data class Album (
     val isFavorite: Boolean,
     val coverImage: String?,
     val userNote: String,
-    val savingDate: String
-)
+    val savingTimestamp: Long
+) {
+    val extendedName = "${this.name} [${this.version}]"
+}

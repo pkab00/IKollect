@@ -42,6 +42,7 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.WizardItemWrapper
 import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
 import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
+import com.vbshkn.ikollect.util.UiText
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -61,7 +62,7 @@ fun AddDetailsScreen(
     ) {
         if (showVersionNameField) {
             item {
-                WizardItemWrapper(stringResource(R.string.wizard_title_version_name)) {
+                WizardItemWrapper(UiText.StringResource(R.string.wizard_title_version_name)) {
                     VersionNameField(
                         value = uiState.versionCandidate!!.name,
                         onValueChange = {
@@ -73,7 +74,7 @@ fun AddDetailsScreen(
         }
 
         item {
-            WizardItemWrapper(stringResource(R.string.add_details_title_image)) {
+            WizardItemWrapper(UiText.StringResource(R.string.add_details_title_image)) {
                 SelectImageItem(
                     imageUrl = uiState.versionCandidate!!.coverImage,
                     onEvent = viewModel::onEvent
@@ -83,7 +84,7 @@ fun AddDetailsScreen(
 
         item {
             WizardItemWrapper(
-                title = stringResource(R.string.add_details_title_komca),
+                title = UiText.StringResource(R.string.add_details_title_komca),
                 showHint = true,
                 onHint = { viewModel.onEvent(AlbumWizardContract.Event.OnShowKomcaHint) }
             ) {

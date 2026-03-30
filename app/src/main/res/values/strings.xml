@@ -59,4 +59,15 @@
     <string name="filler_nothing_to_show">Nothing to show here.</string>
     <string name="label_albums_count">Albums:</string>
     <string name="label_photocards_count">Photocards:</string>
+    <string name="artist_profile_title_information">Information</string>
+    <string name="artist_profile_title_albums">Albums</string>
+    <string name="artist_profile_title_photocards">Photocards</string>
+    <string name="artist_profile_label_status">Status</string>
+    <string name="artist_profile_label_statred_on">Collection started on</string>
+    <string name="artist_profile_label_last_update">Last update on</string>
+    <string name="artist_profile_label_first_album">First album</string>
+    <string name="artist_profile_label_latest_album">Latest album</string>
+    <string name="artist_profile_status_group">Group</string>
+    <string name="artist_profile_status_soloist">Soloist</string>
+    <string name="artist_profile_title_notes">Notes</string>
 </resources>

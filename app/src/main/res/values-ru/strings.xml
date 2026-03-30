@@ -58,4 +58,15 @@
     <string name="filler_nothing_to_show">Здесь пока ничего нет.</string>
     <string name="label_albums_count">Альбомов:</string>
     <string name="label_photocards_count">Фотокарт:</string>
+    <string name="artist_profile_title_information">Сведения</string>
+    <string name="artist_profile_title_albums">Альбомы</string>
+    <string name="artist_profile_title_photocards">Фотокарты</string>
+    <string name="artist_profile_label_status">Статус</string>
+    <string name="artist_profile_label_statred_on">Коллекция начата</string>
+    <string name="artist_profile_label_last_update">Последнее обновление</string>
+    <string name="artist_profile_label_first_album">Первый альбом</string>
+    <string name="artist_profile_label_latest_album">Последний альбом</string>
+    <string name="artist_profile_status_group">Группа</string>
+    <string name="artist_profile_status_soloist">Солист</string>
+    <string name="artist_profile_title_notes">Заметки</string>
 </resources>

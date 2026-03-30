@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.presentation.composable.DataOutlinedCard
 import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
 import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
 import com.vbshkn.ikollect.util.UiText
@@ -45,62 +46,26 @@ fun SeeInfoScreen(
             .padding(top = 16.dp)
     ) {
         with(candidate) {
-            item { DataItem(
+            item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_name),
-                data = name
+                data = UiText.DynamicString(name)
             ) }
-            item { DataItem(
+            item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_artist),
-                data = artistCandidates.joinToString { it.name }
+                data = UiText.DynamicString(artistCandidates.joinToString { it.name })
             ) }
-            item { DataItem(
+            item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_release_year),
-                data = releaseDate
+                data = UiText.DynamicString(releaseDate)
             ) }
-            item { DataItem(
+            item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_barcode),
-                data = barcodeNumber
+                data = UiText.DynamicString(barcodeNumber)
             ) }
-            item { DataItem(
+            item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_discogs_id),
-                data = discogsAlbumId.toString()
+                data = UiText.DynamicString(discogsAlbumId.toString())
             ) }
-        }
-    }
-}
-
-@Composable
-private fun DataItem(
-    label: UiText,
-    data: String
-) {
-    OutlinedCard(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = label.asString(),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = data,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }

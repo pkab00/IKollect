@@ -20,27 +20,31 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
-fun WizardItemWrapper(
+fun ProfileItemWrapper(
     title: UiText,
+    modifier: Modifier = Modifier,
     showHint: Boolean = false,
     onHint: () -> Unit = {},
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
             Text(
                 text = title.asString(),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f)
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 6.dp)
             )
             Box(modifier = Modifier.size(24.dp)) {
                 if (showHint) {

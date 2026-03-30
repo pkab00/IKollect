@@ -53,7 +53,10 @@ fun AppNavHost(navController: NavHostController) {
 
         composable<Route.ArtistProfile> {
             val viewModel = hiltViewModel<ArtistProfileViewModel>()
-            ArtistProfileScreen(viewModel)
+            ArtistProfileScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.popBackStack() }
+            )
         }
 
         artistsGraph(navController)

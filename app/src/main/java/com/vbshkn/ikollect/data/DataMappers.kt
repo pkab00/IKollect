@@ -81,7 +81,7 @@ object DataMappers {
             isFavorite = this.album.isFavorite,
             coverImage = this.album.imageUrl,
             userNote = this.album.userNote ?: "",
-            savingDate = this.album.timestamp.toDateString()
+            savingTimestamp = this.album.timestamp
         )
     }
 
