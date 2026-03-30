@@ -25,7 +25,7 @@ fun AppNavHost(navController: NavHostController) {
             val viewModel = hiltViewModel<AlbumsViewModel>()
             AlbumsScreen(
                 viewModel = viewModel,
-                toAddAlbumRoute = { navController.navigate(Route.AddAlbumRoute(it)) }
+                toAddAlbumRoute = { navController.navigate(Route.AlbumWizardRoute(it)) }
             )
         }
         composable<Route.Photocards> {
@@ -35,7 +35,7 @@ fun AppNavHost(navController: NavHostController) {
         composable<Route.CameraScreen> {
             CameraScreen(
                 onPhotoTaken = { image ->
-                    navController.getBackStackEntry<Route.AddAlbumRoute>()
+                    navController.getBackStackEntry<Route.AlbumWizardRoute>()
                         .savedStateHandle["camera_result"] = image
                     navController.popBackStack()
                 }
@@ -44,7 +44,7 @@ fun AppNavHost(navController: NavHostController) {
         composable<Route.KomcaScanner> {
             KomcaScannerScreen(
                 onNumberRecognized = { number ->
-                    navController.getBackStackEntry<Route.AddAlbumRoute>()
+                    navController.getBackStackEntry<Route.AlbumWizardRoute>()
                         .savedStateHandle["scanner_result"] = number
                     navController.popBackStack()
                 }

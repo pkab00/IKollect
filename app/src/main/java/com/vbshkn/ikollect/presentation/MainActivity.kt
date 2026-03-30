@@ -21,7 +21,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.vbshkn.ikollect.presentation.navigation.NavBarDestinations
 import com.vbshkn.ikollect.presentation.navigation.AppNavHost
 import com.vbshkn.ikollect.presentation.navigation.Route
@@ -48,7 +47,7 @@ fun IKollectApp() {
     val bachStackEntity by navController.currentBackStackEntryAsState()
     val currentDestination = bachStackEntity?.destination
     val hideBottomNavBar = currentDestination?.hierarchy?.any {
-        it.hasRoute<Route.AddAlbumRoute>()
+        it.hasRoute<Route.AlbumWizardRoute>()
                 || it.hasRoute<Route.CameraScreen>()
                 || it.hasRoute<Route.KomcaScanner>()
     } == true

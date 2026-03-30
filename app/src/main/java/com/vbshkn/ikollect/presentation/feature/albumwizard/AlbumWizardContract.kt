@@ -1,8 +1,8 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum
+package com.vbshkn.ikollect.presentation.feature.albumwizard
 
 import com.vbshkn.ikollect.domain.model.VersionCandidate
 
-interface AddAlbumContract {
+interface AlbumWizardContract {
     sealed interface Effect {
         object NavigateBack : Effect
         object NavigateNext : Effect

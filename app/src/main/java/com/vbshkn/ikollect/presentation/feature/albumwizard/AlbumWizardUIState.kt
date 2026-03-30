@@ -1,14 +1,14 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum
+package com.vbshkn.ikollect.presentation.feature.albumwizard
 
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import com.vbshkn.ikollect.domain.model.VersionCandidate
 import com.vbshkn.ikollect.presentation.navigation.Route
 
-data class AddAlbumUIState(
-    val currentRoute: Route.AddAlbumFlow = Route.AddAlbumFlow.SeeInfo,
+data class AlbumWizardUIState(
+    val currentRoute: Route.AlbumWizardFlow = Route.AlbumWizardFlow.SeeInfo,
     val albumCandidate: AlbumCandidate,
     val versionCandidate: VersionCandidate? = null,
     val komcaNumber: String? = null,
-    val dialogState: AddAlbumDialogState = AddAlbumDialogState.None,
+    val dialogState: AlbumWizardDialogState = AlbumWizardDialogState.None,
     val isCoverCached: Boolean = false
 )

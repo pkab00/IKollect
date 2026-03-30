@@ -8,7 +8,7 @@ import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.repository.ArtistRepository
 import com.vbshkn.ikollect.data.repository.ImageRepository
 import com.vbshkn.ikollect.di.ApplicationScope
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumUIState
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardUIState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +20,7 @@ class SaveAlbumUseCase @Inject constructor(
     private val db: AppDatabase,
     @ApplicationScope private val applicationScope: CoroutineScope
 ){
-    operator fun invoke(state: AddAlbumUIState) = applicationScope.launch {
+    operator fun invoke(state: AlbumWizardUIState) = applicationScope.launch {
         val albumCandidate = state.albumCandidate
         val versionCandidate = state.versionCandidate!!
         val komcaNumber = state.komcaNumber

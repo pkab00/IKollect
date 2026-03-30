@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum.screen
+package com.vbshkn.ikollect.presentation.feature.albumwizard.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.WizardItemWrapper
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
 
 @Composable
 fun WrapUpScreen(
-    viewModel: AddAlbumViewModel,
+    viewModel: AlbumWizardViewModel,
     paddingValues: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -42,7 +42,7 @@ fun WrapUpScreen(
                 UserNotesField(
                     value = uiState.albumCandidate.userNote,
                     onValueChange = {
-                        viewModel.onEvent(AddAlbumContract.Event.OnUserNotesChanged(it))
+                        viewModel.onEvent(AlbumWizardContract.Event.OnUserNotesChanged(it))
                     }
                 )
             }

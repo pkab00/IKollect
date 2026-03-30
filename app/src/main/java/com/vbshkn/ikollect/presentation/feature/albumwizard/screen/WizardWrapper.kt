@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum.screen
+package com.vbshkn.ikollect.presentation.feature.albumwizard.screen
 
 import android.Manifest
 import android.content.Intent
@@ -44,17 +44,17 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumDialogState
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardDialogState
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
 import com.vbshkn.ikollect.presentation.navigation.Route
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun WizardWrapper(
     title: String,
-    currentRoute: Route.AddAlbumFlow,
-    viewModel: AddAlbumViewModel,
+    currentRoute: Route.AlbumWizardFlow,
+    viewModel: AlbumWizardViewModel,
     onBack: () -> Unit,
     onNext: () -> Unit,
     onExit: () -> Unit,
@@ -64,7 +64,7 @@ fun WizardWrapper(
     content: @Composable ((PaddingValues) -> Unit)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val onEvent: (AddAlbumContract.Event) -> Unit = viewModel::onEvent
+    val onEvent: (AlbumWizardContract.Event) -> Unit = viewModel::onEvent
 
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -78,7 +78,7 @@ fun WizardWrapper(
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                viewModel.onEvent(AddAlbumContract.Event.OnExistingPhotoSelected(uri.toString()))
+                viewModel.onEvent(AlbumWizardContract.Event.OnExistingPhotoSelected(uri.toString()))
             }
         }
     )
@@ -102,15 +102,15 @@ fun WizardWrapper(
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when(effect) {
-                AddAlbumContract.Effect.Exit -> onExit()
-                AddAlbumContract.Effect.NavigateBack -> onBack()
-                AddAlbumContract.Effect.NavigateNext -> onNext()
-                AddAlbumContract.Effect.OpenGallery -> {
+                AlbumWizardContract.Effect.Exit -> onExit()
+                AlbumWizardContract.Effect.NavigateBack -> onBack()
+                AlbumWizardContract.Effect.NavigateNext -> onNext()
+                AlbumWizardContract.Effect.OpenGallery -> {
                     galleryLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
                 }
-                AddAlbumContract.Effect.TryOpenCamera -> {
+                AlbumWizardContract.Effect.TryOpenCamera -> {
                     val status = cameraPermissionState.status
                     when {
                         status.isGranted -> {
@@ -118,7 +118,7 @@ fun WizardWrapper(
                         }
                         status.shouldShowRationale -> {
                             pending = PENDING.CAMERA
-                            onEvent(AddAlbumContract.Event.OnShowCameraRationale)
+                            onEvent(AlbumWizardContract.Event.OnShowCameraRationale)
                         }
                         else -> {
                             pending = PENDING.CAMERA
@@ -126,7 +126,7 @@ fun WizardWrapper(
                         }
                     }
                 }
-                AddAlbumContract.Effect.TryOpenScanner -> {
+                AlbumWizardContract.Effect.TryOpenScanner -> {
                     val status = cameraPermissionState.status
                     when {
                         status.isGranted -> {
@@ -134,7 +134,7 @@ fun WizardWrapper(
                         }
                         status.shouldShowRationale -> {
                             pending = PENDING.SCANNER
-                            onEvent(AddAlbumContract.Event.OnShowCameraRationale)
+                            onEvent(AlbumWizardContract.Event.OnShowCameraRationale)
                         }
                         else -> {
                             pending = PENDING.SCANNER
@@ -156,7 +156,7 @@ fun WizardWrapper(
                 title = { Text(title) },
                 navigationIcon = {
                     IconButton(
-                        onClick = { onEvent(AddAlbumContract.Event.OnExitClicked) }
+                        onClick = { onEvent(AlbumWizardContract.Event.OnExitClicked) }
                     ) {
                         Icon(Icons.Default.Close, contentDescription = null)
                     }
@@ -203,45 +203,45 @@ fun WizardWrapper(
 
 @Composable
 private fun DialogHost(
-    dialogState: AddAlbumDialogState,
-    onEvent: (AddAlbumContract.Event) -> Unit,
+    dialogState: AlbumWizardDialogState,
+    onEvent: (AlbumWizardContract.Event) -> Unit,
     onRequestPermission: () -> Unit
 ) {
     when(dialogState) {
-        is AddAlbumDialogState.ConfirmExitDialog -> {
+        is AlbumWizardDialogState.ConfirmExitWizardDialog -> {
             ConfirmDialog(
-                onConfirm = { onEvent(AddAlbumContract.Event.OnExitConfirmed) },
-                onDismiss = { onEvent(AddAlbumContract.Event.OnDismissDialog) },
+                onConfirm = { onEvent(AlbumWizardContract.Event.OnExitConfirmed) },
+                onDismiss = { onEvent(AlbumWizardContract.Event.OnDismissDialog) },
                 title = stringResource(R.string.dialog_title_exit),
                 text = stringResource(R.string.dialog_body_unsaved_data),
                 action = stringResource(R.string.dialog_action_yes)
             )
         }
-        is AddAlbumDialogState.CameraRationaleDialog -> {
+        is AlbumWizardDialogState.CameraRationaleWizardDialog -> {
             InfoDialog(
                 title = stringResource(R.string.dialog_title_request_camera),
                 text = stringResource(R.string.dialog_body_request_camera),
                 onDismiss = {
-                    onEvent(AddAlbumContract.Event.OnDismissDialog)
+                    onEvent(AlbumWizardContract.Event.OnDismissDialog)
                     onRequestPermission()
                 }
             )
         }
-        is AddAlbumDialogState.CameraErrorDialog -> {
+        is AlbumWizardDialogState.CameraErrorWizardDialog -> {
             ErrorDialog(
                 title = stringResource(R.string.dialog_title_failed_saving_photo),
                 errorMessage = stringResource(R.string.dialog_body_failed_saving_photo),
-                onDismiss = { onEvent(AddAlbumContract.Event.OnDismissDialog) }
+                onDismiss = { onEvent(AlbumWizardContract.Event.OnDismissDialog) }
             )
         }
-        is AddAlbumDialogState.AboutKomcaDialog -> {
+        is AlbumWizardDialogState.AboutKomcaWizardDialog -> {
             InfoDialog(
                 title = stringResource(R.string.dialog_about_komca_title),
                 text = stringResource(R.string.dialog_about_komca_body),
-                onDismiss = { onEvent(AddAlbumContract.Event.OnDismissDialog) }
+                onDismiss = { onEvent(AlbumWizardContract.Event.OnDismissDialog) }
             )
         }
-        is AddAlbumDialogState.None -> {}
+        is AlbumWizardDialogState.None -> {}
     }
 }
 

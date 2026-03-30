@@ -1,7 +1,6 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum.screen
+package com.vbshkn.ikollect.presentation.feature.albumwizard.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,13 +40,13 @@ import coil3.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.WizardItemWrapper
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AddDetailsScreen(
-    viewModel: AddAlbumViewModel,
+    viewModel: AlbumWizardViewModel,
     paddingValues: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -67,7 +65,7 @@ fun AddDetailsScreen(
                     VersionNameField(
                         value = uiState.versionCandidate!!.name,
                         onValueChange = {
-                            viewModel.onEvent(AddAlbumContract.Event.OnVersionNameChanged(it))
+                            viewModel.onEvent(AlbumWizardContract.Event.OnVersionNameChanged(it))
                         }
                     )
                 }
@@ -87,13 +85,13 @@ fun AddDetailsScreen(
             WizardItemWrapper(
                 title = stringResource(R.string.add_details_title_komca),
                 showHint = true,
-                onHint = { viewModel.onEvent(AddAlbumContract.Event.OnShowKomcaHint) }
+                onHint = { viewModel.onEvent(AlbumWizardContract.Event.OnShowKomcaHint) }
             ) {
                 val text = uiState.komcaNumber
                 KomcaNumberField(
                     value = text ?: "",
                     onValueChange = {
-                        viewModel.onEvent(AddAlbumContract.Event.OnKomcaCodeChanged(it))
+                        viewModel.onEvent(AlbumWizardContract.Event.OnKomcaCodeChanged(it))
                     },
                     onEvent = viewModel::onEvent
                 )
@@ -128,7 +126,7 @@ fun VersionNameField(
 fun KomcaNumberField(
     value: String,
     onValueChange: (String) -> Unit,
-    onEvent: (AddAlbumContract.Event) -> Unit
+    onEvent: (AlbumWizardContract.Event) -> Unit
 ) {
     val isError = value.isNotEmpty() && value.length < 8
 
@@ -146,7 +144,7 @@ fun KomcaNumberField(
         placeholder = { Text("12345678") },
         prefix = { Text("№ ") },
         trailingIcon = {
-            IconButton(onClick = { onEvent(AddAlbumContract.Event.OnScanKomca) }) {
+            IconButton(onClick = { onEvent(AlbumWizardContract.Event.OnScanKomca) }) {
                 Icon(
                     painter = painterResource(R.drawable.ic_scanner),
                     contentDescription = null
@@ -176,7 +174,7 @@ fun KomcaNumberField(
 @Composable
 private fun SelectImageItem(
     imageUrl: String?,
-    onEvent: (AddAlbumContract.Event) -> Unit
+    onEvent: (AlbumWizardContract.Event) -> Unit
 ) {
     OutlinedCard(
         colors = CardDefaults.cardColors(
@@ -205,10 +203,10 @@ private fun SelectImageItem(
                 horizontalArrangement = Arrangement.SpaceAround,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(onClick = { onEvent(AddAlbumContract.Event.OnSelectPicture) }) {
+                Button(onClick = { onEvent(AlbumWizardContract.Event.OnSelectPicture) }) {
                     Text(text = stringResource(R.string.add_details_select_picture))
                 }
-                Button(onClick = { onEvent(AddAlbumContract.Event.OnTakePicture) }) {
+                Button(onClick = { onEvent(AlbumWizardContract.Event.OnTakePicture) }) {
                     Text(text = stringResource(R.string.add_details_take_picture))
                 }
             }

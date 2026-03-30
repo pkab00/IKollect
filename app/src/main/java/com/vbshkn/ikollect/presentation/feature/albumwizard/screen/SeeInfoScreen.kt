@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum.screen
+package com.vbshkn.ikollect.presentation.feature.albumwizard.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -21,20 +21,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
 fun SeeInfoScreen(
-    viewModel: AddAlbumViewModel,
+    viewModel: AlbumWizardViewModel,
     paddingValues: PaddingValues,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val candidate = uiState.albumCandidate
 
     BackHandler(enabled = true) {
-        viewModel.onEvent(AddAlbumContract.Event.OnExitClicked)
+        viewModel.onEvent(AlbumWizardContract.Event.OnExitClicked)
     }
 
     LazyColumn(

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum
+package com.vbshkn.ikollect.presentation.feature.albumwizard
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -19,52 +19,52 @@ import kotlin.reflect.typeOf
 import com.vbshkn.ikollect.domain.usecase.SaveAlbumUseCase
 
 @HiltViewModel
-class AddAlbumViewModel @Inject constructor(
+class AlbumWizardViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val saveAlbumUseCase: SaveAlbumUseCase
 ) : ViewModel() {
-    private val args = savedStateHandle.toRoute<Route.AddAlbumRoute>(
+    private val args = savedStateHandle.toRoute<Route.AlbumWizardRoute>(
         typeMap = mapOf(typeOf<AlbumCandidate>() to AlbumCandidateType)
     )
-    private val _uiState = MutableStateFlow(AddAlbumUIState(albumCandidate = args.candidate))
+    private val _uiState = MutableStateFlow(AlbumWizardUIState(albumCandidate = args.candidate))
     val uiState = _uiState.asStateFlow()
-    private val _effects = Channel<AddAlbumContract.Effect>(Channel.BUFFERED)
+    private val _effects = Channel<AlbumWizardContract.Effect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
 
 
-    fun onEvent(event: AddAlbumContract.Event) {
+    fun onEvent(event: AlbumWizardContract.Event) {
         when (event) {
-            is AddAlbumContract.Event.OnBackClicked -> {
-                sendEffect(AddAlbumContract.Effect.NavigateBack)
+            is AlbumWizardContract.Event.OnBackClicked -> {
+                sendEffect(AlbumWizardContract.Effect.NavigateBack)
             }
-            is AddAlbumContract.Event.OnNextClicked -> {
-                sendEffect(AddAlbumContract.Effect.NavigateNext)
+            is AlbumWizardContract.Event.OnNextClicked -> {
+                sendEffect(AlbumWizardContract.Effect.NavigateNext)
             }
-            is AddAlbumContract.Event.OnExitClicked -> {
-                showDialog(AddAlbumDialogState.ConfirmExitDialog)
+            is AlbumWizardContract.Event.OnExitClicked -> {
+                showDialog(AlbumWizardDialogState.ConfirmExitWizardDialog)
             }
-            is AddAlbumContract.Event.OnExitConfirmed -> {
-                sendEffect(AddAlbumContract.Effect.Exit)
+            is AlbumWizardContract.Event.OnExitConfirmed -> {
+                sendEffect(AlbumWizardContract.Effect.Exit)
             }
-            is AddAlbumContract.Event.OnDismissDialog -> {
+            is AlbumWizardContract.Event.OnDismissDialog -> {
                 dismissDialog()
             }
-            is AddAlbumContract.Event.OnSelectPicture -> {
-                sendEffect(AddAlbumContract.Effect.OpenGallery)
+            is AlbumWizardContract.Event.OnSelectPicture -> {
+                sendEffect(AlbumWizardContract.Effect.OpenGallery)
             }
-            is AddAlbumContract.Event.OnTakePicture -> {
-                sendEffect(AddAlbumContract.Effect.TryOpenCamera)
+            is AlbumWizardContract.Event.OnTakePicture -> {
+                sendEffect(AlbumWizardContract.Effect.TryOpenCamera)
             }
-            is AddAlbumContract.Event.OnScanKomca -> {
-                sendEffect(AddAlbumContract.Effect.TryOpenScanner)
+            is AlbumWizardContract.Event.OnScanKomca -> {
+                sendEffect(AlbumWizardContract.Effect.TryOpenScanner)
             }
-            AddAlbumContract.Event.OnShowKomcaHint -> {
-                showDialog(AddAlbumDialogState.AboutKomcaDialog)
+            AlbumWizardContract.Event.OnShowKomcaHint -> {
+                showDialog(AlbumWizardDialogState.AboutKomcaWizardDialog)
             }
-            is AddAlbumContract.Event.OnShowCameraRationale -> {
-                showDialog(AddAlbumDialogState.CameraRationaleDialog)
+            is AlbumWizardContract.Event.OnShowCameraRationale -> {
+                showDialog(AlbumWizardDialogState.CameraRationaleWizardDialog)
             }
-            is AddAlbumContract.Event.OnPictureCaptured -> {
+            is AlbumWizardContract.Event.OnPictureCaptured -> {
                 _uiState.update {
                     it.copy(
                         versionCandidate = it.versionCandidate?.copy(coverImage = event.uri),
@@ -72,12 +72,12 @@ class AddAlbumViewModel @Inject constructor(
                     )
                 }
             }
-            is AddAlbumContract.Event.OnUpdateVersion -> {
+            is AlbumWizardContract.Event.OnUpdateVersion -> {
                 _uiState.update {
                     it.copy(versionCandidate = event.candidate)
                 }
             }
-            is AddAlbumContract.Event.OnExistingPhotoSelected -> {
+            is AlbumWizardContract.Event.OnExistingPhotoSelected -> {
                 _uiState.value.versionCandidate?.let { candidate ->
                     _uiState.update {
                         it.copy(
@@ -87,51 +87,51 @@ class AddAlbumViewModel @Inject constructor(
                     }
                 }
             }
-            is AddAlbumContract.Event.OnVersionNameChanged -> {
+            is AlbumWizardContract.Event.OnVersionNameChanged -> {
                 _uiState.value.versionCandidate?.let { candidate ->
                     _uiState.update {
                         it.copy(versionCandidate = candidate.copy(name = event.newName))
                     }
                 }
             }
-            is AddAlbumContract.Event.OnKomcaCodeChanged -> {
+            is AlbumWizardContract.Event.OnKomcaCodeChanged -> {
                 _uiState.update {
                     it.copy(komcaNumber = event.newCode)
                 }
             }
-            is AddAlbumContract.Event.OnUserNotesChanged -> {
+            is AlbumWizardContract.Event.OnUserNotesChanged -> {
                 _uiState.update {
                     it.copy(
                         albumCandidate = it.albumCandidate.copy(userNote = event.newValue)
                     )
                 }
             }
-            AddAlbumContract.Event.OnWrapUp -> viewModelScope.launch {
+            AlbumWizardContract.Event.OnWrapUp -> viewModelScope.launch {
                 saveAlbumUseCase(uiState.value)
             }
         }
     }
 
-    fun canNavigateBack(currentRoute: Route.AddAlbumFlow): Boolean {
+    fun canNavigateBack(currentRoute: Route.AlbumWizardFlow): Boolean {
         return when (currentRoute) {
-            Route.AddAlbumFlow.SeeInfo -> false
+            Route.AlbumWizardFlow.SeeInfo -> false
             else -> true
         }
     }
 
-    fun canNavigateNext(currentRoute: Route.AddAlbumFlow): Boolean {
+    fun canNavigateNext(currentRoute: Route.AlbumWizardFlow): Boolean {
         return when (currentRoute) {
-            Route.AddAlbumFlow.SeeInfo -> true
-            Route.AddAlbumFlow.SelectVersion -> _uiState.value.versionCandidate != null
-            Route.AddAlbumFlow.AddDetails -> {
+            Route.AlbumWizardFlow.SeeInfo -> true
+            Route.AlbumWizardFlow.SelectVersion -> _uiState.value.versionCandidate != null
+            Route.AlbumWizardFlow.DetailsWizard -> {
                 val candidate = _uiState.value.versionCandidate
                 candidate?.coverImage != null && candidate.name.isNotBlank()
             }
-            Route.AddAlbumFlow.WrapUp -> true
+            Route.AlbumWizardFlow.WrapUp -> true
         }
     }
 
-    private fun showDialog(dialogState: AddAlbumDialogState) {
+    private fun showDialog(dialogState: AlbumWizardDialogState) {
         _uiState.update {
             it.copy(dialogState = dialogState)
         }
@@ -139,11 +139,11 @@ class AddAlbumViewModel @Inject constructor(
 
     private fun dismissDialog() {
         _uiState.update {
-            it.copy(dialogState = AddAlbumDialogState.None)
+            it.copy(dialogState = AlbumWizardDialogState.None)
         }
     }
 
-    private fun sendEffect(effect: AddAlbumContract.Effect) {
+    private fun sendEffect(effect: AlbumWizardContract.Effect) {
         viewModelScope.launch {
             _effects.send(effect)
         }

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.addalbum.screen
+package com.vbshkn.ikollect.presentation.feature.albumwizard.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,12 +31,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.VersionCandidate
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
 
 @Composable
 fun SelectVersionScreen(
-    viewModel: AddAlbumViewModel,
+    viewModel: AlbumWizardViewModel,
     paddingValues: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -67,10 +67,10 @@ fun SelectVersionScreen(
 private fun VersionPreview(
     version: VersionCandidate,
     selectedVersion: VersionCandidate?,
-    onEvent: (AddAlbumContract.Event) -> Unit
+    onEvent: (AlbumWizardContract.Event) -> Unit
 ) {
     OutlinedCard(
-        onClick = { onEvent(AddAlbumContract.Event.OnUpdateVersion(version)) },
+        onClick = { onEvent(AlbumWizardContract.Event.OnUpdateVersion(version)) },
         border = CardDefaults.outlinedCardBorder(enabled = version == selectedVersion),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if (version == selectedVersion)

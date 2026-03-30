@@ -12,60 +12,60 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumContract
-import com.vbshkn.ikollect.presentation.feature.addalbum.AddAlbumViewModel
-import com.vbshkn.ikollect.presentation.feature.addalbum.screen.AddDetailsScreen
-import com.vbshkn.ikollect.presentation.feature.addalbum.screen.SeeInfoScreen
-import com.vbshkn.ikollect.presentation.feature.addalbum.screen.SelectVersionScreen
-import com.vbshkn.ikollect.presentation.feature.addalbum.screen.WizardWrapper
-import com.vbshkn.ikollect.presentation.feature.addalbum.screen.WrapUpScreen
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
+import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
+import com.vbshkn.ikollect.presentation.feature.albumwizard.screen.AddDetailsScreen
+import com.vbshkn.ikollect.presentation.feature.albumwizard.screen.SeeInfoScreen
+import com.vbshkn.ikollect.presentation.feature.albumwizard.screen.SelectVersionScreen
+import com.vbshkn.ikollect.presentation.feature.albumwizard.screen.WizardWrapper
+import com.vbshkn.ikollect.presentation.feature.albumwizard.screen.WrapUpScreen
 import com.vbshkn.ikollect.presentation.navigation.AlbumCandidateType
 import com.vbshkn.ikollect.presentation.navigation.Route
 import com.vbshkn.ikollect.util.sharedHiltViewModel
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.addAlbumGraph(navController: NavHostController) {
-    navigation<Route.AddAlbumRoute>(
-        startDestination = Route.AddAlbumFlow.SeeInfo,
+    navigation<Route.AlbumWizardRoute>(
+        startDestination = Route.AlbumWizardFlow.SeeInfo,
         typeMap = mapOf(typeOf<AlbumCandidate>() to AlbumCandidateType)
     ) {
-        val onExit: () -> Unit = { navController.popBackStack<Route.AddAlbumRoute>(inclusive = true) }
-        composable<Route.AddAlbumFlow.SeeInfo> { backStackEntity ->
+        val onExit: () -> Unit = { navController.popBackStack<Route.AlbumWizardRoute>(inclusive = true) }
+        composable<Route.AlbumWizardFlow.SeeInfo> { backStackEntity ->
             val sharedViewModel =
-                backStackEntity.sharedHiltViewModel<AddAlbumViewModel, Route.AddAlbumRoute>(navController)
+                backStackEntity.sharedHiltViewModel<AlbumWizardViewModel, Route.AlbumWizardRoute>(navController)
 
             WizardWrapper(
                 title = stringResource(R.string.wizard_title_info),
                 onBack = { navController.popBackStack() },
-                onNext = { navController.navigate(Route.AddAlbumFlow.SelectVersion) },
-                currentRoute = Route.AddAlbumFlow.SeeInfo,
+                onNext = { navController.navigate(Route.AlbumWizardFlow.SelectVersion) },
+                currentRoute = Route.AlbumWizardFlow.SeeInfo,
                 viewModel = sharedViewModel,
                 onExit = onExit,
             ) { paddingValues ->
                 SeeInfoScreen(sharedViewModel, paddingValues)
             }
         }
-        composable<Route.AddAlbumFlow.SelectVersion> { backStackEntity ->
+        composable<Route.AlbumWizardFlow.SelectVersion> { backStackEntity ->
             val sharedViewModel =
-                backStackEntity.sharedHiltViewModel<AddAlbumViewModel, Route.AddAlbumRoute>(navController)
+                backStackEntity.sharedHiltViewModel<AlbumWizardViewModel, Route.AlbumWizardRoute>(navController)
 
             WizardWrapper(
                 title = stringResource(R.string.wizard_title_version),
                 onBack = { navController.popBackStack() },
-                onNext = { navController.navigate(Route.AddAlbumFlow.AddDetails) },
-                currentRoute = Route.AddAlbumFlow.SelectVersion,
+                onNext = { navController.navigate(Route.AlbumWizardFlow.DetailsWizard) },
+                currentRoute = Route.AlbumWizardFlow.SelectVersion,
                 viewModel = sharedViewModel,
                 onExit = onExit
             ) { paddingValues ->
                 SelectVersionScreen(sharedViewModel, paddingValues)
             }
         }
-        composable<Route.AddAlbumFlow.AddDetails> { backStackEntity ->
+        composable<Route.AlbumWizardFlow.DetailsWizard> { backStackEntity ->
             val parentEntity = remember(backStackEntity) {
-                navController.getBackStackEntry<Route.AddAlbumRoute>()
+                navController.getBackStackEntry<Route.AlbumWizardRoute>()
             }
             val sharedViewModel =
-                backStackEntity.sharedHiltViewModel<AddAlbumViewModel, Route.AddAlbumRoute>(
+                backStackEntity.sharedHiltViewModel<AlbumWizardViewModel, Route.AlbumWizardRoute>(
                     navController
                 )
 
@@ -79,7 +79,7 @@ fun NavGraphBuilder.addAlbumGraph(navController: NavHostController) {
             LaunchedEffect(cameraResult, scannerResult) {
                 if (cameraResult != null) {
                     sharedViewModel.onEvent(
-                        AddAlbumContract.Event.OnPictureCaptured(
+                        AlbumWizardContract.Event.OnPictureCaptured(
                             cameraResult!!
                         )
                     )
@@ -87,7 +87,7 @@ fun NavGraphBuilder.addAlbumGraph(navController: NavHostController) {
                 }
                 if (scannerResult != null) {
                     sharedViewModel.onEvent(
-                        AddAlbumContract.Event.OnKomcaCodeChanged(
+                        AlbumWizardContract.Event.OnKomcaCodeChanged(
                             scannerResult!!
                         )
                     )
@@ -98,33 +98,33 @@ fun NavGraphBuilder.addAlbumGraph(navController: NavHostController) {
             WizardWrapper(
                 title = stringResource(R.string.wizard_title_details),
                 onBack = { navController.popBackStack() },
-                onNext = { navController.navigate(Route.AddAlbumFlow.WrapUp) },
+                onNext = { navController.navigate(Route.AlbumWizardFlow.WrapUp) },
                 onExit = onExit,
                 onCamera = { navController.navigate(Route.CameraScreen) },
                 onScanner = { navController.navigate(Route.KomcaScanner) },
-                currentRoute = Route.AddAlbumFlow.AddDetails,
+                currentRoute = Route.AlbumWizardFlow.DetailsWizard,
                 viewModel = sharedViewModel,
             ) { paddingValues ->
                 AddDetailsScreen(sharedViewModel, paddingValues)
             }
         }
-        composable<Route.AddAlbumFlow.WrapUp> { backStackEntity ->
+        composable<Route.AlbumWizardFlow.WrapUp> { backStackEntity ->
             val parentEntity = remember(backStackEntity) {
-                navController.getBackStackEntry<Route.AddAlbumRoute>()
+                navController.getBackStackEntry<Route.AlbumWizardRoute>()
             }
-            val viewModel = hiltViewModel<AddAlbumViewModel>(parentEntity)
+            val viewModel = hiltViewModel<AlbumWizardViewModel>(parentEntity)
 
             WizardWrapper(
                 title = stringResource(R.string.wizard_title_wrapup),
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onNext = {
-                    viewModel.onEvent(AddAlbumContract.Event.OnWrapUp)
+                    viewModel.onEvent(AlbumWizardContract.Event.OnWrapUp)
                     onExit()
                 },
                 onExit = onExit,
                 isLastScreen = true,
-                currentRoute = Route.AddAlbumFlow.WrapUp
+                currentRoute = Route.AlbumWizardFlow.WrapUp
             ) { paddingValues ->
                 WrapUpScreen(viewModel, paddingValues)
             }
