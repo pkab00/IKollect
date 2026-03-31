@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -26,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -39,6 +42,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.Album
+import com.vbshkn.ikollect.domain.model.Artist
+import com.vbshkn.ikollect.domain.model.ArtistProfileData
 import com.vbshkn.ikollect.domain.model.Photocard
 import com.vbshkn.ikollect.presentation.composable.CardGrid
 import com.vbshkn.ikollect.presentation.composable.EmptyCardGridFiller
@@ -55,6 +60,7 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 @Composable
 fun ArtistProfileScreen(
     viewModel: ArtistProfileViewModel,
+    onAnotherArtistClick: (Long) -> Unit,
     onBackClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -103,6 +109,47 @@ fun ArtistProfileScreen(
                 ProfileItemWrapper(
                     title = UiText.StringResource(R.string.artist_profile_title_information)
                 ) { ArtistInfoSection(profile) }
+            }
+            item {
+                when(profile) {
+                    is ArtistProfileData.GroupProfile -> {
+                        ProfileItemWrapper(
+                            title = UiText.StringResource(R.string.artist_profile_title_members),
+                            enabled = profile.members.isNotEmpty()
+                        ) {
+                            CardGrid(
+                                height = 200.dp,
+                                modifier = Modifier.padding(8.dp)
+                            ) {
+                                items(profile.members) { member ->
+                                    MemberOrGroupCard(
+                                        artist = member,
+                                        onClick = onAnotherArtistClick
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    is ArtistProfileData.SoloistProfile -> {
+                        ProfileItemWrapper(
+                            title = UiText.StringResource(R.string.artist_profile_title_in_groups),
+                            enabled = profile.groups.isNotEmpty()
+                        ) {
+                            CardGrid(
+                                height = 200.dp,
+                                modifier = Modifier.padding(8.dp)
+                            ) {
+                                items(profile.groups) { group ->
+                                    MemberOrGroupCard(
+                                        artist = group,
+                                        onClick = onAnotherArtistClick
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    null -> {}
+                }
             }
             item {
                 ProfileItemWrapper(
@@ -202,6 +249,50 @@ private fun AlbumCard(
                 SmallTextLabel(
                     text = UiText.DynamicString(album.savingTimestamp.toDateString()),
                     modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MemberOrGroupCard(
+    artist: Artist,
+    onClick: (Long) -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.size(height = 180.dp, width = 160.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable { onClick(artist.artistId) }
+        ) {
+            AsyncImage(
+                model = artist.profileImage,
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.weight(0.8f)
+            )
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(0.2f)
+                    .padding(6.dp)
+            ) {
+                Text(
+                    text = artist.name,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }

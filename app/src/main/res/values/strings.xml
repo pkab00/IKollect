@@ -71,4 +71,6 @@
     <string name="artist_profile_status_soloist">Soloist</string>
     <string name="artist_profile_title_notes">Notes</string>
     <string name="screen_title_photocards">Photocards</string>
+    <string name="artist_profile_title_in_groups">In groups</string>
+    <string name="artist_profile_title_members">Members</string>
 </resources>

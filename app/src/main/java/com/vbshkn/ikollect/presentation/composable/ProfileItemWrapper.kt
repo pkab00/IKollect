@@ -23,39 +23,42 @@ import com.vbshkn.ikollect.util.UiText
 fun ProfileItemWrapper(
     title: UiText,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     showHint: Boolean = false,
     onHint: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
+    if (enabled) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = modifier
                 .fillMaxWidth()
+                .padding(8.dp)
         ) {
-            Text(
-                text = title.asString(),
-                style = MaterialTheme.typography.titleLarge,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 6.dp)
-            )
-            Box(modifier = Modifier.size(24.dp)) {
-                if (showHint) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_info),
-                        contentDescription = null,
-                        modifier = Modifier.clickable { onHint() }
-                    )
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = title.asString(),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 6.dp)
+                )
+                Box(modifier = Modifier.size(24.dp)) {
+                    if (showHint) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_info),
+                            contentDescription = null,
+                            modifier = Modifier.clickable { onHint() }
+                        )
+                    }
                 }
             }
+            content()
         }
-        content()
     }
 }

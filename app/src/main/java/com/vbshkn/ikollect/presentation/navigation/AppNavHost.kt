@@ -61,6 +61,7 @@ fun AppNavHost(navController: NavHostController) {
             val viewModel = hiltViewModel<ArtistProfileViewModel>()
             ArtistProfileScreen(
                 viewModel = viewModel,
+                onAnotherArtistClick = { navController.navigate(Route.ArtistProfile(it)) },
                 onBackClick = { navController.popBackStack() }
             )
         }

@@ -70,4 +70,6 @@
     <string name="artist_profile_status_soloist">Солист</string>
     <string name="artist_profile_title_notes">Заметки</string>
     <string name="screen_title_photocards">Фотокарты</string>
+    <string name="artist_profile_title_in_groups">" В группах"</string>
+    <string name="artist_profile_title_members">Участники</string>
 </resources>
