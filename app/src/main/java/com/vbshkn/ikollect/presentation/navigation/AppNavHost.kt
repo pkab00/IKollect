@@ -6,14 +6,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.vbshkn.ikollect.presentation.feature.camera.CameraScreen
-import com.vbshkn.ikollect.presentation.feature.albums.AlbumsScreen
-import com.vbshkn.ikollect.presentation.feature.photocards.PhotocardsScreen
-import com.vbshkn.ikollect.presentation.feature.albums.AlbumsViewModel
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsScreen
+import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsScreen
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsViewModel
 import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileScreen
 import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileViewModel
 import com.vbshkn.ikollect.presentation.feature.camera.KomcaScannerScreen
-import com.vbshkn.ikollect.presentation.navigation.graphs.addAlbumGraph
+import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsViewModel
+import com.vbshkn.ikollect.presentation.navigation.graphs.albumWizardGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.artistsGraph
+import com.vbshkn.ikollect.presentation.navigation.graphs.photocardWizardGraph
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -25,11 +27,15 @@ fun AppNavHost(navController: NavHostController) {
             val viewModel = hiltViewModel<AlbumsViewModel>()
             AlbumsScreen(
                 viewModel = viewModel,
-                toAddAlbumRoute = { navController.navigate(Route.AlbumWizardRoute(it)) }
+                onGoToWizard = { navController.navigate(Route.AlbumWizardRoute(it)) }
             )
         }
         composable<Route.Photocards> {
-            PhotocardsScreen()
+            val viewModel = hiltViewModel<PhotocardsViewModel>()
+            PhotocardsScreen(
+                viewModel = viewModel,
+                onGoToWizard = { navController.navigate(Route.PhotocardWizardRoute) }
+            )
         }
 
         composable<Route.CameraScreen> {
@@ -60,6 +66,7 @@ fun AppNavHost(navController: NavHostController) {
         }
 
         artistsGraph(navController)
-        addAlbumGraph(navController)
+        albumWizardGraph(navController)
+        photocardWizardGraph(navController)
     }
 }

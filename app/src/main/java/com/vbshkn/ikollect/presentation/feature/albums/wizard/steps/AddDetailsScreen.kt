@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.albumwizard.screen
+package com.vbshkn.ikollect.presentation.feature.albums.wizard.steps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,9 +39,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.presentation.composable.WizardItemWrapper
-import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
-import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
+import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
+import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardContract
+import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
 import com.vbshkn.ikollect.util.UiText
 
 @OptIn(ExperimentalPermissionsApi::class)

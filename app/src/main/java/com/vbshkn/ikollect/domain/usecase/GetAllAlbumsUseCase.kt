@@ -6,7 +6,7 @@ import com.vbshkn.ikollect.domain.model.Album
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class LoadAllAlbumsUseCase @Inject constructor(
+class GetAllAlbumsUseCase @Inject constructor(
     private val albumRepository: AlbumRepository
 ) {
     operator fun invoke(): Flow<NetworkResult<List<Album>>> {

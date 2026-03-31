@@ -1,40 +1,20 @@
-package com.vbshkn.ikollect.presentation.feature.albumwizard.screen
+package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
 import android.Manifest
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -44,24 +24,19 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
-import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
-import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardDialogState
-import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
-import com.vbshkn.ikollect.presentation.navigation.Route
+import com.vbshkn.ikollect.presentation.feature.albums.wizard.steps.AlbumWizardSteps
+import com.vbshkn.ikollect.presentation.feature.wizard.GenericWizard
+import com.vbshkn.ikollect.presentation.feature.wizard.rememberWizardState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun WizardWrapper(
-    title: String,
-    currentRoute: Route.AlbumWizardFlow,
+fun AlbumWizardScreen(
     viewModel: AlbumWizardViewModel,
     onBack: () -> Unit,
     onNext: () -> Unit,
     onExit: () -> Unit,
     onCamera: () -> Unit = {},
     onScanner: () -> Unit = {},
-    isLastScreen: Boolean = false,
-    content: @Composable ((PaddingValues) -> Unit)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent: (AlbumWizardContract.Event) -> Unit = viewModel::onEvent
@@ -145,60 +120,33 @@ fun WizardWrapper(
             }
         }
     }
+
     DialogHost(
         dialogState = uiState.dialogState,
         onEvent = viewModel::onEvent,
         onRequestPermission = { cameraPermissionState.launchPermissionRequest() },
     )
-    Scaffold(
-        topBar = {
-            LargeTopAppBar(
-                title = { Text(title) },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { onEvent(AlbumWizardContract.Event.OnExitClicked) }
-                    ) {
-                        Icon(Icons.Default.Close, contentDescription = null)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        },
-        bottomBar = {
-            Surface(
-                tonalElevation = 3.dp,
-                modifier = Modifier.navigationBarsPadding()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(
-                        onClick = onBack,
-                        enabled = viewModel.canNavigateBack(currentRoute)
-                    ) { Text(text = stringResource(R.string.wizard_action_back)) }
-                    Button(
-                        onClick = onNext,
-                        enabled = viewModel.canNavigateNext(currentRoute)
-                    ) { Text(
-                        stringResource(
-                            if (isLastScreen) R.string.wizard_action_finish
-                            else R.string.wizard_action_next)
-                    ) }
-                }
-            }
-        },
-        content = { paddingValues ->
-            content(paddingValues)
-        }
+
+    Wrapper(viewModel)
+
+}
+
+@Composable
+fun Wrapper(viewModel: AlbumWizardViewModel) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val steps = remember { listOf(
+        AlbumWizardSteps.SeeInfoStep(viewModel),
+        AlbumWizardSteps.SelectVersionStep(viewModel),
+        AlbumWizardSteps.AddDetailsStep(viewModel),
+        AlbumWizardSteps.WrapUpStep(viewModel)
+    ) }
+    val wizardState = rememberWizardState(
+        steps = steps,
+        onFinish = { viewModel.onEvent(AlbumWizardContract.Event.OnWrapUp) },
+        onExit = { viewModel.onEvent(AlbumWizardContract.Event.OnExitClicked) }
     )
+    GenericWizard(wizardState)
 }
 
 @Composable

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.albums
+package com.vbshkn.ikollect.presentation.feature.albums.list
 
 import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.domain.model.Album

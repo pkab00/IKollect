@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.albums
+package com.vbshkn.ikollect.presentation.feature.albums.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,13 +9,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,22 +37,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
-import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 
 @Composable
 fun AlbumsScreen(
     viewModel: AlbumsViewModel,
-    toAddAlbumRoute: (AlbumCandidate) -> Unit
+    onGoToWizard: (AlbumCandidate) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent: (AlbumsContract.Event) -> Unit = viewModel::onEvent
@@ -66,7 +58,7 @@ fun AlbumsScreen(
         viewModel.effects.collect { effect ->
             when(effect) {
                 is AlbumsContract.Effect.NavigateToAlbum -> {}
-                is AlbumsContract.Effect.NavigateToSaveFlow -> toAddAlbumRoute(effect.candidate)
+                is AlbumsContract.Effect.NavigateToSaveFlow -> onGoToWizard(effect.candidate)
             }
         }
     }

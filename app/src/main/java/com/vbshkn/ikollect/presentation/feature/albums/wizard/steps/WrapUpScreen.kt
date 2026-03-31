@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.albumwizard.screen
+package com.vbshkn.ikollect.presentation.feature.albums.wizard.steps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,9 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.presentation.composable.WizardItemWrapper
-import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardContract
-import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardViewModel
+import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
+import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardContract
+import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
 import com.vbshkn.ikollect.util.UiText
 
 @Composable

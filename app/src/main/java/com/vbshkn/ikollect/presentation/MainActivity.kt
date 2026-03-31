@@ -48,6 +48,7 @@ fun IKollectApp() {
     val currentDestination = bachStackEntity?.destination
     val hideBottomNavBar = currentDestination?.hierarchy?.any {
         it.hasRoute<Route.AlbumWizardRoute>()
+                || it.hasRoute<Route.PhotocardWizardRoute>()
                 || it.hasRoute<Route.CameraScreen>()
                 || it.hasRoute<Route.KomcaScanner>()
     } == true

@@ -1,14 +1,12 @@
-package com.vbshkn.ikollect.presentation.feature.albums
+package com.vbshkn.ikollect.presentation.feature.albums.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
-import com.vbshkn.ikollect.domain.usecase.LoadAllAlbumsUseCase
+import com.vbshkn.ikollect.domain.usecase.GetAllAlbumsUseCase
 import com.vbshkn.ikollect.domain.usecase.ScanAlbumBarcodeUseCase
-import com.vbshkn.ikollect.presentation.feature.albums.AlbumsContract.Effect.*
-import com.vbshkn.ikollect.presentation.feature.albums.AlbumsDialogState.*
 import com.vbshkn.ikollect.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -22,12 +20,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
-    private val loadAllAlbumsUseCase: LoadAllAlbumsUseCase,
+    private val getAllAlbumsUseCase: GetAllAlbumsUseCase,
     private val scanAlbumBarcodeUseCase: ScanAlbumBarcodeUseCase,
 ): ViewModel() {
     private val _uiState = MutableStateFlow(AlbumsUIState())
     val uiState = _uiState.asStateFlow()
-    private val _effects = Channel<AlbumsContract.Effect>(Channel.BUFFERED)
+    private val _effects = Channel<AlbumsContract.Effect>(Channel.Factory.BUFFERED)
     val effects = _effects.receiveAsFlow()
 
     init {
@@ -39,7 +37,7 @@ class AlbumsViewModel @Inject constructor(
     fun onEvent(event: AlbumsContract.Event) {
         when(event) {
             is AlbumsContract.Event.OnAlbumClicked -> {
-                sendEffect(NavigateToAlbum(event.id))
+                sendEffect(AlbumsContract.Effect.NavigateToAlbum(event.id))
             }
             is AlbumsContract.Event.OnStartScanningClicked -> viewModelScope.launch {
                 scanAlbumBarcodeUseCase()
@@ -56,13 +54,14 @@ class AlbumsViewModel @Inject constructor(
                                 it.copy(scannedCandidate = result.data)
                             }
                             showDialog(
-                                ScanningResultDialog(
-                                    "${result.data.artistCandidates.joinToString { it.name }} - ${result.data.name}")
+                                AlbumsDialogState.ScanningResultDialog(
+                                    "${result.data.artistCandidates.joinToString { it.name }} - ${result.data.name}"
+                                )
                             )
                         }
                         is NetworkResult.Error -> {
                             showDialog(
-                                ScanningErrorDialog(
+                                AlbumsDialogState.ScanningErrorDialog(
                                     handleErrors(result.error)
                                 )
                             )
@@ -74,7 +73,7 @@ class AlbumsViewModel @Inject constructor(
                 val candidate = uiState.value.scannedCandidate
                 if (candidate != null) {
                     dismissDialog()
-                    sendEffect(NavigateToSaveFlow(candidate))
+                    sendEffect(AlbumsContract.Effect.NavigateToSaveFlow(candidate))
                 }
             }
             AlbumsContract.Event.OnDismissDialogClicked -> {
@@ -84,7 +83,7 @@ class AlbumsViewModel @Inject constructor(
     }
 
     private suspend fun collectAlbums() {
-        loadAllAlbumsUseCase().collect { result ->
+        getAllAlbumsUseCase().collect { result ->
             when(result) {
                 is NetworkResult.Loading -> _uiState.update {
                         it.copy(isLoading = true)
@@ -118,7 +117,7 @@ class AlbumsViewModel @Inject constructor(
     private fun dismissDialog() {
         _uiState.update {
             it.copy(
-                dialogState = None,
+                dialogState = AlbumsDialogState.None,
                 scannedCandidate = null
             )
         }

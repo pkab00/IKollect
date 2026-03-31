@@ -69,4 +69,5 @@
     <string name="artist_profile_status_group">Группа</string>
     <string name="artist_profile_status_soloist">Солист</string>
     <string name="artist_profile_title_notes">Заметки</string>
+    <string name="screen_title_photocards">Фотокарты</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.albumwizard
+package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
 sealed class AlbumWizardDialogState {
     object ConfirmExitWizardDialog : AlbumWizardDialogState()

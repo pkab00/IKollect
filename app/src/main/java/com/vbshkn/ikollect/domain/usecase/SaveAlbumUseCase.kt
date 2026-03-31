@@ -8,7 +8,7 @@ import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.repository.ArtistRepository
 import com.vbshkn.ikollect.data.repository.ImageRepository
 import com.vbshkn.ikollect.di.ApplicationScope
-import com.vbshkn.ikollect.presentation.feature.albumwizard.AlbumWizardUIState
+import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardUIState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.albumwizard
+package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -108,26 +108,8 @@ class AlbumWizardViewModel @Inject constructor(
             }
             AlbumWizardContract.Event.OnWrapUp -> viewModelScope.launch {
                 saveAlbumUseCase(uiState.value)
+                sendEffect(AlbumWizardContract.Effect.Exit)
             }
-        }
-    }
-
-    fun canNavigateBack(currentRoute: Route.AlbumWizardFlow): Boolean {
-        return when (currentRoute) {
-            Route.AlbumWizardFlow.SeeInfo -> false
-            else -> true
-        }
-    }
-
-    fun canNavigateNext(currentRoute: Route.AlbumWizardFlow): Boolean {
-        return when (currentRoute) {
-            Route.AlbumWizardFlow.SeeInfo -> true
-            Route.AlbumWizardFlow.SelectVersion -> _uiState.value.versionCandidate != null
-            Route.AlbumWizardFlow.DetailsWizard -> {
-                val candidate = _uiState.value.versionCandidate
-                candidate?.coverImage != null && candidate.name.isNotBlank()
-            }
-            Route.AlbumWizardFlow.WrapUp -> true
         }
     }
 
