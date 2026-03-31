@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.artists.profile
 
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,12 +27,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.toBitmap
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.Artist
@@ -50,6 +58,7 @@ import com.vbshkn.ikollect.presentation.composable.EmptyCardGridFiller
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.ProfileItemWrapper
 import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
+import com.vbshkn.ikollect.util.PaletteUtil
 import com.vbshkn.ikollect.util.TimeUtil.toDateString
 import com.vbshkn.ikollect.util.UiText
 import me.onebone.toolbar.CollapsingToolbarScaffold
@@ -260,6 +269,12 @@ fun MemberOrGroupCard(
     artist: Artist,
     onClick: (Long) -> Unit
 ) {
+    val initialColors = listOf(
+        MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f),
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    )
+    var imageGradient by remember { mutableStateOf(Brush.verticalGradient(initialColors)) }
+
     Surface(
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.size(height = 180.dp, width = 160.dp),
@@ -272,10 +287,22 @@ fun MemberOrGroupCard(
                 .clickable { onClick(artist.artistId) }
         ) {
             AsyncImage(
-                model = artist.profileImage,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(artist.profileImage)
+                    .allowHardware(false)
+                    .build(),
+                onSuccess = { result ->
+                    val bitmap = result.result.image.toBitmap()
+                    imageGradient = PaletteUtil.getVividGradient(
+                        bitmap = bitmap,
+                        defaultColors = initialColors
+                    )
+                },
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
-                modifier = Modifier.weight(0.8f)
+                modifier = Modifier
+                    .weight(0.8f)
+                    .background(imageGradient)
             )
 
             Column(

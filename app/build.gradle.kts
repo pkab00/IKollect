@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.palette)
 
     // --- HILT ---
     implementation(libs.hilt.android)

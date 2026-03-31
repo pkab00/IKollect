@@ -18,6 +18,7 @@ composeBom = "2026.02.01"
 loggingInterceptor = "5.3.2"
 materialIconsCore = "1.7.8"
 navigationCompose = "2.9.7"
+palette = "1.0.0"
 playServicesCodeScanner = "16.1.0"
 playServicesMlkitTextRecognition = "19.0.1"
 retrofit = "3.0.0"
@@ -42,6 +43,7 @@ androidx-compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-palette = { module = "androidx.palette:palette", version.ref = "palette" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }

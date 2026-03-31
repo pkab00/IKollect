@@ -21,21 +21,30 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.toBitmap
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.ArtistOverview
 import com.vbshkn.ikollect.presentation.composable.CardGrid
 import com.vbshkn.ikollect.presentation.composable.EmptyCardGridFiller
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
+import com.vbshkn.ikollect.util.PaletteUtil
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
@@ -66,8 +75,9 @@ fun AccountScreen(
                 onAction = onShowAllGroupsClick
             ) {
                 val items = uiState.groupOverviews
-                if (items.isEmpty()) { EmptyCardGridFiller() }
-                else {
+                if (items.isEmpty()) {
+                    EmptyCardGridFiller()
+                } else {
                     CardGrid {
                         items(
                             items = items,
@@ -87,8 +97,9 @@ fun AccountScreen(
                 onAction = onShowAllSoloistsClick
             ) {
                 val items = uiState.soloistsOverviews
-                if (items.isEmpty()) { EmptyCardGridFiller() }
-                else {
+                if (items.isEmpty()) {
+                    EmptyCardGridFiller()
+                } else {
                     CardGrid {
                         items(
                             items = items,
@@ -144,6 +155,12 @@ private fun ArtistBox(
     overview: ArtistOverview,
     onClick: (Long) -> Unit
 ) {
+    val initialColors = listOf(
+        MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f),
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    )
+    var imageGradient by remember { mutableStateOf(Brush.verticalGradient(initialColors)) }
+
     Surface(
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.size(120.dp),
@@ -157,10 +174,23 @@ private fun ArtistBox(
                 .clickable { onClick(overview.artistId) }
         ) {
             AsyncImage(
-                model = overview.imageUrl,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(overview.imageUrl)
+                    .allowHardware(false)
+                    .build(),
+                onSuccess = { result ->
+                    val bitmap = result.result.image.toBitmap()
+                    imageGradient = PaletteUtil.getVividGradient(
+                        bitmap = bitmap,
+                        defaultColors = initialColors
+                    )
+                },
                 contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.weight(0.6f)
+                contentScale = ContentScale.FillHeight,
+                modifier = Modifier
+                    .weight(0.6f)
+                    .fillMaxWidth()
+                    .background(imageGradient)
             )
 
             Column(
@@ -173,7 +203,7 @@ private fun ArtistBox(
                 SmallTextLabel(
                     text = UiText.DynamicString(
                         "${stringResource(R.string.label_albums_count)} ${overview.albumsCount}\n"
-                            +"${stringResource(R.string.label_photocards_count)} ${overview.photocardsCount}"
+                                + "${stringResource(R.string.label_photocards_count)} ${overview.photocardsCount}"
                     )
                 )
                 Text(
