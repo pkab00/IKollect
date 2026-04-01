@@ -7,7 +7,7 @@ import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizar
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
-fun WizardWrapper(
+fun PhotocardWizardScreen(
     viewModel: PhotocardWizardViewModel,
     content: @Composable ((PaddingValues) -> Unit)
 ) {
@@ -19,5 +19,7 @@ fun WizardWrapper(
         backEnabled = true,
         nextEnabled = true,
         isLastScreen = false,
+        stepNumber = 1,
+        totalSteps = 2,
     ) { paddingValues -> content(paddingValues) }
 }

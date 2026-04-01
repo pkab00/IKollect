@@ -10,10 +10,12 @@ import com.vbshkn.ikollect.util.UiText
 
 class WizardState(
     val steps: List<WizardStep>,
+    private val initialStepIndex: Int,
+    private val onStepChanged: (Int) -> Unit,
     private val onFinish: () -> Unit,
     private val onExit: () -> Unit
 ) {
-    var currentStepIndex by mutableIntStateOf(0)
+    var currentStepIndex by mutableIntStateOf(initialStepIndex)
         private set
     val currentStep get() = steps[currentStepIndex]
     val isFirstStep get() = currentStepIndex == 0
@@ -21,11 +23,18 @@ class WizardState(
 
     fun next() {
         if (isLastStep) onFinish()
-        else currentStepIndex++
+        else {
+            currentStepIndex++
+            onStepChanged(currentStepIndex)
+        }
+
     }
 
     fun back() {
-        if (!isFirstStep) currentStepIndex--
+        if (!isFirstStep) {
+            currentStepIndex--
+            onStepChanged(currentStepIndex)
+        }
         else onExit()
     }
 
@@ -35,14 +44,17 @@ class WizardState(
 @Composable
 fun rememberWizardState(
     steps: List<WizardStep>,
+    initialStepIndex: Int,
+    onStepChanged: (Int) -> Unit,
     onFinish: () -> Unit,
     onExit: () -> Unit
+
 ) : WizardState {
-    return remember { WizardState(steps, onFinish, onExit) }
+    return remember { WizardState(steps, initialStepIndex, onStepChanged, onFinish, onExit) }
 }
 
 interface WizardStep {
     val title: UiText
     @Composable fun isNextEnabled(): Boolean
-    @Composable fun Content(paddingValues: PaddingValues)
+    @Composable fun Content()
 }

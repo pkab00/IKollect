@@ -18,8 +18,8 @@ sealed interface AlbumWizardSteps {
             return true
         }
         @Composable
-        override fun Content(paddingValues: PaddingValues) {
-            SeeInfoScreen(viewModel, paddingValues)
+        override fun Content() {
+            SeeInfoScreen(viewModel)
         }
     }
 
@@ -31,8 +31,8 @@ sealed interface AlbumWizardSteps {
             return state.versionCandidate != null
         }
         @Composable
-        override fun Content(paddingValues: PaddingValues) {
-            SelectVersionScreen(viewModel, paddingValues)
+        override fun Content() {
+            SelectVersionScreen(viewModel)
         }
     }
 
@@ -45,8 +45,8 @@ sealed interface AlbumWizardSteps {
             return candidate?.coverImage != null && candidate.name.isNotBlank()
         }
         @Composable
-        override fun Content(paddingValues: PaddingValues) {
-            AddDetailsScreen(viewModel, paddingValues)
+        override fun Content() {
+            AddDetailsScreen(viewModel)
         }
     }
 
@@ -57,8 +57,8 @@ sealed interface AlbumWizardSteps {
             return true
         }
         @Composable
-        override fun Content(paddingValues: PaddingValues) {
-            WrapUpScreen(viewModel, paddingValues)
+        override fun Content() {
+            WrapUpScreen(viewModel)
         }
     }
 }

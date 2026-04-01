@@ -22,6 +22,7 @@ interface AlbumWizardContract {
         object OnScanKomca : Event
         object OnShowCameraRationale : Event
         object OnShowKomcaHint : Event
+        data class OnStepChanged(val newStep: Int) : Event
         data class OnPictureCaptured(val uri: String) : Event
         data class OnUpdateVersion(val candidate: VersionCandidate) : Event
         data class OnExistingPhotoSelected(val path: String) : Event

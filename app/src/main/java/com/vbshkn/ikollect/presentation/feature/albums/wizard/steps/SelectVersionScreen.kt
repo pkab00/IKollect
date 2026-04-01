@@ -35,10 +35,7 @@ import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardContrac
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
 
 @Composable
-fun SelectVersionScreen(
-    viewModel: AlbumWizardViewModel,
-    paddingValues: PaddingValues
-) {
+fun SelectVersionScreen(viewModel: AlbumWizardViewModel, ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val versions = uiState.albumCandidate.versionCandidates
     val selectedVersion = uiState.versionCandidate
@@ -50,7 +47,6 @@ fun SelectVersionScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
             .padding(vertical = 16.dp, horizontal = 8.dp)
     ) {
         items(versions + blankVersionCandidate) { version ->

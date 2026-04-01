@@ -19,10 +19,7 @@ import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewMod
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
-fun SeeInfoScreen(
-    viewModel: AlbumWizardViewModel,
-    paddingValues: PaddingValues,
-) {
+fun SeeInfoScreen(viewModel: AlbumWizardViewModel, ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val candidate = uiState.albumCandidate
 
@@ -30,7 +27,6 @@ fun SeeInfoScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues)
             .padding(top = 16.dp)
     ) {
         with(candidate) {

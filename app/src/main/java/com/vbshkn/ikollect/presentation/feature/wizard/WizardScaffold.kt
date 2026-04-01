@@ -33,6 +33,8 @@ import com.vbshkn.ikollect.util.UiText
 @Composable
 fun WizardScaffold(
     title: UiText,
+    stepNumber: Int,
+    totalSteps: Int,
     onExit: () -> Unit,
     onBack: () -> Unit,
     onNext: () -> Unit,
@@ -50,6 +52,12 @@ fun WizardScaffold(
         topBar = {
             LargeTopAppBar(
                 title = { Text(title.asString()) },
+                actions = {
+                    Text(
+                        text = stringResource(R.string.wizard_step) + " $stepNumber/$totalSteps",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onExit) {
                         Icon(Icons.Default.Close, contentDescription = null)
@@ -58,7 +66,8 @@ fun WizardScaffold(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
         },
@@ -81,11 +90,14 @@ fun WizardScaffold(
                     Button(
                         onClick = onNext,
                         enabled = nextEnabled
-                    ) { Text(
-                        stringResource(
-                            if (isLastScreen) R.string.wizard_action_finish
-                            else R.string.wizard_action_next)
-                    ) }
+                    ) {
+                        Text(
+                            stringResource(
+                                if (isLastScreen) R.string.wizard_action_finish
+                                else R.string.wizard_action_next
+                            )
+                        )
+                    }
                 }
             }
         },

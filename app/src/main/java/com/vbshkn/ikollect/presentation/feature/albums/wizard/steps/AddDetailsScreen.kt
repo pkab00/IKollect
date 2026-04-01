@@ -46,10 +46,7 @@ import com.vbshkn.ikollect.util.UiText
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun AddDetailsScreen(
-    viewModel: AlbumWizardViewModel,
-    paddingValues: PaddingValues
-) {
+fun AddDetailsScreen(viewModel: AlbumWizardViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val showVersionNameField = remember { uiState.versionCandidate?.name?.isBlank() == true }
 
@@ -57,7 +54,6 @@ fun AddDetailsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues)
             .padding(top = 16.dp)
     ) {
         if (showVersionNameField) {
@@ -191,7 +187,6 @@ private fun SelectImageItem(
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            CoverImage(imageUrl)
             Text(
                 text = stringResource(
                     if (imageUrl != null) R.string.add_details_caption_has_cover
@@ -211,6 +206,7 @@ private fun SelectImageItem(
                     Text(text = stringResource(R.string.add_details_take_picture))
                 }
             }
+            CoverImage(imageUrl)
         }
     }
 }
@@ -220,18 +216,20 @@ private fun CoverImage(imageUrl: String?) {
     if (imageUrl == null) {
         Box(
             Modifier
-                .width(100.dp)
-                .height(135.dp)
+                .fillMaxWidth()
+                .height(200.dp)
                 .background(Color.LightGray)
+                .padding(18.dp)
         )
     } else {
         AsyncImage(
             model = imageUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .width(100.dp)
-                .height(135.dp)
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(18.dp)
         )
     }
 }

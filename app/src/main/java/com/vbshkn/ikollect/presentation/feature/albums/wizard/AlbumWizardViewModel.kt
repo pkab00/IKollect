@@ -23,7 +23,7 @@ class AlbumWizardViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val saveAlbumUseCase: SaveAlbumUseCase
 ) : ViewModel() {
-    private val args = savedStateHandle.toRoute<Route.AlbumWizardRoute>(
+    private val args = savedStateHandle.toRoute<Route.AlbumWizard>(
         typeMap = mapOf(typeOf<AlbumCandidate>() to AlbumCandidateType)
     )
     private val _uiState = MutableStateFlow(AlbumWizardUIState(albumCandidate = args.candidate))
@@ -64,18 +64,17 @@ class AlbumWizardViewModel @Inject constructor(
             is AlbumWizardContract.Event.OnShowCameraRationale -> {
                 showDialog(AlbumWizardDialogState.CameraRationaleWizardDialog)
             }
-            is AlbumWizardContract.Event.OnPictureCaptured -> {
-                _uiState.update {
-                    it.copy(
-                        versionCandidate = it.versionCandidate?.copy(coverImage = event.uri),
-                        isCoverCached = true
-                    )
-                }
+            is AlbumWizardContract.Event.OnStepChanged -> _uiState.update {
+                it.copy(stepIndex = event.newStep)
             }
-            is AlbumWizardContract.Event.OnUpdateVersion -> {
-                _uiState.update {
-                    it.copy(versionCandidate = event.candidate)
-                }
+            is AlbumWizardContract.Event.OnPictureCaptured -> _uiState.update {
+                it.copy(
+                    versionCandidate = it.versionCandidate?.copy(coverImage = event.uri),
+                    isCoverCached = true
+                )
+            }
+            is AlbumWizardContract.Event.OnUpdateVersion -> _uiState.update {
+                it.copy(versionCandidate = event.candidate)
             }
             is AlbumWizardContract.Event.OnExistingPhotoSelected -> {
                 _uiState.value.versionCandidate?.let { candidate ->

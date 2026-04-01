@@ -1,6 +1,10 @@
 package com.vbshkn.ikollect.presentation.feature.wizard
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
 fun GenericWizard(
@@ -8,11 +12,15 @@ fun GenericWizard(
 ) {
     WizardScaffold(
         title = state.currentStep.title,
+        stepNumber = state.currentStepIndex + 1,
+        totalSteps = state.steps.size,
         onExit = { state.exit() },
         onBack = { state.back() },
         onNext = { state.next() },
-        backEnabled = !state.isLastStep,
+        backEnabled = !state.isFirstStep,
         nextEnabled = state.currentStep.isNextEnabled(),
         isLastScreen = state.isLastStep
-    ) { paddingValues -> state.currentStep.Content(paddingValues) }
+    ) { paddingValues ->
+        Box(Modifier.fillMaxSize().padding(paddingValues)) { state.currentStep.Content() }
+    }
 }

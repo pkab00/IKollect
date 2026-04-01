@@ -18,17 +18,6 @@ sealed interface Route {
         @Serializable data object AllGroups : ArtistsFlow()
         @Serializable data object AllSoloists : ArtistsFlow()
     }
-
-    @Serializable data class AlbumWizardRoute(val candidate: AlbumCandidate) : Route
-    @Serializable sealed class AlbumWizardFlow : Route {
-        @Serializable data object SeeInfo : AlbumWizardFlow()
-        @Serializable data object SelectVersion : AlbumWizardFlow()
-        @Serializable data object AddDetails : AlbumWizardFlow()
-        @Serializable data object WrapUp : AlbumWizardFlow()
-    }
-
-    @Serializable data object PhotocardWizardRoute : Route
-    @Serializable sealed class PhotocardWizardFlow : Route {
-        @Serializable data object SelectPhoto : PhotocardWizardFlow()
-    }
+    @Serializable data class AlbumWizard(val candidate: AlbumCandidate) : Route
+    @Serializable data object PhotocardWizard : Route
 }

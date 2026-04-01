@@ -11,11 +11,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -32,14 +36,28 @@ import com.vbshkn.ikollect.presentation.feature.wizard.rememberWizardState
 @Composable
 fun AlbumWizardScreen(
     viewModel: AlbumWizardViewModel,
-    onBack: () -> Unit,
-    onNext: () -> Unit,
     onExit: () -> Unit,
-    onCamera: () -> Unit = {},
-    onScanner: () -> Unit = {},
+    onCamera: () -> Unit,
+    onScanner: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent: (AlbumWizardContract.Event) -> Unit = viewModel::onEvent
+
+    val steps = remember {
+        listOf(
+            AlbumWizardSteps.SeeInfoStep(viewModel),
+            AlbumWizardSteps.SelectVersionStep(viewModel),
+            AlbumWizardSteps.AddDetailsStep(viewModel),
+            AlbumWizardSteps.WrapUpStep(viewModel)
+        )
+    }
+    val wizardState = rememberWizardState(
+        steps = steps,
+        initialStepIndex = uiState.stepIndex,
+        onStepChanged = { viewModel.onEvent(AlbumWizardContract.Event.OnStepChanged(it)) },
+        onFinish = { viewModel.onEvent(AlbumWizardContract.Event.OnWrapUp) },
+        onExit = { viewModel.onEvent(AlbumWizardContract.Event.OnExitClicked) }
+    )
 
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -60,15 +78,19 @@ fun AlbumWizardScreen(
 
     LaunchedEffect(cameraPermissionState.status) {
         if (cameraPermissionState.status.isGranted) {
-            when(pending) {
+            when (pending) {
                 PENDING.CAMERA -> {
                     pending = PENDING.NONE
+                    android.util.Log.d("ALBUM_CAMERA", "HELLO FROM SCREEN...")
                     onCamera()
                 }
-                PENDING.SCANNER  -> {
+
+                PENDING.SCANNER -> {
                     pending = PENDING.NONE
-                    onScanner()
+                    android.util.Log.d("ALBUM_CAMERA", "HELLO FROM SCREEN...")
+                    onCamera()
                 }
+
                 else -> {}
             }
         }
@@ -76,41 +98,48 @@ fun AlbumWizardScreen(
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
-            when(effect) {
+            when (effect) {
                 AlbumWizardContract.Effect.Exit -> onExit()
-                AlbumWizardContract.Effect.NavigateBack -> onBack()
-                AlbumWizardContract.Effect.NavigateNext -> onNext()
+                AlbumWizardContract.Effect.NavigateBack -> wizardState.back()
+                AlbumWizardContract.Effect.NavigateNext -> wizardState.next()
                 AlbumWizardContract.Effect.OpenGallery -> {
                     galleryLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
                 }
+
                 AlbumWizardContract.Effect.TryOpenCamera -> {
                     val status = cameraPermissionState.status
                     when {
                         status.isGranted -> {
+                            android.util.Log.d("ALBUM_CAMERA", "HELLO FROM SCREEN...")
                             onCamera()
                         }
+
                         status.shouldShowRationale -> {
                             pending = PENDING.CAMERA
                             onEvent(AlbumWizardContract.Event.OnShowCameraRationale)
                         }
+
                         else -> {
                             pending = PENDING.CAMERA
                             cameraPermissionState.launchPermissionRequest()
                         }
                     }
                 }
+
                 AlbumWizardContract.Effect.TryOpenScanner -> {
                     val status = cameraPermissionState.status
                     when {
                         status.isGranted -> {
                             onScanner()
                         }
+
                         status.shouldShowRationale -> {
                             pending = PENDING.SCANNER
                             onEvent(AlbumWizardContract.Event.OnShowCameraRationale)
                         }
+
                         else -> {
                             pending = PENDING.SCANNER
                             cameraPermissionState.launchPermissionRequest()
@@ -127,25 +156,6 @@ fun AlbumWizardScreen(
         onRequestPermission = { cameraPermissionState.launchPermissionRequest() },
     )
 
-    Wrapper(viewModel)
-
-}
-
-@Composable
-fun Wrapper(viewModel: AlbumWizardViewModel) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val steps = remember { listOf(
-        AlbumWizardSteps.SeeInfoStep(viewModel),
-        AlbumWizardSteps.SelectVersionStep(viewModel),
-        AlbumWizardSteps.AddDetailsStep(viewModel),
-        AlbumWizardSteps.WrapUpStep(viewModel)
-    ) }
-    val wizardState = rememberWizardState(
-        steps = steps,
-        onFinish = { viewModel.onEvent(AlbumWizardContract.Event.OnWrapUp) },
-        onExit = { viewModel.onEvent(AlbumWizardContract.Event.OnExitClicked) }
-    )
     GenericWizard(wizardState)
 }
 
@@ -155,7 +165,7 @@ private fun DialogHost(
     onEvent: (AlbumWizardContract.Event) -> Unit,
     onRequestPermission: () -> Unit
 ) {
-    when(dialogState) {
+    when (dialogState) {
         is AlbumWizardDialogState.ConfirmExitWizardDialog -> {
             ConfirmDialog(
                 onConfirm = { onEvent(AlbumWizardContract.Event.OnExitConfirmed) },
@@ -165,6 +175,7 @@ private fun DialogHost(
                 action = stringResource(R.string.dialog_action_yes)
             )
         }
+
         is AlbumWizardDialogState.CameraRationaleWizardDialog -> {
             InfoDialog(
                 title = stringResource(R.string.dialog_title_request_camera),
@@ -175,6 +186,7 @@ private fun DialogHost(
                 }
             )
         }
+
         is AlbumWizardDialogState.CameraErrorWizardDialog -> {
             ErrorDialog(
                 title = stringResource(R.string.dialog_title_failed_saving_photo),
@@ -182,6 +194,7 @@ private fun DialogHost(
                 onDismiss = { onEvent(AlbumWizardContract.Event.OnDismissDialog) }
             )
         }
+
         is AlbumWizardDialogState.AboutKomcaWizardDialog -> {
             InfoDialog(
                 title = stringResource(R.string.dialog_about_komca_title),
@@ -189,6 +202,7 @@ private fun DialogHost(
                 onDismiss = { onEvent(AlbumWizardContract.Event.OnDismissDialog) }
             )
         }
+
         is AlbumWizardDialogState.None -> {}
     }
 }

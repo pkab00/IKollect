@@ -25,17 +25,13 @@ import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewMod
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
-fun WrapUpScreen(
-    viewModel: AlbumWizardViewModel,
-    paddingValues: PaddingValues
-) {
+fun WrapUpScreen(viewModel: AlbumWizardViewModel, ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues)
             .padding(top = 16.dp)
     ) {
         item {
