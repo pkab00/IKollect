@@ -49,7 +49,8 @@ fun IKollectApp() {
     val hideBottomNavBar = currentDestination?.hierarchy?.any {
         it.hasRoute<Route.AlbumWizard>()
                 || it.hasRoute<Route.PhotocardWizard>()
-                || it.hasRoute<Route.CameraScreen>()
+                || it.hasRoute<Route.AlbumCameraScreen>()
+                || it.hasRoute<Route.PhotocardCameraScreen>()
                 || it.hasRoute<Route.KomcaScanner>()
     } == true
     val navSuiteType = if (hideBottomNavBar) {

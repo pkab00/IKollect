@@ -32,7 +32,6 @@ fun WrapUpScreen(viewModel: AlbumWizardViewModel, ) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = 16.dp)
     ) {
         item {
             WizardItemWrapper(title = UiText.StringResource(R.string.wizard_title_notes)) {

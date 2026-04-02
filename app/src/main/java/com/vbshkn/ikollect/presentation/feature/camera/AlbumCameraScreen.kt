@@ -7,7 +7,6 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,21 +19,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.presentation.composable.CameraPreview
 import java.io.File
 
 @Composable
-fun CameraScreen(
+fun AlbumCameraScreen(
     onPhotoTaken: (String?) -> Unit
 ) {
     val context = LocalContext.current
@@ -64,7 +59,6 @@ fun CameraScreen(
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         Box(
-            contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)

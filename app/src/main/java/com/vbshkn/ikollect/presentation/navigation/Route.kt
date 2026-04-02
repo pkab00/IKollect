@@ -7,8 +7,10 @@ import kotlinx.serialization.Serializable
 sealed interface Route {
     @Serializable data object Albums : Route
     @Serializable data object Photocards : Route
-    @Serializable data object CameraScreen : Route
+
+    @Serializable data object AlbumCameraScreen : Route
     @Serializable data object KomcaScanner : Route
+    @Serializable data object PhotocardCameraScreen : Route
 
     @Serializable data class ArtistProfile(val id: Long) : Route
 

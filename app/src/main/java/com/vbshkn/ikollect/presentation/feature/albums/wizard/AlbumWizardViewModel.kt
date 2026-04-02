@@ -26,11 +26,11 @@ class AlbumWizardViewModel @Inject constructor(
     private val args = savedStateHandle.toRoute<Route.AlbumWizard>(
         typeMap = mapOf(typeOf<AlbumCandidate>() to AlbumCandidateType)
     )
+
     private val _uiState = MutableStateFlow(AlbumWizardUIState(albumCandidate = args.candidate))
     val uiState = _uiState.asStateFlow()
     private val _effects = Channel<AlbumWizardContract.Effect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
-
 
     fun onEvent(event: AlbumWizardContract.Event) {
         when (event) {

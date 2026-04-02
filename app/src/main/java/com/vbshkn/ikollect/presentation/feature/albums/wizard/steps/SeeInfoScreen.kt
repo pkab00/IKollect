@@ -27,7 +27,6 @@ fun SeeInfoScreen(viewModel: AlbumWizardViewModel, ) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = 16.dp)
     ) {
         with(candidate) {
             item { DataOutlinedCard(

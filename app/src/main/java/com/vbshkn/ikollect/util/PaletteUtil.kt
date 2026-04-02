@@ -14,7 +14,7 @@ object PaletteUtil {
         return palette.dominantSwatch?.rgb?.let { Color(it) } ?: defaultColor
     }
 
-    fun getVividGradient(
+    fun getVibrantGradient(
         bitmap: Bitmap,
         defaultColors: List<Color>
     ): Brush {
@@ -26,5 +26,19 @@ object PaletteUtil {
             return Brush.verticalGradient(colors = defaultColors)
         }
         return Brush.verticalGradient(colors = listOf(dominantColor, vibrantColor))
+    }
+
+    fun getSoftGradient(
+        bitmap: Bitmap,
+        defaultColors: List<Color>
+    ): Brush {
+        val palette = Palette.from(bitmap).generate()
+        val dominantColor = palette.dominantSwatch?.rgb?.let { Color(it) }
+        val mutedColor = palette.lightMutedSwatch?.rgb?.let { Color(it) }
+
+        if (dominantColor == null || mutedColor == null) {
+            return Brush.verticalGradient(colors = defaultColors)
+        }
+        return Brush.verticalGradient(colors = listOf(dominantColor, mutedColor))
     }
 }

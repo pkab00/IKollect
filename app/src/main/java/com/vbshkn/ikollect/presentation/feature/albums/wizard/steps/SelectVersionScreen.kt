@@ -47,7 +47,7 @@ fun SelectVersionScreen(viewModel: AlbumWizardViewModel, ) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 16.dp, horizontal = 8.dp)
+            .padding(horizontal = 8.dp)
     ) {
         items(versions + blankVersionCandidate) { version ->
             VersionPreview(

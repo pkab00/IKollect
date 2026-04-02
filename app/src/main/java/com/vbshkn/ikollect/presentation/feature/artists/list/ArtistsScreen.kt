@@ -180,7 +180,7 @@ private fun ArtistBox(
                     .build(),
                 onSuccess = { result ->
                     val bitmap = result.result.image.toBitmap()
-                    imageGradient = PaletteUtil.getVividGradient(
+                    imageGradient = PaletteUtil.getVibrantGradient(
                         bitmap = bitmap,
                         defaultColors = initialColors
                     )

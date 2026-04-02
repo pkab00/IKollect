@@ -2,7 +2,7 @@ package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
 import com.vbshkn.ikollect.domain.model.VersionCandidate
 
-interface AlbumWizardContract {
+sealed interface AlbumWizardContract {
     sealed interface Effect {
         object NavigateBack : Effect
         object NavigateNext : Effect

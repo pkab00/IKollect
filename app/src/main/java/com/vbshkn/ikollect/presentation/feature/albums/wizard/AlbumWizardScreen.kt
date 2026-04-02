@@ -17,9 +17,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavBackStackEntry
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -30,12 +32,15 @@ import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.steps.AlbumWizardSteps
 import com.vbshkn.ikollect.presentation.feature.wizard.GenericWizard
+import com.vbshkn.ikollect.presentation.feature.wizard.dialog.CameraRationaleDialog
+import com.vbshkn.ikollect.presentation.feature.wizard.dialog.ExitWizardDialog
 import com.vbshkn.ikollect.presentation.feature.wizard.rememberWizardState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun AlbumWizardScreen(
     viewModel: AlbumWizardViewModel,
+    savedStateHandle: SavedStateHandle,
     onExit: () -> Unit,
     onCamera: () -> Unit,
     onScanner: () -> Unit
@@ -81,13 +86,11 @@ fun AlbumWizardScreen(
             when (pending) {
                 PENDING.CAMERA -> {
                     pending = PENDING.NONE
-                    android.util.Log.d("ALBUM_CAMERA", "HELLO FROM SCREEN...")
                     onCamera()
                 }
 
                 PENDING.SCANNER -> {
                     pending = PENDING.NONE
-                    android.util.Log.d("ALBUM_CAMERA", "HELLO FROM SCREEN...")
                     onCamera()
                 }
 
@@ -112,7 +115,6 @@ fun AlbumWizardScreen(
                     val status = cameraPermissionState.status
                     when {
                         status.isGranted -> {
-                            android.util.Log.d("ALBUM_CAMERA", "HELLO FROM SCREEN...")
                             onCamera()
                         }
 
@@ -150,13 +152,38 @@ fun AlbumWizardScreen(
         }
     }
 
+    CameraResultObserver(
+        viewModel = viewModel,
+        savedStateHandle = savedStateHandle
+    )
     DialogHost(
         dialogState = uiState.dialogState,
         onEvent = viewModel::onEvent,
         onRequestPermission = { cameraPermissionState.launchPermissionRequest() },
     )
-
     GenericWizard(wizardState)
+}
+
+@Composable
+private fun CameraResultObserver(
+    viewModel: AlbumWizardViewModel,
+    savedStateHandle: SavedStateHandle
+) {
+    val cameraResult by savedStateHandle.getStateFlow<String?>("camera_result", null)
+        .collectAsStateWithLifecycle()
+    val scannerResult by savedStateHandle.getStateFlow<String?>("scanner_result", null)
+        .collectAsStateWithLifecycle()
+
+    LaunchedEffect(cameraResult, scannerResult) {
+        if (cameraResult != null) {
+            viewModel.onEvent(AlbumWizardContract.Event.OnPictureCaptured(cameraResult!!))
+            savedStateHandle["camera_result"] = null
+        }
+        if (scannerResult != null) {
+            viewModel.onEvent(AlbumWizardContract.Event.OnKomcaCodeChanged(scannerResult!!))
+            savedStateHandle["scanner_result"] = null
+        }
+    }
 }
 
 @Composable
@@ -167,24 +194,17 @@ private fun DialogHost(
 ) {
     when (dialogState) {
         is AlbumWizardDialogState.ConfirmExitWizardDialog -> {
-            ConfirmDialog(
+            ExitWizardDialog(
                 onConfirm = { onEvent(AlbumWizardContract.Event.OnExitConfirmed) },
-                onDismiss = { onEvent(AlbumWizardContract.Event.OnDismissDialog) },
-                title = stringResource(R.string.dialog_title_exit),
-                text = stringResource(R.string.dialog_body_unsaved_data),
-                action = stringResource(R.string.dialog_action_yes)
+                onDismiss = { onEvent(AlbumWizardContract.Event.OnDismissDialog) }
             )
         }
 
         is AlbumWizardDialogState.CameraRationaleWizardDialog -> {
-            InfoDialog(
-                title = stringResource(R.string.dialog_title_request_camera),
-                text = stringResource(R.string.dialog_body_request_camera),
-                onDismiss = {
-                    onEvent(AlbumWizardContract.Event.OnDismissDialog)
-                    onRequestPermission()
-                }
-            )
+            CameraRationaleDialog {
+                onEvent(AlbumWizardContract.Event.OnDismissDialog)
+                onRequestPermission()
+            }
         }
 
         is AlbumWizardDialogState.CameraErrorWizardDialog -> {
