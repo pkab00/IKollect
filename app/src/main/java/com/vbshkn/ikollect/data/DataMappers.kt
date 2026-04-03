@@ -23,7 +23,11 @@ object DataMappers {
     fun ArtistDetailsResponse.toDomain(): ArtistCandidate {
         return ArtistCandidate(
             artistId = this.id,
-            name = ArtistNameHelper.pickBestNameOption(this.name, this.nameVariations),
+            name = ArtistNameHelper.pickBestNameOption(
+                apiName = this.name,
+                nameVariations = this.nameVariations,
+                isGroupName = !this.members.isNullOrEmpty()
+            ),
             isGroup = !this.members.isNullOrEmpty(),
             isFavorite = false,
             profileImage = this.images.first().uri,
@@ -34,7 +38,11 @@ object DataMappers {
     fun ArtistDetailsResponse.toEntity(): ArtistEntity {
         return ArtistEntity(
             artistId = this.id,
-            name = ArtistNameHelper.pickBestNameOption(this.name, this.nameVariations),
+            name = ArtistNameHelper.pickBestNameOption(
+                apiName = this.name,
+                nameVariations = this.nameVariations,
+                isGroupName = !this.members.isNullOrEmpty()
+            ),
             isGroup = !this.members.isNullOrEmpty(),
             isFavorite = false,
             imageUrl = if (this.images.isEmpty()) null
