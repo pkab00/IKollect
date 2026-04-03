@@ -3,11 +3,11 @@ package com.vbshkn.ikollect.data.repository
 import com.vbshkn.ikollect.data.DataMappers.toDomain
 import com.vbshkn.ikollect.data.DataMappers.toEntity
 import com.vbshkn.ikollect.data.local.datasource.ArtistLocalDataSource
-import com.vbshkn.ikollect.data.local.model.pojo.ArtistMinimalDetail
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.pojo.GroupWithMembers
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.datasource.ArtistRemoteDataSource
+import com.vbshkn.ikollect.domain.model.Artist
 import com.vbshkn.ikollect.domain.model.ArtistOverview
 import com.vbshkn.ikollect.domain.model.ArtistProfileData
 import com.vbshkn.ikollect.util.asLocalResult
@@ -26,12 +26,16 @@ class ArtistRepository @Inject constructor(
         return artistLocalDS.getAll()
     }
 
-    fun getById(id: Long): Flow<ArtistEntity?> {
+    private fun getById(id: Long): Flow<ArtistEntity?> {
         return artistLocalDS.getById(id)
     }
 
-    fun getGroupWithMembers(groupId: Long): Flow<GroupWithMembers?> {
-        return artistLocalDS.getGroupWithMembers(groupId)
+    fun getGroupMembers(groupId: Long): Flow<NetworkResult<List<Artist>>> {
+        return artistLocalDS
+            .getGroupWithMembers(groupId)
+            .asLocalResult { groupWithMembers ->
+                groupWithMembers?.members?.map { it.toDomain() } ?: emptyList()
+            }
     }
 
     fun getArtistOverviews(): Flow<NetworkResult<List<ArtistOverview>>> {

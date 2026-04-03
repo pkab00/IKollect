@@ -73,4 +73,11 @@
     <string name="artist_profile_title_in_groups">" В группах"</string>
     <string name="artist_profile_title_members">Участники</string>
     <string name="wizard_step">Шаг</string>
+    <string name="photocard_wizard_title_select_photo">Выберите фото</string>
+    <string name="photocard_wizard_artist_dialog_title">Подсказка</string>
+    <string name="photocard_wizard_artist_dialog_body">Выберите артиста, из альбома которого вы получили данную фотокарту. Если карта пренадлежит группе, далее вам будет предложено выбрать конокретных её участников.</string>
+    <string name="photocard_wizard_subtitle_select_photo">Выберите артиста - владельца релиза:</string>
+    <string name="photocard_wizard_title_select_owner">Выберите владелльца</string>
+    <string name="photocard_wizard_title_select_members">Выберите участников</string>
+    <string name="photocard_wizard_subtitle_select_members">Отметьте участников группы, изображённых на фотокарте:</string>
 </resources>

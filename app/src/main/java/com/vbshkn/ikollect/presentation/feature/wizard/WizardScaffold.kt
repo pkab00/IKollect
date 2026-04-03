@@ -51,7 +51,10 @@ fun WizardScaffold(
     Scaffold(
         topBar = {
             LargeTopAppBar(
-                title = { Text(title.asString()) },
+                title = { Text(
+                    text = title.asString(),
+                    modifier = Modifier.padding(end = 6.dp)
+                ) },
                 actions = {
                     Text(
                         text = stringResource(R.string.wizard_step) + " $stepNumber/$totalSteps",

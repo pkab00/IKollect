@@ -32,9 +32,9 @@ import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.steps.AlbumWizardSteps
 import com.vbshkn.ikollect.presentation.feature.wizard.GenericWizard
+import com.vbshkn.ikollect.presentation.feature.wizard.WizardState
 import com.vbshkn.ikollect.presentation.feature.wizard.dialog.CameraRationaleDialog
 import com.vbshkn.ikollect.presentation.feature.wizard.dialog.ExitWizardDialog
-import com.vbshkn.ikollect.presentation.feature.wizard.rememberWizardState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -56,13 +56,15 @@ fun AlbumWizardScreen(
             AlbumWizardSteps.WrapUpStep(viewModel)
         )
     }
-    val wizardState = rememberWizardState(
-        steps = steps,
-        initialStepIndex = uiState.stepIndex,
-        onStepChanged = { viewModel.onEvent(AlbumWizardContract.Event.OnStepChanged(it)) },
-        onFinish = { viewModel.onEvent(AlbumWizardContract.Event.OnWrapUp) },
-        onExit = { viewModel.onEvent(AlbumWizardContract.Event.OnExitClicked) }
-    )
+    val wizardState = remember {
+        WizardState(
+            steps = steps,
+            initialStepIndex = uiState.stepIndex,
+            onStepChanged = { viewModel.onEvent(AlbumWizardContract.Event.OnStepChanged(it)) },
+            onFinish = { viewModel.onEvent(AlbumWizardContract.Event.OnWrapUp) },
+            onExit = { viewModel.onEvent(AlbumWizardContract.Event.OnExitClicked) }
+        )
+    }
 
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)

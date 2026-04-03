@@ -13,17 +13,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.steps.PhotocardWizardSteps
 import com.vbshkn.ikollect.presentation.feature.wizard.GenericWizard
+import com.vbshkn.ikollect.presentation.feature.wizard.WizardState
 import com.vbshkn.ikollect.presentation.feature.wizard.dialog.CameraRationaleDialog
 import com.vbshkn.ikollect.presentation.feature.wizard.dialog.ExitWizardDialog
-import com.vbshkn.ikollect.presentation.feature.wizard.rememberWizardState
 import kotlin.collections.buildList
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -36,24 +39,26 @@ fun PhotocardWizardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val steps = remember(uiState) {
+    val steps = remember(uiState.photocardCandidate.isOwnerAGroup) {
         buildList {
             add(PhotocardWizardSteps.SelectPhotoStep(viewModel))
             add(PhotocardWizardSteps.SelectArtistStep(viewModel))
-            add(PhotocardWizardSteps.SelectAlbumStep(viewModel))
-            if (uiState.photocardCandidate.owner?.isGroup == true) {
-                add(PhotocardWizardSteps.WhoIsOnTheCardOptional(viewModel))
+            if (uiState.photocardCandidate.isOwnerAGroup) {
+                add(PhotocardWizardSteps.SelectMembersOptionalStep(viewModel))
             }
+            add(PhotocardWizardSteps.SelectAlbumStep(viewModel))
             add(PhotocardWizardSteps.AddDetailsStep(viewModel))
         }
     }
-    val wizardState = rememberWizardState(
-        steps = steps,
-        initialStepIndex = uiState.currentStep,
-        onStepChanged = { viewModel.onEvent(PhotocardWizardContract.Event.OnStepChanged(it)) },
-        onFinish = { onExit() },
-        onExit = { viewModel.onEvent(PhotocardWizardContract.Event.OnExitClicked) }
-    )
+    val wizardState = remember(steps) {
+        WizardState(
+            steps = steps,
+            initialStepIndex = uiState.currentStep,
+            onStepChanged = { viewModel.onEvent(PhotocardWizardContract.Event.OnStepChanged(it)) },
+            onFinish = { onExit() },
+            onExit = { viewModel.onEvent(PhotocardWizardContract.Event.OnExitClicked) }
+        )
+    }
 
     val context = LocalContext.current
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -157,6 +162,13 @@ private fun DialogHost(
                 onEvent(PhotocardWizardContract.Event.OnDismissDialog)
                 onRequestPermission()
             }
+        }
+        PhotocardWizardDialogState.SelectArtistTip -> {
+            InfoDialog(
+                title = stringResource(R.string.photocard_wizard_artist_dialog_title),
+                text = stringResource(R.string.photocard_wizard_artist_dialog_body),
+                onDismiss = { onEvent(PhotocardWizardContract.Event.OnDismissDialog) }
+            )
         }
         PhotocardWizardDialogState.None -> {}
     }

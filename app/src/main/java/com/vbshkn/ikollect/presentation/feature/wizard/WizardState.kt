@@ -41,18 +41,6 @@ class WizardState(
     fun exit() = onExit()
 }
 
-@Composable
-fun rememberWizardState(
-    steps: List<WizardStep>,
-    initialStepIndex: Int,
-    onStepChanged: (Int) -> Unit,
-    onFinish: () -> Unit,
-    onExit: () -> Unit
-
-) : WizardState {
-    return remember { WizardState(steps, initialStepIndex, onStepChanged, onFinish, onExit) }
-}
-
 interface WizardStep {
     val title: UiText
     @Composable fun isNextEnabled(): Boolean

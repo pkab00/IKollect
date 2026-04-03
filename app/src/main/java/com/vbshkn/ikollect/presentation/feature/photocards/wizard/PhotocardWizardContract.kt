@@ -19,5 +19,8 @@ sealed interface PhotocardWizardContract {
         object OnOpenGallerySelector : Event
         object OnOpenCamera : Event
         data class OnPhotoSelected(val uri: String) : Event
+        object OnShowSelectArtistTip : Event
+        data class OnUpdateOwner(val id: Long, val isGroup: Boolean) : Event
+        data class OnUpdateDepictedIds(val ids: List<Long>) : Event
     }
 }

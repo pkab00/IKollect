@@ -3,13 +3,14 @@ package com.vbshkn.ikollect.presentation.feature.photocards.wizard.steps
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardStep
 import com.vbshkn.ikollect.util.UiText
 
 sealed interface PhotocardWizardSteps {
     class SelectPhotoStep(val viewModel: PhotocardWizardViewModel) : WizardStep {
-        override val title: UiText = UiText.DynamicString("Раз")
+        override val title: UiText = UiText.StringResource(R.string.photocard_wizard_title_select_photo)
         @Composable
         override fun isNextEnabled(): Boolean {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -22,31 +23,33 @@ sealed interface PhotocardWizardSteps {
     }
 
     class SelectArtistStep(val viewModel: PhotocardWizardViewModel) : WizardStep {
-        override val title: UiText = UiText.DynamicString("Два")
+        override val title: UiText = UiText.StringResource(R.string.photocard_wizard_title_select_owner)
         @Composable
         override fun isNextEnabled(): Boolean {
-            return true
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            return uiState.photocardCandidate.ownerId != null
         }
         @Composable
         override fun Content() {
-            // TODO
+            SelectArtistScreen(viewModel)
+        }
+    }
+
+    class SelectMembersOptionalStep(val viewModel: PhotocardWizardViewModel) : WizardStep {
+        override val title: UiText =  UiText.StringResource(R.string.photocard_wizard_title_select_members)
+        @Composable
+        override fun isNextEnabled(): Boolean {
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            return uiState.photocardCandidate.depictedArtistsId.isNotEmpty()
+        }
+        @Composable
+        override fun Content() {
+            SelectMembersScreen(viewModel)
         }
     }
 
     class SelectAlbumStep(val viewModel: PhotocardWizardViewModel) : WizardStep {
         override val title: UiText = UiText.DynamicString("Три")
-        @Composable
-        override fun isNextEnabled(): Boolean {
-            return true
-        }
-        @Composable
-        override fun Content() {
-            // TODO
-        }
-    }
-
-    class WhoIsOnTheCardOptional(val viewModel: PhotocardWizardViewModel) : WizardStep {
-        override val title: UiText = UiText.DynamicString("Четыре")
         @Composable
         override fun isNextEnabled(): Boolean {
             return true
