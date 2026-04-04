@@ -3,6 +3,7 @@ package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
+import com.vbshkn.ikollect.domain.usecase.GetArtistAlbumOverviewsUseCase
 import com.vbshkn.ikollect.domain.usecase.GetArtistOverviewsUseCase
 import com.vbshkn.ikollect.domain.usecase.GetGroupMembersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class PhotocardWizardViewModel @Inject constructor(
     private val getArtistOverviewsUseCase: GetArtistOverviewsUseCase,
-    private val getGroupMembersUseCase: GetGroupMembersUseCase
+    private val getGroupMembersUseCase: GetGroupMembersUseCase,
+    private val getArtistAlbumOverviewsUseCase: GetArtistAlbumOverviewsUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PhotocardWizardUIState())
     val uiState = _uiState.asStateFlow()
@@ -30,8 +32,9 @@ class PhotocardWizardViewModel @Inject constructor(
     val effects = _effects.receiveAsFlow()
 
     init {
-        collectArtists()
-        collectMembers()
+        observeArtists()
+        observeMembers()
+        observeAlbums()
     }
 
     fun onEvent(event: PhotocardWizardContract.Event) {
@@ -80,11 +83,19 @@ class PhotocardWizardViewModel @Inject constructor(
                 it.copy(dialogState = PhotocardWizardDialogState.SelectArtistTip)
             }
 
-            is PhotocardWizardContract.Event.OnUpdateDepictedIds -> _uiState.update {
-                it.copy(photocardCandidate = it.photocardCandidate.copy(depictedArtistsId = event.ids))
+            is PhotocardWizardContract.Event.OnMemberSelected -> _uiState.update { state ->
+                val displayNameTemp = state.members
+                    .filter { it.artistId in event.ids }
+                    .joinToString { it.name } + " -"
+                state.copy(
+                    photocardCandidate = state.photocardCandidate.copy(
+                        depictedArtistsId = event.ids,
+                        displayName = displayNameTemp
+                    )
+                )
             }
 
-            is PhotocardWizardContract.Event.OnUpdateOwner -> _uiState.update {
+            is PhotocardWizardContract.Event.OnOwnerSelected -> _uiState.update {
                 it.copy(
                     photocardCandidate = it.photocardCandidate.copy(
                         ownerId = event.id,
@@ -92,6 +103,14 @@ class PhotocardWizardViewModel @Inject constructor(
                         depictedArtistsId = if (!event.isGroup) listOf(event.id) else emptyList()
                     )
                 )
+            }
+
+            is PhotocardWizardContract.Event.OnAlbumSelected -> _uiState.update {
+                it.copy(photocardCandidate = it.photocardCandidate.copy(albumId = event.id))
+            }
+
+            is PhotocardWizardContract.Event.OnDisplayedNameChanged -> _uiState.update {
+                it.copy(photocardCandidate = it.photocardCandidate.copy(displayName = event.newName))
             }
         }
     }
@@ -102,7 +121,7 @@ class PhotocardWizardViewModel @Inject constructor(
         }
     }
 
-    private fun collectArtists() = viewModelScope.launch {
+    private fun observeArtists() = viewModelScope.launch {
         getArtistOverviewsUseCase().collect { result ->
             when (result) {
                 is NetworkResult.Loading -> _uiState.update {
@@ -123,7 +142,7 @@ class PhotocardWizardViewModel @Inject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun collectMembers() = viewModelScope.launch {
+    private fun observeMembers() = viewModelScope.launch {
         uiState.map { it.photocardCandidate.ownerId }
             .distinctUntilChanged()
             .flatMapLatest { ownerId ->
@@ -138,6 +157,31 @@ class PhotocardWizardViewModel @Inject constructor(
                         state.copy(
                             isLoading = false,
                             members = result.data.sortedBy { it.name }
+                        )
+                    }
+                    is NetworkResult.Error -> _uiState.update {
+                        it.copy(isLoading = false)
+                    }
+                }
+            }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeAlbums() = viewModelScope.launch {
+        uiState.map { it.photocardCandidate.ownerId }
+            .distinctUntilChanged()
+            .flatMapLatest { ownerId ->
+                if (ownerId == null) { flowOf(NetworkResult.Success(emptyList())) }
+                else { getArtistAlbumOverviewsUseCase(ownerId) }
+            }.collect { result ->
+                when (result) {
+                    is NetworkResult.Loading -> _uiState.update {
+                        it.copy(isLoading = true)
+                    }
+                    is NetworkResult.Success -> _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            albumOverviews = result.data.sortedBy { it.name }
                         )
                     }
                     is NetworkResult.Error -> _uiState.update {

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -31,8 +30,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.Artist
-import com.vbshkn.ikollect.domain.model.ArtistOverview
-import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
@@ -81,7 +78,7 @@ fun SelectableMember(
             val updatedMembers = if (member.artistId in selectedMembers) {
                 selectedMembers - member.artistId
             } else { selectedMembers + member.artistId }
-            onEvent(PhotocardWizardContract.Event.OnUpdateDepictedIds(updatedMembers))
+            onEvent(PhotocardWizardContract.Event.OnMemberSelected(updatedMembers))
         },
         border = CardDefaults.outlinedCardBorder(enabled = member.artistId in selectedMembers),
         colors = CardDefaults.outlinedCardColors(

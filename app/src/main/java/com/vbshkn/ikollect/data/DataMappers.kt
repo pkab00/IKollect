@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.data
 
+import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
@@ -10,6 +11,7 @@ import com.vbshkn.ikollect.data.remote.dao.FormatDao
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
 import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.AlbumOverview
 import com.vbshkn.ikollect.domain.model.Artist
 import com.vbshkn.ikollect.domain.model.ArtistCandidate
 import com.vbshkn.ikollect.domain.model.ArtistOverview
@@ -90,6 +92,18 @@ object DataMappers {
             coverImage = this.album.imageUrl,
             userNote = this.album.userNote ?: "",
             savingTimestamp = this.album.timestamp
+        )
+    }
+
+    fun AlbumEntity.toDomain(): AlbumOverview {
+        return AlbumOverview(
+            albumId = this.albumId,
+            komcaNumber = this.komcaNumber,
+            name = this.name,
+            version = this.version ?: "",
+            isFavorite = this.isFavorite,
+            imageUrl = this.imageUrl ?: "",
+            timestamp = this.timestamp
         )
     }
 

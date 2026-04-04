@@ -9,12 +9,10 @@ import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
 import com.vbshkn.ikollect.data.remote.datasource.AlbumRemoteDataSource
 import com.vbshkn.ikollect.domain.model.Album
 import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.AlbumOverview
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class AlbumRepository @Inject constructor(
@@ -46,10 +44,19 @@ class AlbumRepository @Inject constructor(
         return data.releaseDetailsResponse.styles.any { style -> validStyles.contains(style.lowercase()) }
     }
 
-    fun loadAllAlbums(): Flow<NetworkResult<List<Album>>> {
+    fun getAllAlbums(): Flow<NetworkResult<List<Album>>> {
         return albumLocalDS.getAllWithArtists()
             .asLocalResult { albums ->
                 albums.map { it.toDomain() }
+            }
+    }
+
+    fun getAllByArtist(artistId: Long): Flow<NetworkResult<List<AlbumOverview>>> {
+        return albumLocalDS.getAllByArtist(artistId)
+            .asLocalResult { artistsWithAlbums ->
+                artistsWithAlbums
+                    .flatMap { it.albums }
+                    .map { it.toDomain() }
             }
     }
 

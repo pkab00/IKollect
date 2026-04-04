@@ -5,6 +5,7 @@ import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithPhotocards
+import com.vbshkn.ikollect.data.local.model.pojo.ArtistWithAlbums
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -17,6 +18,10 @@ class AlbumLocalDataSource @Inject constructor(
 
     fun getAllWithArtists(): Flow<List<AlbumWithArtists>> {
         return dao.getAllWithArtists()
+    }
+
+    fun getAllByArtist(artistId: Long): Flow<List<ArtistWithAlbums>> {
+        return dao.getAllByArtist(artistId)
     }
 
     fun getWithArtistsByBarcode(barcode: String): Flow<AlbumWithArtists>? {

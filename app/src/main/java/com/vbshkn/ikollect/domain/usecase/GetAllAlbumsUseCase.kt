@@ -10,6 +10,6 @@ class GetAllAlbumsUseCase @Inject constructor(
     private val albumRepository: AlbumRepository
 ) {
     operator fun invoke(): Flow<NetworkResult<List<Album>>> {
-        return albumRepository.loadAllAlbums()
+        return albumRepository.getAllAlbums()
     }
 }

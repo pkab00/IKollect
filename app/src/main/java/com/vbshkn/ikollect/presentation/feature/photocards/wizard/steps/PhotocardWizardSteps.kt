@@ -49,26 +49,26 @@ sealed interface PhotocardWizardSteps {
     }
 
     class SelectAlbumStep(val viewModel: PhotocardWizardViewModel) : WizardStep {
-        override val title: UiText = UiText.DynamicString("Три")
+        override val title: UiText = UiText.StringResource(R.string.photocard_wizard_title_select_album)
         @Composable
         override fun isNextEnabled(): Boolean {
             return true
         }
         @Composable
         override fun Content() {
-            // TODO
+            SelectAlbumScreen(viewModel)
         }
     }
 
     class AddDetailsStep(val viewModel: PhotocardWizardViewModel) : WizardStep {
-        override val title: UiText = UiText.DynamicString("Пять")
+        override val title: UiText = UiText.StringResource(R.string.photocard_wizard_title_wrap_up)
         @Composable
         override fun isNextEnabled(): Boolean {
             return true
         }
         @Composable
         override fun Content() {
-            // TODO
+            WrapUpScreen(viewModel)
         }
     }
 }

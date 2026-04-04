@@ -1,5 +1,7 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 
+import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardContract
+
 sealed interface PhotocardWizardContract {
     sealed interface Effect {
         object NavigateBack : Effect
@@ -20,7 +22,10 @@ sealed interface PhotocardWizardContract {
         object OnOpenCamera : Event
         data class OnPhotoSelected(val uri: String) : Event
         object OnShowSelectArtistTip : Event
-        data class OnUpdateOwner(val id: Long, val isGroup: Boolean) : Event
-        data class OnUpdateDepictedIds(val ids: List<Long>) : Event
+        data class OnOwnerSelected(val id: Long, val isGroup: Boolean) : Event
+        data class OnMemberSelected(val ids: List<Long>) : Event
+        data class OnAlbumSelected(val id: Long) : Event
+        data class OnDisplayedNameChanged(val newName: String) : Event
+
     }
 }

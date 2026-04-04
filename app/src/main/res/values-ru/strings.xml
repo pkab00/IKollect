@@ -80,4 +80,10 @@
     <string name="photocard_wizard_title_select_owner">Выберите владелльца</string>
     <string name="photocard_wizard_title_select_members">Выберите участников</string>
     <string name="photocard_wizard_subtitle_select_members">Отметьте участников группы, изображённых на фотокарте:</string>
+    <string name="photocard_wizard_title_select_album">Выберите альбом</string>
+    <string name="photocard_wizard_subtitle_select_album">Выберите альбом, из которого вы получили фотокарту. Вы можете пропуститть этот шаг.</string>
+    <string name="photocard_wizard_title_wrap_up">Почти готово</string>
+    <string name="textfield_text_too_long">Текст слишком ддлинный.</string>
+    <string name="photocard_name_field_suppoting_text">Это название будет отображаться в вашем каталоге фотокарт.</string>
+    <string name="photocard_wizard_subtitle_display_name">Название</string>
 </resources>

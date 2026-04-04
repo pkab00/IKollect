@@ -36,7 +36,7 @@ interface AlbumDao {
 
     @Transaction
     @Query("SELECT * FROM ArtistEntity WHERE artistId == :artistId")
-    fun getAllByArtist(artistId: Long): Flow<ArtistWithAlbums?>
+    fun getAllByArtist(artistId: Long): Flow<List<ArtistWithAlbums>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlbum(albumEntity: AlbumEntity): Long

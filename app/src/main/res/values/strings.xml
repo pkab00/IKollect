@@ -74,11 +74,17 @@
     <string name="artist_profile_title_in_groups">In groups</string>
     <string name="artist_profile_title_members">Members</string>
     <string name="wizard_step">Step</string>
-    <string name="photocard_wizard_title_select_photo">Select a photo</string>
+    <string name="photocard_wizard_title_select_photo">Select photo</string>
     <string name="photocard_wizard_artist_dialog_title">Tip</string>
     <string name="photocard_wizard_artist_dialog_body">Select the artist from whose album you received this photocard. If the card belongs to a group, you will be asked to select specific members.</string>
     <string name="photocard_wizard_subtitle_select_photo">Select the artist who owns the release:</string>
     <string name="photocard_wizard_title_select_owner">Select the owner</string>
     <string name="photocard_wizard_title_select_members">Select members</string>
     <string name="photocard_wizard_subtitle_select_members">Select the group members which are depicted on the photocard:</string>
+    <string name="photocard_wizard_title_select_album">Select album</string>
+    <string name="photocard_wizard_subtitle_select_album">Select an album from which you received this photocard. You can skip this step.</string>
+    <string name="photocard_wizard_title_wrap_up">Wrapping up</string>
+    <string name="textfield_text_too_long">The text is too long.</string>
+    <string name="photocard_name_field_suppoting_text">This name will be displayed in your photocards catalogue.</string>
+    <string name="photocard_wizard_subtitle_display_name">Name</string>
 </resources>

@@ -2,6 +2,7 @@ package com.vbshkn.ikollect.presentation.feature.photocards.wizard.steps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,10 +27,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.model.AlbumOverview
 import com.vbshkn.ikollect.domain.model.ArtistOverview
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
@@ -37,11 +40,11 @@ import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
-fun SelectArtistScreen(viewModel: PhotocardWizardViewModel) {
+fun SelectAlbumScreen(viewModel: PhotocardWizardViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(100.dp),
+        columns = GridCells.Adaptive(150.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
@@ -51,19 +54,17 @@ fun SelectArtistScreen(viewModel: PhotocardWizardViewModel) {
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             WizardItemWrapper(
-                title = UiText.StringResource(R.string.photocard_wizard_subtitle_select_photo),
-                showHint = true,
-                onHint = { viewModel.onEvent(PhotocardWizardContract.Event.OnShowSelectArtistTip) },
+                title = UiText.StringResource(R.string.photocard_wizard_subtitle_select_album),
                 content = {}
             )
         }
         items(
-            items = uiState.artistOverviews,
-            key = { it.artistId }
-        ) { artist ->
+            items = uiState.albumOverviews,
+            key = { it.albumId }
+        ) { album ->
             SelectableAlbum(
-                artist = artist,
-                selectedArtistId = uiState.photocardCandidate.ownerId,
+                album = album,
+                selectedAlbumId = uiState.photocardCandidate.albumId,
                 onEvent = viewModel::onEvent
             )
         }
@@ -72,15 +73,15 @@ fun SelectArtistScreen(viewModel: PhotocardWizardViewModel) {
 
 @Composable
 private fun SelectableAlbum(
-    artist: ArtistOverview,
-    selectedArtistId: Long?,
+    album: AlbumOverview,
+    selectedAlbumId: Long?,
     onEvent: (PhotocardWizardContract.Event) -> Unit
 ) {
     OutlinedCard(
-        onClick = { onEvent(PhotocardWizardContract.Event.OnOwnerSelected(artist.artistId, artist.isGroup)) },
-        border = CardDefaults.outlinedCardBorder(enabled = artist.artistId == selectedArtistId),
+        onClick = { onEvent(PhotocardWizardContract.Event.OnAlbumSelected(album.albumId)) },
+        border = CardDefaults.outlinedCardBorder(enabled = album.albumId == selectedAlbumId),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = if (artist.artistId == selectedArtistId)
+            containerColor = if (album.albumId == selectedAlbumId)
                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
             else Color.Transparent
         )
@@ -90,23 +91,44 @@ private fun SelectableAlbum(
             modifier = Modifier.fillMaxSize()
         ) {
             AsyncImage(
-                model = artist.imageUrl,
+                model = album.imageUrl,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .size(100.dp)
-                    .padding(6.dp)
-                    .clip(CircleShape)
+                    .size(150.dp)
             )
             Text(
-                text = artist.name,
+                text = album.extendedName,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                maxLines = 2,
+                minLines = 2,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .padding(8.dp)
                     .heightIn(min = 30.dp)
                     .wrapContentHeight(Alignment.CenterVertically),
             )
+            if (album.komcaNumber != null) {
+                Text(
+                    text = "KOMCA: ${album.komcaNumber}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .heightIn(min = 16.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .heightIn(min = 16.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
+                )
+            }
         }
     }
 }
