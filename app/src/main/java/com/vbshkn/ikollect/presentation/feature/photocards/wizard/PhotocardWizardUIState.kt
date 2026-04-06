@@ -4,13 +4,16 @@ import com.vbshkn.ikollect.domain.model.AlbumOverview
 import com.vbshkn.ikollect.domain.model.Artist
 import com.vbshkn.ikollect.domain.model.ArtistOverview
 import com.vbshkn.ikollect.domain.model.PhotocardCandidate
+import com.vbshkn.ikollect.domain.model.Tag
 
 data class PhotocardWizardUIState(
     val currentStep: Int = 0,
     val isLoading: Boolean = false,
+    val enableTagSelector: Boolean = false,
     val dialogState: PhotocardWizardDialogState = PhotocardWizardDialogState.None,
     val photocardCandidate: PhotocardCandidate = PhotocardCandidate(),
     val artistOverviews: List<ArtistOverview> = emptyList(),
     val members: List<Artist> = emptyList(),
-    val albumOverviews: List<AlbumOverview> = emptyList()
+    val albumOverviews: List<AlbumOverview> = emptyList(),
+    val tags: List<Tag> = emptyList()
 )

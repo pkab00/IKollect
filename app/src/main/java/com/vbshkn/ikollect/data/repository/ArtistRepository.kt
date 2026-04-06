@@ -1,7 +1,7 @@
 package com.vbshkn.ikollect.data.repository
 
-import com.vbshkn.ikollect.data.DataMappers.toDomain
-import com.vbshkn.ikollect.data.DataMappers.toEntity
+import com.vbshkn.ikollect.data.mapper.DataMappers.toDomain
+import com.vbshkn.ikollect.data.mapper.DataMappers.toEntity
 import com.vbshkn.ikollect.data.local.datasource.ArtistLocalDataSource
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.pojo.GroupWithMembers

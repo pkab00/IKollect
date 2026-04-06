@@ -22,11 +22,10 @@ import androidx.room.PrimaryKey
 ])
 data class PhotocardEntity(
     @PrimaryKey(autoGenerate = true)
-    val photocardId: Long,
-    val albumId: Int?,
+    val photocardId: Long = 0,
+    val albumId: Long?,
     val ownerId: Long,
     val displayName: String,
-    val isPob: Boolean,
     val isFavorite: Boolean,
     val imageUrl: String?,
     val userNote: String?

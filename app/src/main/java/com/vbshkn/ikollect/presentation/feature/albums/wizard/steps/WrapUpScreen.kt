@@ -1,11 +1,9 @@
 package com.vbshkn.ikollect.presentation.feature.albums.wizard.steps
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -58,7 +56,7 @@ private fun UserNotesField(
         onValueChange = {
             if (it.length <= maxChar) onValueChange(it)
         },
-        placeholder = { Text(stringResource(R.string.placeholder_notes)) },
+        placeholder = { Text(stringResource(R.string.album_notes_placeholder)) },
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 150.dp, max = 400.dp),

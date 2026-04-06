@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.data.repository
 
-import com.vbshkn.ikollect.data.DataMappers.toDomain
+import com.vbshkn.ikollect.data.mapper.DataMappers.toDomain
 import com.vbshkn.ikollect.data.local.datasource.PhotocardLocalDataSource
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 import com.vbshkn.ikollect.data.remote.NetworkResult
@@ -17,5 +17,12 @@ class PhotocardRepository @Inject constructor(
             .asLocalResult { photocards ->
                 photocards.map { it.toDomain() }
             }
+    }
+
+    suspend fun insertWithArtists(
+        entity: PhotocardEntity,
+        artistIds: List<Long>
+    ) {
+        photocardLocalDS.insertPhotocardWithArtists(entity, artistIds)
     }
 }

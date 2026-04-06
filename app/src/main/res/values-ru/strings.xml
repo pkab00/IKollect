@@ -47,7 +47,7 @@
     <string name="komca_textfield_number_too_short">Слишком короткий номер.</string>
     <string name="wizard_title_wrapup">Почти готово</string>
     <string name="wizard_title_notes">Заметки</string>
-    <string name="placeholder_notes">Добавьте заметки об альбоме (необязательно)</string>
+    <string name="album_notes_placeholder">Добавьте заметки об альбоме (необязательно)</string>
     <string name="wizard_cant_find_version">Не вижу свою версию...</string>
     <string name="wizard_title_version_name">Версия</string>
     <string name="supporting_text_version">Введите название версии.</string>
@@ -86,4 +86,13 @@
     <string name="textfield_text_too_long">Текст слишком ддлинный.</string>
     <string name="photocard_name_field_suppoting_text">Это название будет отображаться в вашем каталоге фотокарт.</string>
     <string name="photocard_wizard_subtitle_display_name">Название</string>
+    <string name="tag_autograph">Автораф</string>
+    <string name="tag_concert">Концерт</string>
+    <string name="tag_damaged">С дефектами</string>
+    <string name="tag_duplicate">Дубликат</string>
+    <string name="tag_unit">Юнит</string>
+    <string name="photocard_wizard_subtitle_tags">Тэги</string>
+    <string name="photocard_notes_placeholder">Ваши заметки о карте (необязательно)</string>
+    <string name="photocard_wizard_subtitle_notes">Заметки</string>
+    <string name="tag_selector_title">Выберите тэги</string>
 </resources>

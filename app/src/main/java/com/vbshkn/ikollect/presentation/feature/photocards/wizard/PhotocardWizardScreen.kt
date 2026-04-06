@@ -55,7 +55,10 @@ fun PhotocardWizardScreen(
             steps = steps,
             initialStepIndex = uiState.currentStep,
             onStepChanged = { viewModel.onEvent(PhotocardWizardContract.Event.OnStepChanged(it)) },
-            onFinish = { onExit() },
+            onFinish = {
+                viewModel.onEvent(PhotocardWizardContract.Event.OnFinish)
+                viewModel.onEvent(PhotocardWizardContract.Event.OnExitConfirmed)
+            },
             onExit = { viewModel.onEvent(PhotocardWizardContract.Event.OnExitClicked) }
         )
     }
@@ -90,15 +93,18 @@ fun PhotocardWizardScreen(
                         )
                     )
                 }
+
                 PhotocardWizardContract.Effect.TryOpenCamera -> {
                     when {
                         cameraPermissionState.status.isGranted -> {
                             onCamera()
                         }
+
                         cameraPermissionState.status.shouldShowRationale -> {
                             pending = true
                             viewModel.onEvent(PhotocardWizardContract.Event.OnShowCameraRationale)
                         }
+
                         else -> {
                             pending = true
                             cameraPermissionState.launchPermissionRequest()
@@ -157,12 +163,14 @@ private fun DialogHost(
                 onDismiss = { onEvent(PhotocardWizardContract.Event.OnDismissDialog) }
             )
         }
+
         PhotocardWizardDialogState.CameraRationale -> {
             CameraRationaleDialog {
                 onEvent(PhotocardWizardContract.Event.OnDismissDialog)
                 onRequestPermission()
             }
         }
+
         PhotocardWizardDialogState.SelectArtistTip -> {
             InfoDialog(
                 title = stringResource(R.string.photocard_wizard_artist_dialog_title),
@@ -170,6 +178,7 @@ private fun DialogHost(
                 onDismiss = { onEvent(PhotocardWizardContract.Event.OnDismissDialog) }
             )
         }
+
         PhotocardWizardDialogState.None -> {}
     }
 }

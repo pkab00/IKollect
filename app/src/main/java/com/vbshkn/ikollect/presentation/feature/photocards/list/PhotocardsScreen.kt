@@ -13,11 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
 
 @Composable
@@ -25,6 +27,8 @@ fun PhotocardsScreen(
     viewModel: PhotocardsViewModel,
     onGoToWizard: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             TopBar(onGoToWizard = onGoToWizard)
@@ -40,10 +44,15 @@ fun PhotocardsScreen(
                 .padding(paddingValues)
                 .padding(10.dp)
         ) {
-            Text(
-                text = stringResource(R.string.filler_nothing_to_show),
-                style = MaterialTheme.typography.labelLarge
-            )
+            if (uiState.photocards.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.filler_nothing_to_show),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+            else {
+
+            }
         }
     }
 }

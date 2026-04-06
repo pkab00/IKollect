@@ -48,7 +48,7 @@
     <string name="komca_textfield_number_too_short">The number is too short.</string>
     <string name="wizard_title_wrapup">Wrapping up</string>
     <string name="wizard_title_notes">Notes</string>
-    <string name="placeholder_notes">Add your notes about the album (optional)</string>
+    <string name="album_notes_placeholder">Add your notes about the album (optional)</string>
     <string name="wizard_cant_find_version">Can\'t find my version...</string>
     <string name="wizard_title_version_name">Version</string>
     <string name="supporting_text_version">Enter your version name.</string>
@@ -87,4 +87,18 @@
     <string name="textfield_text_too_long">The text is too long.</string>
     <string name="photocard_name_field_suppoting_text">This name will be displayed in your photocards catalogue.</string>
     <string name="photocard_wizard_subtitle_display_name">Name</string>
+    <string name="tag_pob" translatable="false">POB</string>
+    <string name="tag_autograph">Autograph</string>
+    <string name="tag_polaroid" translatable="false">Polaroid</string>
+    <string name="tag_lucky_draw" translatable="false">Lucky Draw</string>
+    <string name="tag_membership" translatable="false">Membership</string>
+    <string name="tag_concert">Concert</string>
+    <string name="tag_fan_made" translatable="false">Fan-made</string>
+    <string name="tag_damaged">Damaged</string>
+    <string name="tag_duplicate">Duplicate</string>
+    <string name="tag_unit">Unit</string>
+    <string name="photocard_wizard_subtitle_tags">Tags</string>
+    <string name="photocard_notes_placeholder">Your notes about the card (optional)</string>
+    <string name="photocard_wizard_subtitle_notes">Notes</string>
+    <string name="tag_selector_title">Select tags</string>
 </resources>

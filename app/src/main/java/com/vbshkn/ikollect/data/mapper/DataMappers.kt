@@ -1,7 +1,8 @@
-package com.vbshkn.ikollect.data
+package com.vbshkn.ikollect.data.mapper
 
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
+import com.vbshkn.ikollect.data.local.model.entity.TagEntity
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistMinimalDetail
@@ -17,9 +18,10 @@ import com.vbshkn.ikollect.domain.model.ArtistCandidate
 import com.vbshkn.ikollect.domain.model.ArtistOverview
 import com.vbshkn.ikollect.domain.model.ArtistProfileData
 import com.vbshkn.ikollect.domain.model.Photocard
+import com.vbshkn.ikollect.domain.model.Tag
 import com.vbshkn.ikollect.domain.model.VersionCandidate
 import com.vbshkn.ikollect.util.ArtistNameHelper
-import com.vbshkn.ikollect.util.TimeUtil.toDateString
+import com.vbshkn.ikollect.util.UiText
 
 object DataMappers {
     fun ArtistDetailsResponse.toDomain(): ArtistCandidate {
@@ -48,7 +50,7 @@ object DataMappers {
             isGroup = !this.members.isNullOrEmpty(),
             isFavorite = false,
             imageUrl = if (this.images.isEmpty()) null
-                       else this.images.first().uri
+            else this.images.first().uri
         )
     }
 
@@ -135,7 +137,6 @@ object DataMappers {
             ownerId = this.photocard.ownerId,
             displayName = this.photocard.displayName,
             depictedArtists = this.artists.map { it.toDomain() },
-            isPob = this.photocard.isPob,
             isFavorite = this.photocard.isFavorite,
             imageUrl = this.photocard.imageUrl,
             userNote = this.photocard.userNote
@@ -184,5 +185,18 @@ object DataMappers {
                 groups = this.groups.map { it.toDomain() }
             )
         }
+    }
+
+    fun TagEntity.toDomain(): Tag {
+        return Tag(
+            id = this.tagId,
+            isSystem = this.isSystemTag,
+            name = if (this.isSystemTag) {
+                val resId = SystemTag.getResId(this.tagName)
+                if (resId != null) UiText.StringResource(resId)
+                else UiText.DynamicString(this.tagName)
+            } else UiText.DynamicString(this.tagName),
+            color = this.tagColor
+        )
     }
 }

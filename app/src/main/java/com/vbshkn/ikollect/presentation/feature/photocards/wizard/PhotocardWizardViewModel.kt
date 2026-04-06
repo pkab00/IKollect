@@ -3,9 +3,11 @@ package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
+import com.vbshkn.ikollect.domain.usecase.GetAllTagsUseCase
 import com.vbshkn.ikollect.domain.usecase.GetArtistAlbumOverviewsUseCase
 import com.vbshkn.ikollect.domain.usecase.GetArtistOverviewsUseCase
 import com.vbshkn.ikollect.domain.usecase.GetGroupMembersUseCase
+import com.vbshkn.ikollect.domain.usecase.SavePhotocardUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,7 +26,9 @@ import kotlinx.coroutines.launch
 class PhotocardWizardViewModel @Inject constructor(
     private val getArtistOverviewsUseCase: GetArtistOverviewsUseCase,
     private val getGroupMembersUseCase: GetGroupMembersUseCase,
-    private val getArtistAlbumOverviewsUseCase: GetArtistAlbumOverviewsUseCase
+    private val getArtistAlbumOverviewsUseCase: GetArtistAlbumOverviewsUseCase,
+    private val getAllTagsUseCase: GetAllTagsUseCase,
+    private val savePhotocardUseCase: SavePhotocardUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PhotocardWizardUIState())
     val uiState = _uiState.asStateFlow()
@@ -35,6 +39,7 @@ class PhotocardWizardViewModel @Inject constructor(
         observeArtists()
         observeMembers()
         observeAlbums()
+        observeTags()
     }
 
     fun onEvent(event: PhotocardWizardContract.Event) {
@@ -111,6 +116,30 @@ class PhotocardWizardViewModel @Inject constructor(
 
             is PhotocardWizardContract.Event.OnDisplayedNameChanged -> _uiState.update {
                 it.copy(photocardCandidate = it.photocardCandidate.copy(displayName = event.newName))
+            }
+
+            is PhotocardWizardContract.Event.OnAddTagClicked -> _uiState.update {
+                it.copy(enableTagSelector = true)
+            }
+            is PhotocardWizardContract.Event.OnDismissTagSelector -> _uiState.update {
+                it.copy(enableTagSelector = false)
+            }
+            is PhotocardWizardContract.Event.OnTagSelected -> _uiState.update { state ->
+                state.copy(
+                    photocardCandidate = state.photocardCandidate.copy(
+                        tagIds = if (event.tagId in state.photocardCandidate.tagIds) {
+                            state.photocardCandidate.tagIds - event.tagId
+                        } else { state.photocardCandidate.tagIds + event.tagId }
+                    )
+                )
+            }
+
+            is PhotocardWizardContract.Event.OnUserNotesChanged -> _uiState.update { state ->
+                state.copy(photocardCandidate = state.photocardCandidate.copy(userNote = event.newValue))
+            }
+
+            PhotocardWizardContract.Event.OnFinish -> {
+                savePhotocardUseCase(uiState.value.photocardCandidate)
             }
         }
     }
@@ -189,5 +218,24 @@ class PhotocardWizardViewModel @Inject constructor(
                     }
                 }
             }
+    }
+
+    private fun observeTags() = viewModelScope.launch {
+        getAllTagsUseCase().collect { result ->
+            when (result) {
+                is NetworkResult.Success -> _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        tags = result.data
+                    )
+                }
+                is NetworkResult.Loading -> _uiState.update {
+                    it.copy(isLoading = true)
+                }
+                is NetworkResult.Error -> _uiState.update {
+                    it.copy(isLoading = false)
+                }
+            }
+        }
     }
 }

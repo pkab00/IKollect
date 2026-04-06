@@ -1,7 +1,7 @@
 package com.vbshkn.ikollect.data.repository
 
 import com.vbshkn.ikollect.data.AppError
-import com.vbshkn.ikollect.data.DataMappers.toDomain
+import com.vbshkn.ikollect.data.mapper.DataMappers.toDomain
 import com.vbshkn.ikollect.data.local.datasource.AlbumLocalDataSource
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.remote.NetworkResult
