@@ -1,9 +1,6 @@
-package com.vbshkn.ikollect.domain.model
+package com.vbshkn.ikollect.domain.model.list
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class Artist(
+data class ArtistListItem(
     val artistId: Long,
     val name: String,
     val isGroup: Boolean,

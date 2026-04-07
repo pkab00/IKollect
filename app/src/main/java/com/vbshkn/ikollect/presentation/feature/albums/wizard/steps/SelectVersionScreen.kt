@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.VersionCandidate
+import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardContract
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
 

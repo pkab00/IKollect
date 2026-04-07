@@ -29,11 +29,16 @@ object DatabaseModule {
     lateinit var database: AppDatabase
     val systemTags =
         listOf(
-            "tag_pob" to 0xFF990000, "tag_autograph" to 0xFF0000CC,
-            "tag_polaroid" to 0xFFCC00CC, "tag_lucky_draw" to 0xFF009933,
-            "tag_membership" to 0xFF990000, "tag_concert" to 0xFF0000CC,
-            "tag_fan_made" to 0xFFCC00CC, "tag_damaged" to 0xFF666666,
-            "tag_duplicate" to 0xFF666666, "tag_unit" to 0xFF009933
+            "tag_pob" to 0xFFFF8A80,          // Soft Coral
+            "tag_membership" to 0xFFFFAB91,   // Muted Deep Orange
+            "tag_autograph" to 0xFF9FA8DA,    // Pastel Indigo
+            "tag_concert" to 0xFF90CAF9,      // Soft Sky Blue
+            "tag_polaroid" to 0xFFCE93D8,     // Soft Lilac
+            "tag_fan_made" to 0xFFF48FB1,     // Soft Pink
+            "tag_lucky_draw" to 0xFFA5D6A7,   // Pale Sage Green
+            "tag_unit" to 0xFF80CBC4,         // Muted Teal
+            "tag_damaged" to 0xFFCFD8DC,      // Blue Grey Light
+            "tag_duplicate" to 0xFFB0BEC5     // Muted Slate
         ).mapIndexed { index, pair ->
                 TagEntity(
                     tagId = (index + 1).toLong(),

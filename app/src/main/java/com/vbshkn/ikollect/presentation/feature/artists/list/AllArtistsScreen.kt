@@ -33,12 +33,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.ArtistOverview
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 
 @Composable
 fun AllArtistsScreen(
     title: String,
-    artists: List<ArtistOverview>,
+    artists: List<ArtistListItem>,
     onArtistClick: (Long) -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -70,7 +70,7 @@ fun AllArtistsScreen(
 
 @Composable
 private fun ArtistCircleItem(
-    artist: ArtistOverview,
+    artist: ArtistListItem,
     onClick: () -> Unit
 ) {
     Column(
@@ -81,7 +81,7 @@ private fun ArtistCircleItem(
             .clickable(onClick = onClick,)
     ) {
         AsyncImage(
-            model = artist.imageUrl,
+            model = artist.profileImage,
             contentDescription = artist.name,
             contentScale = ContentScale.Crop,
             modifier = Modifier

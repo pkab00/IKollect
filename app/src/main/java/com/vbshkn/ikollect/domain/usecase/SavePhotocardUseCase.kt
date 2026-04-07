@@ -7,7 +7,7 @@ import com.vbshkn.ikollect.data.repository.ImageRepository
 import com.vbshkn.ikollect.data.repository.PhotocardRepository
 import com.vbshkn.ikollect.data.repository.TagRepository
 import com.vbshkn.ikollect.di.ApplicationScope
-import com.vbshkn.ikollect.domain.model.PhotocardCandidate
+import com.vbshkn.ikollect.domain.model.candidate.PhotocardCandidate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,8 +31,8 @@ class SavePhotocardUseCase @Inject constructor(
         )
 
         db.withTransaction {
-            photocardRepository.insertWithArtists(photocardEntity, candidate.depictedArtistsId)
-            tagRepository.linkTagsToPhotocard(photocardEntity.photocardId, candidate.tagIds.toList())
+            val id = photocardRepository.insertWithArtists(photocardEntity, candidate.depictedArtistsId)
+            tagRepository.linkTagsToPhotocard(id, candidate.tagIds.toList())
         }
     }
 }

@@ -40,11 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.Album
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.details.AlbumDetails
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
+import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
+import com.vbshkn.ikollect.util.UiText
 
 @Composable
 fun AlbumsScreen(
@@ -56,7 +58,7 @@ fun AlbumsScreen(
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
-            when(effect) {
+            when (effect) {
                 is AlbumsContract.Effect.NavigateToAlbum -> {}
                 is AlbumsContract.Effect.NavigateToSaveFlow -> onGoToWizard(effect.candidate)
             }
@@ -83,11 +85,9 @@ fun AlbumsScreen(
         ) {
             if (uiState.error != null) {
                 ErrorScreen()
-            }
-            else if (uiState.albums.isEmpty()) {
+            } else if (uiState.albums.isEmpty()) {
                 NoAlbumsScreen()
-            }
-            else {
+            } else {
                 AlbumsGrid(uiState.albums)
             }
         }
@@ -99,7 +99,7 @@ fun AlbumsScreen(
 }
 
 @Composable
-fun AlbumsGrid(albums: List<Album>) {
+fun AlbumsGrid(albums: List<AlbumDetails>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -167,7 +167,7 @@ private fun TopBar(
 
 @Composable
 fun AlbumCard(
-    album: Album,
+    album: AlbumDetails,
     onClick: () -> Unit
 ) {
     Card(
@@ -221,19 +221,10 @@ fun AlbumCard(
                 }
 
                 // Тег с версией
-                Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(6.dp)
-                ) {
-                    Text(
-                        text = album.version,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
+                SmallTextLabel(
+                    text = UiText.DynamicString(album.version),
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                )
             }
         }
     }
@@ -244,7 +235,7 @@ private fun DialogHost(
     dialogState: AlbumsDialogState,
     onEvent: (AlbumsContract.Event) -> Unit
 ) {
-    when(dialogState) {
+    when (dialogState) {
         is AlbumsDialogState.ScanningErrorDialog -> {
             ErrorDialog(
                 title = stringResource(R.string.error_title_scanning),
@@ -252,6 +243,7 @@ private fun DialogHost(
                 onDismiss = { onEvent(AlbumsContract.Event.OnDismissDialogClicked) },
             )
         }
+
         is AlbumsDialogState.ScanningResultDialog -> {
             ConfirmDialog(
                 title = stringResource(R.string.dialog_title_album_detected),
@@ -261,6 +253,7 @@ private fun DialogHost(
                 onDismiss = { onEvent(AlbumsContract.Event.OnDismissDialogClicked) },
             )
         }
+
         is AlbumsDialogState.None -> {}
     }
 }

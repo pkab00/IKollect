@@ -1,11 +1,13 @@
-package com.vbshkn.ikollect.domain.model
+package com.vbshkn.ikollect.domain.model.details
 
-data class Album (
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
+
+data class AlbumDetails (
     val albumId: Long,
     val masterId: Long,
     val barcodeNumber: String,
     val name: String,
-    val artists: List<Artist>,
+    val artists: List<ArtistListItem>,
     val version: String,
     val releaseDate: String,
     val isFavorite: Boolean,

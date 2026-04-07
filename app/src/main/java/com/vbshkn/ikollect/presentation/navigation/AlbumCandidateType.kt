@@ -3,7 +3,7 @@ package com.vbshkn.ikollect.presentation.navigation
 import android.net.Uri
 import androidx.navigation.NavType
 import androidx.savedstate.SavedState
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import kotlinx.serialization.json.Json
 
 object AlbumCandidateType : NavType<AlbumCandidate>(isNullableAllowed = false) {

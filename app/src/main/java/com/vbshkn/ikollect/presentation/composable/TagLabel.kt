@@ -16,11 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.vbshkn.ikollect.domain.model.Tag
+import com.vbshkn.ikollect.domain.model.TagItem
 
 @Composable
 fun TagLabel(
-    tag: Tag,
+    tag: TagItem,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
@@ -30,18 +30,17 @@ fun TagLabel(
         border = if (isSelected) BorderStroke(1f.dp, MaterialTheme.colorScheme.outline)
                  else BorderStroke(0.5f.dp, tag.color),
         color = tag.color.copy(alpha = 0.5f),
-        contentColor = Color.White,
+        contentColor = Color.White.copy(alpha = 0.9f),
         modifier = modifier.clickable { onClick() }
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(6.dp)
         ) {
             Text(
                 text = tag.name.asString(),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

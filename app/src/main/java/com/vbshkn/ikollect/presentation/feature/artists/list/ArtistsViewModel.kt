@@ -3,7 +3,7 @@ package com.vbshkn.ikollect.presentation.feature.artists.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
-import com.vbshkn.ikollect.domain.usecase.GetArtistOverviewsUseCase
+import com.vbshkn.ikollect.domain.usecase.GetArtistListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ArtistsViewModel @Inject constructor(
-    private val getArtistOverviewsUseCase: GetArtistOverviewsUseCase
+    private val getArtistListUseCase: GetArtistListUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ArtistsUIState())
     val uiState = _uiState.asStateFlow()
@@ -25,7 +25,7 @@ class ArtistsViewModel @Inject constructor(
     }
 
     private suspend fun collectArtistOverviews() {
-        getArtistOverviewsUseCase().collect { networkResult ->
+        getArtistListUseCase().collect { networkResult ->
             when(networkResult) {
                 is NetworkResult.Loading -> _uiState.update {
                     it.copy(isLoading = true)

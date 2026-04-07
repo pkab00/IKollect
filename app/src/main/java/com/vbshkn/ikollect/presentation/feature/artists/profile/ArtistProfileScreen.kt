@@ -1,6 +1,7 @@
 package com.vbshkn.ikollect.presentation.feature.artists.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -45,15 +47,16 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.Album
-import com.vbshkn.ikollect.domain.model.Artist
-import com.vbshkn.ikollect.domain.model.ArtistProfileData
-import com.vbshkn.ikollect.domain.model.Photocard
+import com.vbshkn.ikollect.domain.model.details.AlbumDetails
+import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
+import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 import com.vbshkn.ikollect.presentation.composable.CardGrid
 import com.vbshkn.ikollect.presentation.composable.EmptyCardGridFiller
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.ProfileItemWrapper
 import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
+import com.vbshkn.ikollect.presentation.composable.TagLabel
 import com.vbshkn.ikollect.util.PaletteUtil
 import com.vbshkn.ikollect.util.TimeUtil.toDateString
 import com.vbshkn.ikollect.util.UiText
@@ -196,16 +199,86 @@ fun ArtistProfileScreen(
 }
 
 @Composable
-fun PhotocardCard(
-    photocard: Photocard,
+private fun PhotocardCard(
+    photocard: PhotocardListItem,
     onClick: (Long) -> Unit
 ) {
-    // TODO
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.size(height = 180.dp, width = 160.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable { onClick(photocard.photocardId) }
+        ) {
+            AsyncImage(
+                model = photocard.imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.weight(0.6f)
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(6.dp)
+                    .weight(0.4f)
+            ) {
+                Text(
+                    text = photocard.displayName,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
+                )
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val tagsLimit = 2
+                    val displayTags = photocard.tags.take(tagsLimit)
+                    val remainingTags = photocard.tags.size - tagsLimit
+                    displayTags.forEach { tag ->
+                        TagLabel(
+                            tag = tag,
+                            isSelected = false,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                    }
+                    if (remainingTags > 0) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(26.dp)
+                                .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
+                        ) {
+                            Text(
+                                text = "+$remainingTags",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun AlbumCard(
-    album: Album,
+    album: AlbumDetails,
     onClick: (Long) -> Unit
 ) {
     Surface(
@@ -224,7 +297,7 @@ private fun AlbumCard(
                 model = album.coverImage,
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
-                modifier = Modifier.weight(0.8f)
+                modifier = Modifier.weight(0.6f)
             )
 
             Column(
@@ -233,6 +306,7 @@ private fun AlbumCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(6.dp)
+                    .weight(0.4f)
             ) {
                 Text(
                     text = album.name,
@@ -243,12 +317,12 @@ private fun AlbumCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.SemiBold
                 )
-                SmallTextLabel(
-                    text = UiText.DynamicString(album.version),
-                    modifier = Modifier.fillMaxWidth()
-                )
                 HorizontalDivider(
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                SmallTextLabel(
+                    text = UiText.DynamicString(album.version),
                     modifier = Modifier.fillMaxWidth()
                 )
                 SmallTextLabel(
@@ -262,7 +336,7 @@ private fun AlbumCard(
 
 @Composable
 fun MemberOrGroupCard(
-    artist: Artist,
+    artist: ArtistListItem,
     onClick: (Long) -> Unit
 ) {
     val initialColors = listOf(
@@ -297,7 +371,7 @@ fun MemberOrGroupCard(
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
-                    .weight(0.8f)
+                    .weight(0.7f)
                     .background(imageGradient)
             )
 
@@ -305,7 +379,7 @@ fun MemberOrGroupCard(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .weight(0.2f)
+                    .weight(0.3f)
                     .padding(6.dp)
             ) {
                 Text(

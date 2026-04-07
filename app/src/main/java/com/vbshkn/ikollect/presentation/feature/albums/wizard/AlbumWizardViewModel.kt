@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.presentation.navigation.AlbumCandidateType
 import com.vbshkn.ikollect.presentation.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel

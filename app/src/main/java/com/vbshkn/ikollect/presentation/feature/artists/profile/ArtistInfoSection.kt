@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.ArtistProfileData
+import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
 import com.vbshkn.ikollect.util.TimeUtil.toDateString
 import com.vbshkn.ikollect.util.UiText
 

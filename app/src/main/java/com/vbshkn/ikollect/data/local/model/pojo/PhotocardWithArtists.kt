@@ -6,14 +6,23 @@ import androidx.room.Relation
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
+import com.vbshkn.ikollect.data.local.model.entity.PhotocardTagCrossRef
+import com.vbshkn.ikollect.data.local.model.entity.TagEntity
 
 data class PhotocardWithArtists(
     @Embedded
     val photocard: PhotocardEntity,
     @Relation(
-        parentColumn = "photocardId",
-        entityColumn = "artistId",
-        associateBy = Junction(PhotocardArtistCrossRef::class)
+        entity = ArtistEntity::class,
+        parentColumn = "ownerId",
+        entityColumn = "artistId"
     )
-    val artists: List<ArtistEntity>
+    val owner: ArtistEntity,
+    @Relation(
+        entity = TagEntity::class,
+        parentColumn = "photocardId",
+        entityColumn = "tagId",
+        associateBy = Junction(PhotocardTagCrossRef::class)
+    )
+    val tags: List<TagEntity>
 )

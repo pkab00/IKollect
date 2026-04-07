@@ -39,7 +39,7 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.ArtistOverview
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 import com.vbshkn.ikollect.presentation.composable.CardGrid
 import com.vbshkn.ikollect.presentation.composable.EmptyCardGridFiller
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
@@ -78,7 +78,7 @@ fun AccountScreen(
                 if (items.isEmpty()) {
                     EmptyCardGridFiller()
                 } else {
-                    CardGrid {
+                    CardGrid(height = 160.dp) {
                         items(
                             items = items,
                             key = { it.artistId }
@@ -100,7 +100,7 @@ fun AccountScreen(
                 if (items.isEmpty()) {
                     EmptyCardGridFiller()
                 } else {
-                    CardGrid {
+                    CardGrid(height = 160.dp) {
                         items(
                             items = items,
                             key = { it.artistId }
@@ -152,7 +152,7 @@ private fun SectionWrapper(
 
 @Composable
 private fun ArtistBox(
-    overview: ArtistOverview,
+    overview: ArtistListItem,
     onClick: (Long) -> Unit
 ) {
     val initialColors = listOf(
@@ -175,7 +175,7 @@ private fun ArtistBox(
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(overview.imageUrl)
+                    .data(overview.profileImage)
                     .allowHardware(false)
                     .build(),
                 onSuccess = { result ->
@@ -200,12 +200,6 @@ private fun ArtistBox(
                     .fillMaxWidth()
                     .padding(6.dp)
             ) {
-                SmallTextLabel(
-                    text = UiText.DynamicString(
-                        "${stringResource(R.string.label_albums_count)} ${overview.albumsCount}\n"
-                                + "${stringResource(R.string.label_photocards_count)} ${overview.photocardsCount}"
-                    )
-                )
                 Text(
                     text = overview.name,
                     textAlign = TextAlign.Center,

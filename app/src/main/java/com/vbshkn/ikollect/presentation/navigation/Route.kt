@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.presentation.navigation
 
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import kotlinx.serialization.Serializable
 
 @Serializable

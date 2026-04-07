@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -36,7 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.Tag
+import com.vbshkn.ikollect.domain.model.TagItem
 import com.vbshkn.ikollect.presentation.composable.TagLabel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardUIState
@@ -130,7 +129,7 @@ private fun PhotocardDisplayName(
 
 @Composable
 fun PhotocardTags(
-    selectedTags: List<Tag>,
+    selectedTags: List<TagItem>,
     onEvent: (PhotocardWizardContract.Event) -> Unit
 ) {
     Surface(
@@ -187,7 +186,7 @@ fun PhotocardTags(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun TagSelectionSheet(
-    allTags: List<Tag>,
+    allTags: List<TagItem>,
     selectedTagIds: Set<Long>,
     enabled: Boolean,
     onTagClick: (Long) -> Unit,

@@ -1,15 +1,17 @@
 package com.vbshkn.ikollect.data.repository
 
 import com.vbshkn.ikollect.data.AppError
-import com.vbshkn.ikollect.data.mapper.DataMappers.toDomain
+import com.vbshkn.ikollect.data.mapper.DataMappers.toListItem
+import com.vbshkn.ikollect.data.mapper.DataMappers.toDetails
+import com.vbshkn.ikollect.data.mapper.DataMappers.toCandidate
 import com.vbshkn.ikollect.data.local.datasource.AlbumLocalDataSource
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
 import com.vbshkn.ikollect.data.remote.datasource.AlbumRemoteDataSource
-import com.vbshkn.ikollect.domain.model.Album
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
-import com.vbshkn.ikollect.domain.model.AlbumOverview
+import com.vbshkn.ikollect.domain.model.details.AlbumDetails
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.list.AlbumListItem
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -24,7 +26,7 @@ class AlbumRepository @Inject constructor(
         when(val webResponse = albumRemoteDS.getFullReleaseData(barcode)) {
             is NetworkResult.Success -> {
                 if (validateStyles(webResponse.data)) {
-                    emit(NetworkResult.Success(webResponse.data.toDomain()))
+                    emit(NetworkResult.Success(webResponse.data.toCandidate()))
                 }
                 else {
                     emit(NetworkResult.Error(AppError.InvalidAlbumStyle))
@@ -44,19 +46,19 @@ class AlbumRepository @Inject constructor(
         return data.releaseDetailsResponse.styles.any { style -> validStyles.contains(style.lowercase()) }
     }
 
-    fun getAllAlbums(): Flow<NetworkResult<List<Album>>> {
+    fun getAllAlbums(): Flow<NetworkResult<List<AlbumDetails>>> {
         return albumLocalDS.getAllWithArtists()
             .asLocalResult { albums ->
-                albums.map { it.toDomain() }
+                albums.map { it.toDetails() }
             }
     }
 
-    fun getAllByArtist(artistId: Long): Flow<NetworkResult<List<AlbumOverview>>> {
+    fun getAllByArtist(artistId: Long): Flow<NetworkResult<List<AlbumListItem>>> {
         return albumLocalDS.getAllByArtist(artistId)
             .asLocalResult { artistsWithAlbums ->
                 artistsWithAlbums
                     .flatMap { it.albums }
-                    .map { it.toDomain() }
+                    .map { it.toListItem() }
             }
     }
 

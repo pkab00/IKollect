@@ -95,4 +95,5 @@
     <string name="photocard_notes_placeholder">Ваши заметки о карте (необязательно)</string>
     <string name="photocard_wizard_subtitle_notes">Заметки</string>
     <string name="tag_selector_title">Выберите тэги</string>
+    <string name="error_loading_photocards">Не удалось загрузить ваши фотокарты.</string>
 </resources>

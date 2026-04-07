@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.usecase.GetAllTagsUseCase
-import com.vbshkn.ikollect.domain.usecase.GetArtistAlbumOverviewsUseCase
-import com.vbshkn.ikollect.domain.usecase.GetArtistOverviewsUseCase
+import com.vbshkn.ikollect.domain.usecase.GetArtistAlbumListUseCase
+import com.vbshkn.ikollect.domain.usecase.GetArtistListUseCase
 import com.vbshkn.ikollect.domain.usecase.GetGroupMembersUseCase
 import com.vbshkn.ikollect.domain.usecase.SavePhotocardUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,9 +24,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PhotocardWizardViewModel @Inject constructor(
-    private val getArtistOverviewsUseCase: GetArtistOverviewsUseCase,
+    private val getArtistListUseCase: GetArtistListUseCase,
     private val getGroupMembersUseCase: GetGroupMembersUseCase,
-    private val getArtistAlbumOverviewsUseCase: GetArtistAlbumOverviewsUseCase,
+    private val getArtistAlbumListUseCase: GetArtistAlbumListUseCase,
     private val getAllTagsUseCase: GetAllTagsUseCase,
     private val savePhotocardUseCase: SavePhotocardUseCase
 ) : ViewModel() {
@@ -151,7 +151,7 @@ class PhotocardWizardViewModel @Inject constructor(
     }
 
     private fun observeArtists() = viewModelScope.launch {
-        getArtistOverviewsUseCase().collect { result ->
+        getArtistListUseCase().collect { result ->
             when (result) {
                 is NetworkResult.Loading -> _uiState.update {
                     it.copy(isLoading = true)
@@ -159,7 +159,7 @@ class PhotocardWizardViewModel @Inject constructor(
                 is NetworkResult.Success -> _uiState.update { state ->
                     state.copy(
                         isLoading = false,
-                        artistOverviews = result.data.sortedBy { it.name }
+                        artists = result.data.sortedBy { it.name }
                     )
                 }
                 is NetworkResult.Error -> _uiState.update {
@@ -201,7 +201,7 @@ class PhotocardWizardViewModel @Inject constructor(
             .distinctUntilChanged()
             .flatMapLatest { ownerId ->
                 if (ownerId == null) { flowOf(NetworkResult.Success(emptyList())) }
-                else { getArtistAlbumOverviewsUseCase(ownerId) }
+                else { getArtistAlbumListUseCase(ownerId) }
             }.collect { result ->
                 when (result) {
                     is NetworkResult.Loading -> _uiState.update {
@@ -210,7 +210,7 @@ class PhotocardWizardViewModel @Inject constructor(
                     is NetworkResult.Success -> _uiState.update { state ->
                         state.copy(
                             isLoading = false,
-                            albumOverviews = result.data.sortedBy { it.name }
+                            albums = result.data.sortedBy { it.name }
                         )
                     }
                     is NetworkResult.Error -> _uiState.update {

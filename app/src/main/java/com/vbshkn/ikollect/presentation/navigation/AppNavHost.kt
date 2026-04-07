@@ -5,7 +5,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.presentation.feature.camera.AlbumCameraScreen
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsScreen

@@ -1,7 +1,7 @@
 package com.vbshkn.ikollect.presentation.feature.artists.profile
 
 import com.vbshkn.ikollect.data.AppError
-import com.vbshkn.ikollect.domain.model.ArtistProfileData
+import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
 
 data class ArtistProfileUIState(
     val isLoading: Boolean = false,

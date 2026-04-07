@@ -1,10 +1,9 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 
-import com.vbshkn.ikollect.domain.model.AlbumOverview
-import com.vbshkn.ikollect.domain.model.Artist
-import com.vbshkn.ikollect.domain.model.ArtistOverview
-import com.vbshkn.ikollect.domain.model.PhotocardCandidate
-import com.vbshkn.ikollect.domain.model.Tag
+import com.vbshkn.ikollect.domain.model.list.AlbumListItem
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
+import com.vbshkn.ikollect.domain.model.candidate.PhotocardCandidate
+import com.vbshkn.ikollect.domain.model.TagItem
 
 data class PhotocardWizardUIState(
     val currentStep: Int = 0,
@@ -12,8 +11,8 @@ data class PhotocardWizardUIState(
     val enableTagSelector: Boolean = false,
     val dialogState: PhotocardWizardDialogState = PhotocardWizardDialogState.None,
     val photocardCandidate: PhotocardCandidate = PhotocardCandidate(),
-    val artistOverviews: List<ArtistOverview> = emptyList(),
-    val members: List<Artist> = emptyList(),
-    val albumOverviews: List<AlbumOverview> = emptyList(),
-    val tags: List<Tag> = emptyList()
+    val artists: List<ArtistListItem> = emptyList(),
+    val members: List<ArtistListItem> = emptyList(),
+    val albums: List<AlbumListItem> = emptyList(),
+    val tags: List<TagItem> = emptyList()
 )

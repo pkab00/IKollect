@@ -1,5 +1,7 @@
-package com.vbshkn.ikollect.domain.model
+package com.vbshkn.ikollect.domain.model.candidate
 
+import com.vbshkn.ikollect.domain.model.candidate.ArtistCandidate
+import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.Artist
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
@@ -69,7 +69,7 @@ fun SelectMembersScreen(viewModel: PhotocardWizardViewModel) {
 
 @Composable
 fun SelectableMember(
-    member: Artist,
+    member: ArtistListItem,
     selectedMembers: List<Long>,
     onEvent: (PhotocardWizardContract.Event) -> Unit
 ) {

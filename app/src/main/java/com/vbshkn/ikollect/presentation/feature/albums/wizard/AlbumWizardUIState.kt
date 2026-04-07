@@ -1,7 +1,7 @@
 package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
-import com.vbshkn.ikollect.domain.model.VersionCandidate
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
 import com.vbshkn.ikollect.presentation.navigation.Route
 
 data class AlbumWizardUIState(

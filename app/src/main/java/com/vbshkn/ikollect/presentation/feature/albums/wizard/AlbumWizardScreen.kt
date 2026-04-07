@@ -86,18 +86,11 @@ fun AlbumWizardScreen(
     LaunchedEffect(cameraPermissionState.status) {
         if (cameraPermissionState.status.isGranted) {
             when (pending) {
-                PENDING.CAMERA -> {
-                    pending = PENDING.NONE
-                    onCamera()
-                }
-
-                PENDING.SCANNER -> {
-                    pending = PENDING.NONE
-                    onCamera()
-                }
-
+                PENDING.CAMERA -> { onCamera() }
+                PENDING.SCANNER -> { onScanner() }
                 else -> {}
             }
+            pending = PENDING.NONE
         }
     }
 

@@ -1,15 +1,14 @@
 package com.vbshkn.ikollect.data.repository
 
-import com.vbshkn.ikollect.data.mapper.DataMappers.toDomain
+import com.vbshkn.ikollect.data.mapper.DataMappers.toProfile
+import com.vbshkn.ikollect.data.mapper.DataMappers.toListItem
 import com.vbshkn.ikollect.data.mapper.DataMappers.toEntity
 import com.vbshkn.ikollect.data.local.datasource.ArtistLocalDataSource
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
-import com.vbshkn.ikollect.data.local.model.pojo.GroupWithMembers
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.datasource.ArtistRemoteDataSource
-import com.vbshkn.ikollect.domain.model.Artist
-import com.vbshkn.ikollect.domain.model.ArtistOverview
-import com.vbshkn.ikollect.domain.model.ArtistProfileData
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
+import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -30,22 +29,22 @@ class ArtistRepository @Inject constructor(
         return artistLocalDS.getById(id)
     }
 
-    fun getGroupMembers(groupId: Long): Flow<NetworkResult<List<Artist>>> {
+    fun getGroupMembers(groupId: Long): Flow<NetworkResult<List<ArtistListItem>>> {
         return artistLocalDS
             .getGroupWithMembers(groupId)
             .asLocalResult { groupWithMembers ->
-                groupWithMembers?.members?.map { it.toDomain() } ?: emptyList()
+                groupWithMembers?.members?.map { it.toListItem() } ?: emptyList()
             }
     }
 
-    fun getArtistOverviews(): Flow<NetworkResult<List<ArtistOverview>>> {
+    fun getListItems(): Flow<NetworkResult<List<ArtistListItem>>> {
         return artistLocalDS
-            .getArtistOverviews()
-            .asLocalResult { list -> list.map { it.toDomain() } }
+            .getAll()
+            .asLocalResult { list -> list.map { it.toListItem() } }
     }
 
     fun getArtistProfileData(id: Long): Flow<NetworkResult<ArtistProfileData?>> {
-        return artistLocalDS.getWithFullDetail(id).asLocalResult { it?.toDomain() }
+        return artistLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
     }
 
     suspend fun insertToDatabase(entity: ArtistEntity) {

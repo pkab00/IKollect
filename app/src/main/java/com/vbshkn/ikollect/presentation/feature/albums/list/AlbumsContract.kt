@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.albums.list
 
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 
 interface AlbumsContract {
     sealed interface Effect {

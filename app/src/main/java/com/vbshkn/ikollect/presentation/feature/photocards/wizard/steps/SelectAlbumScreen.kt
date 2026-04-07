@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -23,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -32,8 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.AlbumOverview
-import com.vbshkn.ikollect.domain.model.ArtistOverview
+import com.vbshkn.ikollect.domain.model.list.AlbumListItem
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
@@ -59,7 +56,7 @@ fun SelectAlbumScreen(viewModel: PhotocardWizardViewModel) {
             )
         }
         items(
-            items = uiState.albumOverviews,
+            items = uiState.albums,
             key = { it.albumId }
         ) { album ->
             SelectableAlbum(
@@ -73,7 +70,7 @@ fun SelectAlbumScreen(viewModel: PhotocardWizardViewModel) {
 
 @Composable
 private fun SelectableAlbum(
-    album: AlbumOverview,
+    album: AlbumListItem,
     selectedAlbumId: Long?,
     onEvent: (PhotocardWizardContract.Event) -> Unit
 ) {

@@ -25,7 +25,7 @@ interface PhotocardDao {
     fun getAllByArtist(artistId: Long): Flow<ArtistWithPhotocards?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPhotocard(photocardEntity: PhotocardEntity)
+    suspend fun insertPhotocard(photocardEntity: PhotocardEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertArtistLinks(links: List<PhotocardArtistCrossRef>)
@@ -34,11 +34,12 @@ interface PhotocardDao {
     suspend fun insertPhotocardWithArtists(
         photocardEntity: PhotocardEntity,
         artistIds: List<Long>
-    ) {
-        insertPhotocard(photocardEntity)
+    ): Long {
+        val photocardId = insertPhotocard(photocardEntity)
         val links = artistIds.map { artistId ->
-            PhotocardArtistCrossRef(photocardId = photocardEntity.photocardId, artistId = artistId)
+            PhotocardArtistCrossRef(photocardId = photocardId, artistId = artistId)
         }
         insertArtistLinks(links)
+        return photocardId
     }
 }

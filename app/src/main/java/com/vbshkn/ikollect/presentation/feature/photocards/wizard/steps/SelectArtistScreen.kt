@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.ArtistOverview
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
@@ -58,7 +58,7 @@ fun SelectArtistScreen(viewModel: PhotocardWizardViewModel) {
             )
         }
         items(
-            items = uiState.artistOverviews,
+            items = uiState.artists,
             key = { it.artistId }
         ) { artist ->
             SelectableAlbum(
@@ -72,7 +72,7 @@ fun SelectArtistScreen(viewModel: PhotocardWizardViewModel) {
 
 @Composable
 private fun SelectableAlbum(
-    artist: ArtistOverview,
+    artist: ArtistListItem,
     selectedArtistId: Long?,
     onEvent: (PhotocardWizardContract.Event) -> Unit
 ) {
@@ -90,7 +90,7 @@ private fun SelectableAlbum(
             modifier = Modifier.fillMaxSize()
         ) {
             AsyncImage(
-                model = artist.imageUrl,
+                model = artist.profileImage,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

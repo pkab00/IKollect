@@ -24,7 +24,11 @@ data class ArtistFullDetail(
         entity = PhotocardEntity::class,
         parentColumn = "artistId",
         entityColumn = "photocardId",
-        associateBy = Junction(PhotocardArtistCrossRef::class)
+        associateBy = Junction(
+            value = PhotocardArtistCrossRef::class,
+            parentColumn = "artistId",
+            entityColumn = "photocardId"
+        )
     )
     val photocardsDepicted: List<PhotocardWithArtists>,
     @Relation(

@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
-import com.vbshkn.ikollect.domain.model.VersionCandidate
+import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
 
 sealed interface AlbumWizardContract {
     sealed interface Effect {

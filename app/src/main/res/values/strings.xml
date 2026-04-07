@@ -101,4 +101,5 @@
     <string name="photocard_notes_placeholder">Your notes about the card (optional)</string>
     <string name="photocard_wizard_subtitle_notes">Notes</string>
     <string name="tag_selector_title">Select tags</string>
+    <string name="error_loading_photocards">Failed to load your photocards.</string>
 </resources>

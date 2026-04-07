@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.domain.model
+package com.vbshkn.ikollect.domain.model.candidate
 
 data class PhotocardCandidate(
     val imageUrl: String? = null,

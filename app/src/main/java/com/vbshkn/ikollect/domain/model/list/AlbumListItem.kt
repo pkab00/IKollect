@@ -1,6 +1,6 @@
-package com.vbshkn.ikollect.domain.model
+package com.vbshkn.ikollect.domain.model.list
 
-data class AlbumOverview(
+data class AlbumListItem(
     val albumId: Long,
     val komcaNumber: String?,
     val name: String,

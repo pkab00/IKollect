@@ -25,7 +25,7 @@ class PhotocardLocalDataSource @Inject constructor(
     suspend fun insertPhotocardWithArtists(
         photocardEntity: PhotocardEntity,
         artistIds: List<Long>
-    ) {
-        dao.insertPhotocardWithArtists(photocardEntity, artistIds)
+    ) : Long {
+        return dao.insertPhotocardWithArtists(photocardEntity, artistIds)
     }
 }

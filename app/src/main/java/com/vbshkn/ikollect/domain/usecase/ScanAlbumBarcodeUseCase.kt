@@ -4,7 +4,7 @@ import com.vbshkn.ikollect.data.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.service.BarcodeScannerService
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

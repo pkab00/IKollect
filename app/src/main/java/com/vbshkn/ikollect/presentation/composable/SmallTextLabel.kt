@@ -28,9 +28,8 @@ fun SmallTextLabel(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
-        shape = RoundedCornerShape(6.dp),
-        modifier = modifier.heightIn(min = 36.dp)
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        modifier = modifier
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -41,7 +40,8 @@ fun SmallTextLabel(
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                maxLines = 1
             )
         }
     }

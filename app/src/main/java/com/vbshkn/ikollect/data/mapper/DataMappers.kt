@@ -5,26 +5,24 @@ import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.entity.TagEntity
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
-import com.vbshkn.ikollect.data.local.model.pojo.ArtistMinimalDetail
 import com.vbshkn.ikollect.data.local.model.pojo.PhotocardWithArtists
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse
 import com.vbshkn.ikollect.data.remote.dao.FormatDao
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
-import com.vbshkn.ikollect.domain.model.Album
-import com.vbshkn.ikollect.domain.model.AlbumCandidate
-import com.vbshkn.ikollect.domain.model.AlbumOverview
-import com.vbshkn.ikollect.domain.model.Artist
-import com.vbshkn.ikollect.domain.model.ArtistCandidate
-import com.vbshkn.ikollect.domain.model.ArtistOverview
-import com.vbshkn.ikollect.domain.model.ArtistProfileData
-import com.vbshkn.ikollect.domain.model.Photocard
-import com.vbshkn.ikollect.domain.model.Tag
-import com.vbshkn.ikollect.domain.model.VersionCandidate
+import com.vbshkn.ikollect.domain.model.details.AlbumDetails
+import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
+import com.vbshkn.ikollect.domain.model.list.AlbumListItem
+import com.vbshkn.ikollect.domain.model.candidate.ArtistCandidate
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
+import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
+import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
+import com.vbshkn.ikollect.domain.model.TagItem
+import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
 import com.vbshkn.ikollect.util.ArtistNameHelper
 import com.vbshkn.ikollect.util.UiText
 
 object DataMappers {
-    fun ArtistDetailsResponse.toDomain(): ArtistCandidate {
+    fun ArtistDetailsResponse.toCandidate(): ArtistCandidate {
         return ArtistCandidate(
             artistId = this.id,
             name = ArtistNameHelper.pickBestNameOption(
@@ -54,13 +52,13 @@ object DataMappers {
         )
     }
 
-    fun FullReleaseData.toDomain(): AlbumCandidate {
+    fun FullReleaseData.toCandidate(): AlbumCandidate {
         return AlbumCandidate(
             discogsAlbumId = this.searchResult.id,
             masterId = this.searchResult.masterId,
             barcodeNumber = this.barcode,
             name = this.releaseDetailsResponse.title,
-            artistCandidates = this.artistDetailsResponses.map { it.toDomain() },
+            artistCandidates = this.artistDetailsResponses.map { it.toCandidate() },
             versionCandidates = mapVersionCandidates(this.availableVersions),
             releaseDate = this.searchResult.year,
             isFavorite = false,
@@ -81,13 +79,13 @@ object DataMappers {
         }
     }
 
-    fun AlbumWithArtists.toDomain(): Album {
-        return Album(
+    fun AlbumWithArtists.toDetails(): AlbumDetails {
+        return AlbumDetails(
             albumId = this.album.albumId,
             masterId = this.album.masterId,
             barcodeNumber = this.album.barcodeNumber,
             name = this.album.name,
-            artists = this.artists.map { it.toDomain() },
+            artists = this.artists.map { it.toListItem() },
             version = this.album.version ?: "No data",
             releaseDate = this.album.releaseDate ?: "No data",
             isFavorite = this.album.isFavorite,
@@ -97,8 +95,8 @@ object DataMappers {
         )
     }
 
-    fun AlbumEntity.toDomain(): AlbumOverview {
-        return AlbumOverview(
+    fun AlbumEntity.toListItem(): AlbumListItem {
+        return AlbumListItem(
             albumId = this.albumId,
             komcaNumber = this.komcaNumber,
             name = this.name,
@@ -107,17 +105,6 @@ object DataMappers {
             imageUrl = this.imageUrl ?: "",
             timestamp = this.timestamp
         )
-    }
-
-    fun ArtistEntity.toDomain(): Artist {
-        return Artist(
-            artistId = this.artistId,
-            name = this.name,
-            isGroup = this.isGroup,
-            isFavorite = this.isFavorite,
-            profileImage = this.imageUrl
-        )
-
     }
 
     fun ArtistCandidate.toEntity(): ArtistEntity {
@@ -130,65 +117,46 @@ object DataMappers {
         )
     }
 
-    fun PhotocardWithArtists.toDomain(): Photocard {
-        return Photocard(
+    fun PhotocardWithArtists.toListItem(): PhotocardListItem {
+        return PhotocardListItem(
             photocardId = this.photocard.photocardId,
-            albumId = this.photocard.albumId,
-            ownerId = this.photocard.ownerId,
+            owner = this.owner.toListItem(),
             displayName = this.photocard.displayName,
-            depictedArtists = this.artists.map { it.toDomain() },
-            isFavorite = this.photocard.isFavorite,
-            imageUrl = this.photocard.imageUrl,
-            userNote = this.photocard.userNote
+            tags = this.tags.map { it.toDomain() },
+            imageUrl = this.photocard.imageUrl
         )
     }
 
-    fun ArtistMinimalDetail.toDomain(): ArtistOverview {
-        return if (this.isGroup) {
-            ArtistOverview(
-                artistId = this.artistId,
-                name = this.name,
-                isGroup = true,
-                isFavorite = this.isFavorite,
-                imageUrl = this.imageUrl,
-                albumsCount = this.albumsCount,
-                photocardsCount = this.photocardsOwnedCount
-            )
-        }
-        else {
-            ArtistOverview(
-                artistId = this.artistId,
-                name = this.name,
-                isGroup = false,
-                isFavorite = this.isFavorite,
-                imageUrl = this.imageUrl,
-                albumsCount = this.albumsCount,
-                photocardsCount = this.photocardsDepictedCount
-            )
-        }
+    fun ArtistEntity.toListItem(): ArtistListItem {
+        return ArtistListItem(
+            artistId = this.artistId,
+            name = this.name,
+            isGroup = this.isGroup,
+            isFavorite = this.isFavorite,
+            profileImage = this.imageUrl
+        )
     }
 
-    fun ArtistFullDetail.toDomain(): ArtistProfileData {
+    fun ArtistFullDetail.toProfile(): ArtistProfileData {
         return if (this.artist.isGroup) {
             ArtistProfileData.GroupProfile(
-                artist = this.artist.toDomain(),
-                albums = this.albums.map { it.toDomain() },
-                photocards = this.photocardsOwned.map { it.toDomain() },
-                members = this.members.map { it.toDomain() }
+                artist = this.artist.toListItem(),
+                albums = this.albums.map { it.toDetails() },
+                photocards = this.photocardsOwned.map { it.toListItem() },
+                members = this.members.map { it.toListItem() }
             )
-        }
-        else {
+        } else {
             ArtistProfileData.SoloistProfile(
-                artist = this.artist.toDomain(),
-                albums = this.albums.map { it.toDomain() },
-                photocards = this.photocardsDepicted.map { it.toDomain() },
-                groups = this.groups.map { it.toDomain() }
+                artist = this.artist.toListItem(),
+                albums = this.albums.map { it.toDetails() },
+                photocards = this.photocardsDepicted.map { it.toListItem() },
+                groups = this.groups.map { it.toListItem() }
             )
         }
     }
 
-    fun TagEntity.toDomain(): Tag {
-        return Tag(
+    fun TagEntity.toDomain(): TagItem {
+        return TagItem(
             id = this.tagId,
             isSystem = this.isSystemTag,
             name = if (this.isSystemTag) {
