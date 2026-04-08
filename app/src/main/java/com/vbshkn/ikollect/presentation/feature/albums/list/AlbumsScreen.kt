@@ -83,7 +83,7 @@ fun AlbumsScreen(
                 .padding(paddingValues)
                 .padding(10.dp)
         ) {
-            if (uiState.error != null) {
+            if ( uiState.albums.isEmpty() && uiState.error != null) {
                 ErrorScreen()
             } else if (uiState.albums.isEmpty()) {
                 NoAlbumsScreen()

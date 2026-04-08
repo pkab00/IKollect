@@ -34,7 +34,7 @@ fun WrapUpScreen(viewModel: AlbumWizardViewModel, ) {
         item {
             WizardItemWrapper(title = UiText.StringResource(R.string.wizard_title_notes)) {
                 UserNotesField(
-                    value = uiState.albumCandidate.userNote,
+                    value = uiState.albumCandidate?.userNote!!,
                     onValueChange = {
                         viewModel.onEvent(AlbumWizardContract.Event.OnUserNotesChanged(it))
                     }

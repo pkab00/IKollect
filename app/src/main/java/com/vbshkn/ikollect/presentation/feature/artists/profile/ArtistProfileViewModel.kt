@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.data.remote.NetworkResult
+import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.GetArtistProfileDataUseCase
 import com.vbshkn.ikollect.presentation.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,36 +19,26 @@ import javax.inject.Inject
 class ArtistProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getArtistProfileDataUseCase: GetArtistProfileDataUseCase
-) : ViewModel() {
+) : BaseViewModel<
+        ArtistProfileUIState,
+        ArtistProfileContract.Event,
+        ArtistProfileContract.Effect
+        >(initialState = ArtistProfileUIState()) {
     private val args = savedStateHandle.toRoute<Route.ArtistProfile>()
     private val artistId = args.id
-    private val _uiState = MutableStateFlow(ArtistProfileUIState())
-    val uiState = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            collectProfileData()
-        }
+        observeProfileData()
     }
 
-    private suspend fun collectProfileData() =
-        getArtistProfileDataUseCase(artistId).collect { networkResult ->
-            when(networkResult) {
-                is NetworkResult.Loading -> _uiState.update {
-                    it.copy(isLoading = true)
-                }
-                is NetworkResult.Error -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = networkResult.error
-                    )
-                }
-                is NetworkResult.Success -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        profileData = networkResult.data
-                    )
-                }
-            }
-        }
+    override fun onEvent(event: ArtistProfileContract.Event) {
+        // TODO
+    }
+
+    private fun observeProfileData() = collectFlowIntoState(
+        flow = getArtistProfileDataUseCase(artistId),
+        onSuccess = { state, data -> state.copy(isLoading = false, profileData = data) },
+        onLoading = { state -> state.copy(isLoading = true) },
+        onError = { state, e -> state.copy(isLoading = false, error = e) }
+    )
 }

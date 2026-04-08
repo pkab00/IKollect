@@ -35,9 +35,9 @@ import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardContrac
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
 
 @Composable
-fun SelectVersionScreen(viewModel: AlbumWizardViewModel, ) {
+fun SelectVersionScreen(viewModel: AlbumWizardViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val versions = uiState.albumCandidate.versionCandidates
+    val versions = uiState.albumCandidate!!.versionCandidates
     val selectedVersion = uiState.versionCandidate
     val blankVersionCandidate = VersionCandidate("", null)
 

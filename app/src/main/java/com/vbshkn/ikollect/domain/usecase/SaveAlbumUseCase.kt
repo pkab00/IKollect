@@ -21,7 +21,7 @@ class SaveAlbumUseCase @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope
 ){
     operator fun invoke(state: AlbumWizardUIState) = applicationScope.launch {
-        val albumCandidate = state.albumCandidate
+        val albumCandidate = state.albumCandidate!!
         val versionCandidate = state.versionCandidate!!
         val komcaNumber = state.komcaNumber
 

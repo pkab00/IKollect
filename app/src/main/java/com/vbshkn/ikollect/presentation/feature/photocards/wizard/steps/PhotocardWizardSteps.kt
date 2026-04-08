@@ -64,7 +64,8 @@ sealed interface PhotocardWizardSteps {
         override val title: UiText = UiText.StringResource(R.string.photocard_wizard_title_wrap_up)
         @Composable
         override fun isNextEnabled(): Boolean {
-            return true
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            return !uiState.photocardCandidate.displayName.isNullOrBlank()
         }
         @Composable
         override fun Content() {

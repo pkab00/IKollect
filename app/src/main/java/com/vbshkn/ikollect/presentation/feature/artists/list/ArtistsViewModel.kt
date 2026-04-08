@@ -3,6 +3,7 @@ package com.vbshkn.ikollect.presentation.feature.artists.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
+import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.GetArtistListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -14,29 +15,32 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class ArtistsViewModel @Inject constructor(
     private val getArtistListUseCase: GetArtistListUseCase
-) : ViewModel() {
-    private val _uiState = MutableStateFlow(ArtistsUIState())
-    val uiState = _uiState.asStateFlow()
-
+) : BaseViewModel<
+        ArtistsUIState,
+        ArtistsContract.Event,
+        ArtistsContract.Effect
+        >(initialState = ArtistsUIState()) {
     init {
-        viewModelScope.launch {
-            collectArtistOverviews()
-        }
+        collectArtistOverviews()
     }
 
-    private suspend fun collectArtistOverviews() {
+    override fun onEvent(event: ArtistsContract.Event) {
+        // TODO
+    }
+
+    private fun collectArtistOverviews() = viewModelScope.launch {
         getArtistListUseCase().collect { networkResult ->
             when(networkResult) {
-                is NetworkResult.Loading -> _uiState.update {
+                is NetworkResult.Loading -> updateState {
                     it.copy(isLoading = true)
                 }
-                is NetworkResult.Error -> _uiState.update {
+                is NetworkResult.Error -> updateState {
                     it.copy(
                         isLoading = false,
                         error = networkResult.error
                     )
                 }
-                is NetworkResult.Success -> _uiState.update { state ->
+                is NetworkResult.Success -> updateState { state ->
                     val all = networkResult.data
                     val (groups, soloists) = all.partition { it.isGroup }
                     state.copy(

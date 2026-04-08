@@ -31,9 +31,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,16 +45,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.util.toRange
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
-import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
 import com.vbshkn.ikollect.presentation.composable.TagLabel
-import com.vbshkn.ikollect.util.PaletteUtil
-import com.vbshkn.ikollect.util.UiText
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun PhotocardsScreen(
@@ -76,7 +68,7 @@ fun PhotocardsScreen(
 
     Scaffold(
         topBar = {
-            TopBar(onEvent = viewModel::omEvent)
+            TopBar(onEvent = viewModel::onEvent)
         },
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -115,7 +107,7 @@ fun PhotocardsScreen(
                     ) { photocard ->
                         PhotocardCard(
                             photocard = photocard,
-                            onEvent = viewModel::omEvent
+                            onEvent = viewModel::onEvent
                         )
                     }
                 }

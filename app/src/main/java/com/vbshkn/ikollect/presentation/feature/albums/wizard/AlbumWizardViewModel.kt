@@ -1,53 +1,43 @@
 package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.presentation.navigation.AlbumCandidateType
 import com.vbshkn.ikollect.presentation.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.reflect.typeOf
 import com.vbshkn.ikollect.domain.usecase.SaveAlbumUseCase
+import com.vbshkn.ikollect.domain.base.BaseViewModel
 
 @HiltViewModel
 class AlbumWizardViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val saveAlbumUseCase: SaveAlbumUseCase
-) : ViewModel() {
+) : BaseViewModel<
+        AlbumWizardUIState,
+        AlbumWizardContract.Event,
+        AlbumWizardContract.Effect
+        >(initialState = AlbumWizardUIState()) {
     private val args = savedStateHandle.toRoute<Route.AlbumWizard>(
         typeMap = mapOf(typeOf<AlbumCandidate>() to AlbumCandidateType)
     )
 
-    private val _uiState = MutableStateFlow(AlbumWizardUIState(albumCandidate = args.candidate))
-    val uiState = _uiState.asStateFlow()
-    private val _effects = Channel<AlbumWizardContract.Effect>(Channel.BUFFERED)
-    val effects = _effects.receiveAsFlow()
+    init {
+        updateState { state -> state.copy(albumCandidate = args.candidate) }
+    }
 
-    fun onEvent(event: AlbumWizardContract.Event) {
+    override fun onEvent(event: AlbumWizardContract.Event) {
         when (event) {
             is AlbumWizardContract.Event.OnBackClicked -> {
                 sendEffect(AlbumWizardContract.Effect.NavigateBack)
             }
             is AlbumWizardContract.Event.OnNextClicked -> {
                 sendEffect(AlbumWizardContract.Effect.NavigateNext)
-            }
-            is AlbumWizardContract.Event.OnExitClicked -> {
-                showDialog(AlbumWizardDialogState.ConfirmExitWizardDialog)
-            }
-            is AlbumWizardContract.Event.OnExitConfirmed -> {
-                sendEffect(AlbumWizardContract.Effect.Exit)
-            }
-            is AlbumWizardContract.Event.OnDismissDialog -> {
-                dismissDialog()
             }
             is AlbumWizardContract.Event.OnSelectPicture -> {
                 sendEffect(AlbumWizardContract.Effect.OpenGallery)
@@ -58,75 +48,66 @@ class AlbumWizardViewModel @Inject constructor(
             is AlbumWizardContract.Event.OnScanKomca -> {
                 sendEffect(AlbumWizardContract.Effect.TryOpenScanner)
             }
-            AlbumWizardContract.Event.OnShowKomcaHint -> {
-                showDialog(AlbumWizardDialogState.AboutKomcaWizardDialog)
-            }
-            is AlbumWizardContract.Event.OnShowCameraRationale -> {
-                showDialog(AlbumWizardDialogState.CameraRationaleWizardDialog)
-            }
-            is AlbumWizardContract.Event.OnStepChanged -> _uiState.update {
+            is AlbumWizardContract.Event.OnStepChanged -> updateState {
                 it.copy(stepIndex = event.newStep)
             }
-            is AlbumWizardContract.Event.OnPictureCaptured -> _uiState.update {
+            is AlbumWizardContract.Event.OnPictureCaptured -> updateState {
                 it.copy(
                     versionCandidate = it.versionCandidate?.copy(coverImage = event.uri),
                     isCoverCached = true
                 )
             }
-            is AlbumWizardContract.Event.OnUpdateVersion -> _uiState.update {
+            is AlbumWizardContract.Event.OnUpdateVersion -> updateState {
                 it.copy(versionCandidate = event.candidate)
             }
-            is AlbumWizardContract.Event.OnExistingPhotoSelected -> {
-                _uiState.value.versionCandidate?.let { candidate ->
-                    _uiState.update {
-                        it.copy(
-                            versionCandidate = candidate.copy(coverImage = event.path),
-                            isCoverCached = false
-                        )
-                    }
-                }
-            }
-            is AlbumWizardContract.Event.OnVersionNameChanged -> {
-                _uiState.value.versionCandidate?.let { candidate ->
-                    _uiState.update {
-                        it.copy(versionCandidate = candidate.copy(name = event.newName))
-                    }
-                }
-            }
-            is AlbumWizardContract.Event.OnKomcaCodeChanged -> {
-                _uiState.update {
-                    it.copy(komcaNumber = event.newCode)
-                }
-            }
-            is AlbumWizardContract.Event.OnUserNotesChanged -> {
-                _uiState.update {
-                    it.copy(
-                        albumCandidate = it.albumCandidate.copy(userNote = event.newValue)
+            is AlbumWizardContract.Event.OnExistingPhotoSelected -> updateState { state ->
+                state.versionCandidate?.let { candidate ->
+                    state.copy(
+                        versionCandidate = candidate.copy(coverImage = event.path),
+                        isCoverCached = false
                     )
-                }
+                } ?: state
             }
-            AlbumWizardContract.Event.OnWrapUp -> viewModelScope.launch {
-                saveAlbumUseCase(uiState.value)
+            is AlbumWizardContract.Event.OnVersionNameChanged -> updateState { state ->
+                state.versionCandidate?.let { candidate ->
+                    state.copy(versionCandidate = candidate.copy(name = event.newName))
+                } ?: state
+            }
+            is AlbumWizardContract.Event.OnKomcaCodeChanged -> updateState {
+                it.copy(komcaNumber = event.newCode)
+            }
+            is AlbumWizardContract.Event.OnUserNotesChanged -> updateState {
+                it.copy(albumCandidate = it.albumCandidate?.copy(userNote = event.newValue))
+            }
+            is AlbumWizardContract.Event.OnExitClicked -> {
+                showDialog(AlbumWizardDialogState.ConfirmExitWizardDialog)
+            }
+            is AlbumWizardContract.Event.OnExitConfirmed -> {
                 sendEffect(AlbumWizardContract.Effect.Exit)
+            }
+            is AlbumWizardContract.Event.OnDismissDialog -> {
+                dismissDialog()
+            }
+            is AlbumWizardContract.Event.OnShowKomcaHint -> {
+                showDialog(AlbumWizardDialogState.AboutKomcaWizardDialog)
+            }
+            is AlbumWizardContract.Event.OnShowCameraRationale -> {
+                showDialog(AlbumWizardDialogState.CameraRationaleWizardDialog)
+            }
+            AlbumWizardContract.Event.OnWrapUp -> {
+                viewModelScope.launch {
+                    saveAlbumUseCase(uiState.value)
+                    sendEffect(AlbumWizardContract.Effect.Exit)
+                }
             }
         }
     }
 
     private fun showDialog(dialogState: AlbumWizardDialogState) {
-        _uiState.update {
-            it.copy(dialogState = dialogState)
-        }
+        updateState { it.copy(dialogState = dialogState) }
     }
 
     private fun dismissDialog() {
-        _uiState.update {
-            it.copy(dialogState = AlbumWizardDialogState.None)
-        }
-    }
-
-    private fun sendEffect(effect: AlbumWizardContract.Effect) {
-        viewModelScope.launch {
-            _effects.send(effect)
-        }
+        updateState { it.copy(dialogState = AlbumWizardDialogState.None) }
     }
 }

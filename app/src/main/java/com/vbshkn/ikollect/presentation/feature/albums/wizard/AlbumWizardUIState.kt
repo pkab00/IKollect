@@ -6,7 +6,7 @@ import com.vbshkn.ikollect.presentation.navigation.Route
 
 data class AlbumWizardUIState(
     val stepIndex: Int = 0,
-    val albumCandidate: AlbumCandidate,
+    val albumCandidate: AlbumCandidate? = null,
     val versionCandidate: VersionCandidate? = null,
     val komcaNumber: String? = null,
     val dialogState: AlbumWizardDialogState = AlbumWizardDialogState.None,

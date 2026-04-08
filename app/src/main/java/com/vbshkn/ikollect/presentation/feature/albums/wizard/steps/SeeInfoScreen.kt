@@ -28,26 +28,26 @@ fun SeeInfoScreen(viewModel: AlbumWizardViewModel, ) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        with(candidate) {
+        candidate?.let {
             item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_name),
-                data = UiText.DynamicString(name)
+                data = UiText.DynamicString(it.name)
             ) }
             item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_artist),
-                data = UiText.DynamicString(artistCandidates.joinToString { it.name })
+                data = UiText.DynamicString(it.artistCandidates.joinToString { it.name })
             ) }
             item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_release_year),
-                data = UiText.DynamicString(releaseDate)
+                data = UiText.DynamicString(it.releaseDate)
             ) }
             item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_barcode),
-                data = UiText.DynamicString(barcodeNumber)
+                data = UiText.DynamicString(it.barcodeNumber)
             ) }
             item { DataOutlinedCard(
                 label = UiText.StringResource(R.string.see_info_discogs_id),
-                data = UiText.DynamicString(discogsAlbumId.toString())
+                data = UiText.DynamicString(it.discogsAlbumId.toString())
             ) }
         }
     }

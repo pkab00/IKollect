@@ -6,5 +6,5 @@ import javax.inject.Inject
 class GetAllPhotocardsUseCase @Inject constructor(
     private val photocardRepository: PhotocardRepository
 ) {
-    suspend operator fun invoke() = photocardRepository.getAll()
+    operator fun invoke() = photocardRepository.getAll()
 }
