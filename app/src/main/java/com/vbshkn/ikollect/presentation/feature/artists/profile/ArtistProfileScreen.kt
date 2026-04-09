@@ -1,475 +1,141 @@
 package com.vbshkn.ikollect.presentation.feature.artists.profile
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.allowHardware
-import coil3.toBitmap
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.details.AlbumDetails
 import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
-import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
-import com.vbshkn.ikollect.domain.model.list.ArtistListItem
-import com.vbshkn.ikollect.presentation.composable.CardGrid
-import com.vbshkn.ikollect.presentation.composable.EmptyCardGridFiller
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
-import com.vbshkn.ikollect.presentation.composable.ProfileItemWrapper
-import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
-import com.vbshkn.ikollect.presentation.composable.TagLabel
-import com.vbshkn.ikollect.util.PaletteUtil
+import com.vbshkn.ikollect.presentation.composable.profile.ProfileItemWrapper
+import com.vbshkn.ikollect.presentation.composable.profile.AlbumList
+import com.vbshkn.ikollect.presentation.composable.profile.ArtistList
+import com.vbshkn.ikollect.presentation.composable.profile.InfoRowItem
+import com.vbshkn.ikollect.presentation.composable.profile.NotesField
+import com.vbshkn.ikollect.presentation.composable.profile.PhotocardList
+import com.vbshkn.ikollect.presentation.composable.profile.ProfileInfoSection
+import com.vbshkn.ikollect.presentation.composable.profile.ProfileScaffold
+import com.vbshkn.ikollect.presentation.composable.profile.StatCard
+import com.vbshkn.ikollect.presentation.composable.profile.rememberProfileTopBarState
 import com.vbshkn.ikollect.util.TimeUtil.toDateString
 import com.vbshkn.ikollect.util.UiText
-import me.onebone.toolbar.CollapsingToolbarScaffold
-import me.onebone.toolbar.CollapsingToolbarState
-import me.onebone.toolbar.ScrollStrategy
-import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 @Composable
 fun ArtistProfileScreen(
     viewModel: ArtistProfileViewModel,
-    onAnotherArtistClick: (Long) -> Unit,
-    onBackClick: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToArtist: (Long) -> Unit,
+    onNavigateToAlbum: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val state = rememberCollapsingToolbarScaffoldState()
+    val topBarState = rememberProfileTopBarState()
     val profile = uiState.profileData
 
-    val expandedHeight = 300.dp
-    val collapsedHeight = 56.dp
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                is ArtistProfileContract.Effect.NavigateBack -> onNavigateBack()
+                is ArtistProfileContract.Effect.NavigateToAlbum -> onNavigateToAlbum(effect.id)
+                is ArtistProfileContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
+            }
+        }
+    }
 
-    CollapsingToolbarScaffold(
-        state = state,
-        scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
-        toolbarModifier = Modifier.background(MaterialTheme.colorScheme.primary),
-        modifier = Modifier.fillMaxSize(),
-        toolbar = {
-            ArtistCollapsingToolbar(
-                toolbarState = state.toolbarState,
-                title = profile?.artist?.name ?: "",
-                imageUrl = profile?.artist?.profileImage,
-                onBackClick = onBackClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(expandedHeight)
-                    .parallax(0.5f),
-                textModifier = Modifier
-                    .road(
-                        whenCollapsed = Alignment.CenterStart,
-                        whenExpanded = Alignment.BottomStart
+    val totalAlbums = (profile?.albums?.size ?: 0).toString()
+    val totalPhotocards = (profile?.photocards?.size ?: 0).toString()
+    val status = UiText.DynamicString(if (profile?.artist?.isGroup == true) stringResource(R.string.status_group) else stringResource(R.string.status_soloist))
+    val firstAlbum = profile?.albums?.minByOrNull { it.savingTimestamp }
+    val lastAlbum = profile?.albums?.maxByOrNull { it.savingTimestamp }
+
+    ProfileScaffold(
+        topBarState = topBarState,
+        onNavigate = onNavigateBack,
+        imageUrl = profile?.artist?.profileImage,
+        title = profile?.artist?.name ?: ""
+    ) {
+        item {
+            val statItems = listOf(
+                StatCard.TextStatCardItem(
+                    label = UiText.StringResource(R.string.artist_profile_title_albums),
+                    value = UiText.DynamicString(totalAlbums),
+                    painter = painterResource(R.drawable.ic_albums),
+                ),
+                StatCard.TextStatCardItem(
+                    label = UiText.StringResource(R.string.artist_profile_title_photocards),
+                    value = UiText.DynamicString(totalPhotocards),
+                    painter = painterResource(R.drawable.ic_photocards)
+                )
+            )
+            val infoItems = listOf(
+                InfoRowItem(
+                    label = UiText.StringResource(R.string.artist_profile_label_status),
+                    value = status
+                ),
+                InfoRowItem(
+                    label = UiText.StringResource(R.string.artist_profile_label_statred_on),
+                    value = UiText.DynamicString(
+                        firstAlbum?.savingTimestamp?.toDateString() ?: "-:-"
                     )
-                    .padding(start = 56.dp, end = 16.dp, top = collapsedHeight, bottom = 16.dp),
-                backModifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .height(collapsedHeight)
-                    .pin()
+                ),
+                InfoRowItem(
+                    label = UiText.StringResource(R.string.artist_profile_label_last_update),
+                    value = UiText.DynamicString(
+                        lastAlbum?.savingTimestamp?.toDateString() ?: "-:-"
+                    )
+                ),
+                InfoRowItem(
+                    label = UiText.StringResource(R.string.artist_profile_label_first_album),
+                    value = UiText.DynamicString(firstAlbum?.extendedName ?: "-:-"),
+                    isLongText = true
+                ),
+                InfoRowItem(
+                    label = UiText.StringResource(R.string.artist_profile_label_latest_album),
+                    value = UiText.DynamicString(lastAlbum?.extendedName ?: "-:-"),
+                    isLongText = true
+                )
+            )
+
+            ProfileItemWrapper(
+                title = UiText.StringResource(R.string.artist_profile_title_information)
+            ) { ProfileInfoSection(statItems, infoItems) }
+        }
+        item {
+            when (profile) {
+                is ArtistProfileData.GroupProfile -> {
+                    ArtistList(
+                        title = UiText.StringResource(R.string.artist_profile_title_members),
+                        artists = profile.members,
+                        onClick = { viewModel.onEvent(ArtistProfileContract.Event.OnArtistCardClicked(it)) }
+                    )
+                }
+                is ArtistProfileData.SoloistProfile -> {
+                    ArtistList(
+                        title = UiText.StringResource(R.string.artist_profile_title_in_groups),
+                        artists = profile.groups,
+                        onClick = { viewModel.onEvent(ArtistProfileContract.Event.OnArtistCardClicked(it)) }
+                    )
+                }
+                null -> {}
+            }
+        }
+        item {
+            AlbumList(
+                title = UiText.StringResource(R.string.artist_profile_title_albums),
+                albums = uiState.profileData?.albums,
+                onClick = { viewModel.onEvent(ArtistProfileContract.Event.OnAlbumCardClicked(it)) }
             )
         }
-    ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 6.dp)
-        ) {
-            item {
-                ProfileItemWrapper(
-                    title = UiText.StringResource(R.string.artist_profile_title_information)
-                ) { ArtistInfoSection(profile) }
-            }
-            item {
-                when(profile) {
-                    is ArtistProfileData.GroupProfile -> {
-                        ProfileItemWrapper(
-                            title = UiText.StringResource(R.string.artist_profile_title_members),
-                            enabled = profile.members.isNotEmpty()
-                        ) {
-                            CardGrid(
-                                height = 200.dp,
-                                modifier = Modifier.padding(8.dp)
-                            ) {
-                                items(profile.members) { member ->
-                                    MemberOrGroupCard(
-                                        artist = member,
-                                        onClick = onAnotherArtistClick
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    is ArtistProfileData.SoloistProfile -> {
-                        ProfileItemWrapper(
-                            title = UiText.StringResource(R.string.artist_profile_title_in_groups),
-                            enabled = profile.groups.isNotEmpty()
-                        ) {
-                            CardGrid(
-                                height = 200.dp,
-                                modifier = Modifier.padding(8.dp)
-                            ) {
-                                items(profile.groups) { group ->
-                                    MemberOrGroupCard(
-                                        artist = group,
-                                        onClick = onAnotherArtistClick
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    null -> {}
-                }
-            }
-            item {
-                ProfileItemWrapper(
-                    title = UiText.StringResource(R.string.artist_profile_title_albums)
-                ) {
-                    if (!profile?.albums.isNullOrEmpty()) {
-                        CardGrid(
-                            height = 275.dp,
-                            modifier = Modifier.padding(8.dp)
-                        ) {
-                            items(profile.albums) { album ->
-                                AlbumCard(album) {}
-                            }
-                        }
-                    } else { EmptyCardGridFiller() }
-                }
-            }
-            item {
-                ProfileItemWrapper(
-                    title = UiText.StringResource(R.string.artist_profile_title_photocards)
-                ) {
-                    if (!profile?.photocards.isNullOrEmpty()) {
-                        CardGrid(
-                            height = 275.dp,
-                            modifier = Modifier.padding(8.dp)
-                        ) {
-                            items(profile.photocards) { photocard ->
-                                PhotocardCard(photocard) {}
-                            }
-                        }
-                    } else { EmptyCardGridFiller() }
-                }
-            }
+        item {
+            PhotocardList(
+                title = UiText.StringResource(R.string.artist_profile_title_photocards),
+                photocards = uiState.profileData?.photocards,
+                onClick = {}
+            )
         }
     }
     if (uiState.isLoading) {
         LoadingOverlay()
-    }
-}
-
-@Composable
-private fun PhotocardCard(
-    photocard: PhotocardListItem,
-    onClick: (Long) -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.size(height = 180.dp, width = 160.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { onClick(photocard.photocardId) }
-        ) {
-            AsyncImage(
-                model = photocard.imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier.weight(0.6f)
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp)
-                    .weight(0.4f)
-            ) {
-                Text(
-                    text = photocard.displayName,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.SemiBold
-                )
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    val tagsLimit = 2
-                    val displayTags = photocard.tags.take(tagsLimit)
-                    val remainingTags = photocard.tags.size - tagsLimit
-                    displayTags.forEach { tag ->
-                        TagLabel(
-                            tag = tag,
-                            isSelected = false,
-                            modifier = Modifier.weight(1f, fill = false)
-                        )
-                    }
-                    if (remainingTags > 0) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(26.dp)
-                                .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
-                        ) {
-                            Text(
-                                text = "+$remainingTags",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AlbumCard(
-    album: AlbumDetails,
-    onClick: (Long) -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.size(height = 180.dp, width = 160.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { onClick(album.albumId) }
-        ) {
-            AsyncImage(
-                model = album.coverImage,
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier.weight(0.6f)
-            )
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp)
-                    .weight(0.4f)
-            ) {
-                Text(
-                    text = album.name,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.SemiBold
-                )
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                SmallTextLabel(
-                    text = UiText.DynamicString(album.version),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                SmallTextLabel(
-                    text = UiText.DynamicString(album.savingTimestamp.toDateString()),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun MemberOrGroupCard(
-    artist: ArtistListItem,
-    onClick: (Long) -> Unit
-) {
-    val initialColors = listOf(
-        MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f),
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-    )
-    var imageGradient by remember { mutableStateOf(Brush.verticalGradient(initialColors)) }
-
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.size(height = 180.dp, width = 160.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { onClick(artist.artistId) }
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(artist.profileImage)
-                    .allowHardware(false)
-                    .build(),
-                onSuccess = { result ->
-                    val bitmap = result.result.image.toBitmap()
-                    imageGradient = PaletteUtil.getVibrantGradient(
-                        bitmap = bitmap,
-                        defaultColors = initialColors
-                    )
-                },
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier
-                    .weight(0.7f)
-                    .background(imageGradient)
-            )
-
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .weight(0.3f)
-                    .padding(6.dp)
-            ) {
-                Text(
-                    text = artist.name,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ArtistCollapsingToolbar(
-    toolbarState: CollapsingToolbarState,
-    title: String,
-    imageUrl: String?,
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    textModifier: Modifier = Modifier,
-    backModifier: Modifier = Modifier,
-) {
-    val textSize = (20f + (12f * toolbarState.progress)).sp
-
-
-    // Основной фон с картинкой
-    Box(
-        modifier = modifier
-    ) {
-        // Фотография артиста
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        // Градиент
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.6f)
-                        ),
-                        startY = 300f
-                    )
-                )
-        )
-
-        // Дополнительное затемнение при сворачивании
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 1f - toolbarState.progress))
-        )
-    }
-
-    // 3. Анимированный заголовок (Имя)
-    Text(
-        text = title,
-        color = if (toolbarState.progress < 0.3f)
-            MaterialTheme.colorScheme.onSurfaceVariant
-        else Color.White,
-        fontSize = textSize,
-        fontWeight = FontWeight.Bold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = textModifier
-    )
-
-    // 4. Кнопка "Назад" (закреплена всегда сверху)
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = backModifier
-    ) {
-        IconButton(onClick = onBackClick) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = null,
-                tint = if (toolbarState.progress < 0.3f) MaterialTheme.colorScheme.onSurfaceVariant
-                else Color.White
-            )
-        }
     }
 }

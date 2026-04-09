@@ -32,7 +32,7 @@ class SavePhotocardUseCase @Inject constructor(
 
         db.withTransaction {
             val id = photocardRepository.insertWithArtists(photocardEntity, candidate.depictedArtistsId)
-            tagRepository.linkTagsToPhotocard(id, candidate.tagIds.toList())
+            tagRepository.linkPhotocard(id, candidate.tagIds.toList())
         }
     }
 }

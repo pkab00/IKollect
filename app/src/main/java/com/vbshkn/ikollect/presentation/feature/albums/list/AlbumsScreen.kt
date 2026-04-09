@@ -20,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -51,7 +50,8 @@ import com.vbshkn.ikollect.util.UiText
 @Composable
 fun AlbumsScreen(
     viewModel: AlbumsViewModel,
-    onGoToWizard: (AlbumCandidate) -> Unit
+    onGoToWizard: (AlbumCandidate) -> Unit,
+    onAlbumClick: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent: (AlbumsContract.Event) -> Unit = viewModel::onEvent
@@ -59,7 +59,7 @@ fun AlbumsScreen(
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is AlbumsContract.Effect.NavigateToAlbum -> {}
+                is AlbumsContract.Effect.NavigateToAlbum -> onAlbumClick(effect.id)
                 is AlbumsContract.Effect.NavigateToSaveFlow -> onGoToWizard(effect.candidate)
             }
         }
@@ -88,7 +88,7 @@ fun AlbumsScreen(
             } else if (uiState.albums.isEmpty()) {
                 NoAlbumsScreen()
             } else {
-                AlbumsGrid(uiState.albums)
+                AlbumsGrid(uiState.albums, viewModel::onEvent)
             }
         }
 
@@ -99,7 +99,10 @@ fun AlbumsScreen(
 }
 
 @Composable
-fun AlbumsGrid(albums: List<AlbumDetails>) {
+fun AlbumsGrid(
+    albums: List<AlbumDetails>,
+    onEvent: (AlbumsContract.Event) -> Unit
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -110,7 +113,10 @@ fun AlbumsGrid(albums: List<AlbumDetails>) {
             items = albums,
             key = { it.albumId }
         ) { album ->
-            AlbumCard(album = album, onClick = {})
+            AlbumCard(
+                album = album,
+                onClick = { onEvent(AlbumsContract.Event.OnAlbumClicked(album.albumId)) }
+            )
         }
     }
 }

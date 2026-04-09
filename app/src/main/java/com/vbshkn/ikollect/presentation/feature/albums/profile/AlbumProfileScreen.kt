@@ -1,0 +1,125 @@
+package com.vbshkn.ikollect.presentation.feature.albums.profile
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
+import com.vbshkn.ikollect.presentation.composable.profile.ArtistList
+import com.vbshkn.ikollect.presentation.composable.profile.InfoRowItem
+import com.vbshkn.ikollect.presentation.composable.profile.NotesField
+import com.vbshkn.ikollect.presentation.composable.profile.PhotocardList
+import com.vbshkn.ikollect.presentation.composable.profile.ProfileInfoSection
+import com.vbshkn.ikollect.presentation.composable.profile.ProfileItemWrapper
+import com.vbshkn.ikollect.presentation.composable.profile.ProfileScaffold
+import com.vbshkn.ikollect.presentation.composable.profile.StatCard
+import com.vbshkn.ikollect.presentation.composable.profile.rememberProfileTopBarState
+import com.vbshkn.ikollect.util.TimeUtil.toDateString
+import com.vbshkn.ikollect.util.UiText
+
+@Composable
+fun AlbumProfileScreen(
+    viewModel: AlbumProfileViewModel,
+    onNavigateBack: () -> Unit,
+    onNavigateToArtist: (Long) -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val profile = uiState.profile
+    val topBarState = rememberProfileTopBarState()
+
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                is AlbumProfileContract.Effect.NavigateBack -> onNavigateBack()
+                is AlbumProfileContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
+            }
+        }
+    }
+
+    val totalPhotocards = (profile?.photocards?.size ?: 0).toString()
+    val statItems = listOf(
+        StatCard.ImageStatCardItem(
+            imageUrl = profile?.album?.artists[0]?.profileImage,
+            label = UiText.DynamicString(profile?.album?.artists[0]?.name ?: ""),
+            onClick = { viewModel.onEvent(AlbumProfileContract.Event.OnOwnerClicked) }
+        ),
+        StatCard.TextStatCardItem(
+            label = UiText.StringResource(R.string.artist_profile_title_photocards),
+            value = UiText.DynamicString(totalPhotocards),
+            painter = painterResource(R.drawable.ic_photocards)
+        )
+    )
+    val infoItems = listOf(
+        InfoRowItem(
+            label = UiText.StringResource(R.string.album_profile_label_title),
+            value = UiText.DynamicString(profile?.album?.name ?: "-:-"),
+            isLongText = true
+        ),
+        InfoRowItem(
+            label = UiText.StringResource(R.string.album_profile_label_version),
+            value = UiText.DynamicString(profile?.album?.version ?: "-:-"),
+            isLongText = true
+        ),
+        InfoRowItem(
+            label = UiText.StringResource(R.string.album_profile_label_artists),
+            value = UiText.DynamicString(profile?.album?.artists?.joinToString { it.name } ?: "-:-"),
+            isLongText = true
+        ),
+        InfoRowItem(
+            label = UiText.StringResource(R.string.album_profile_label_release_year),
+            value = UiText.DynamicString(profile?.album?.releaseDate ?: "-:-"),
+        ),
+        InfoRowItem(
+            label = UiText.StringResource(R.string.album_profile_label_komca),
+            value = UiText.DynamicString(profile?.album?.komcaNumber ?: "-:-"),
+        ),
+        InfoRowItem(
+            label = UiText.StringResource(R.string.album_profile_label_added_on),
+            value = UiText.DynamicString(profile?.album?.savingTimestamp?.toDateString() ?: "-:-"),
+        )
+    )
+
+    ProfileScaffold(
+        imageUrl = profile?.album?.coverImage,
+        title = profile?.album?.name ?: "",
+        topBarState = topBarState,
+        onNavigate = onNavigateBack,
+    ) {
+        item {
+            ProfileItemWrapper(
+                title = UiText.StringResource(R.string.artist_profile_title_information)
+            ) { ProfileInfoSection(statItems, infoItems) }
+        }
+
+        item {
+            profile?.album?.artists?.let { items ->
+                if (items.size > 1) {
+                    ArtistList(
+                        title = UiText.StringResource(R.string.profile_title_featuring),
+                        artists = items.drop(1),
+                        onClick = { viewModel.onEvent(AlbumProfileContract.Event.OnArtistCardClicked(it)) }
+                    )
+                }
+            }
+        }
+        item {
+            PhotocardList(
+                title = UiText.StringResource(R.string.artist_profile_title_photocards),
+                photocards = profile?.photocards,
+                onClick = {}
+            )
+        }
+        item {
+            NotesField(
+                title = UiText.StringResource(R.string.profile_title_notes),
+                text = uiState.profile?.album?.userNote?.let {
+                    if (it.isBlank()) UiText.StringResource(R.string.placeholder_no_notes)
+                    else UiText.DynamicString(it)
+                } ?: UiText.StringResource(R.string.placeholder_no_notes)
+            )
+        }
+    }
+    if (uiState.isLoading) { LoadingOverlay() }
+}

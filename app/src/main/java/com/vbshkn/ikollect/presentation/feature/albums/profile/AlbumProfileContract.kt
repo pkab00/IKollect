@@ -1,14 +1,13 @@
-package com.vbshkn.ikollect.presentation.feature.artists.profile
+package com.vbshkn.ikollect.presentation.feature.albums.profile
 
-sealed interface ArtistProfileContract {
+sealed interface AlbumProfileContract {
     sealed interface Effect {
         object NavigateBack : Effect
         data class NavigateToArtist(val id: Long) : Effect
-        data class NavigateToAlbum(val id: Long) : Effect
     }
     sealed interface Event {
         object OnBackClicked : Event
+        object OnOwnerClicked : Event
         data class OnArtistCardClicked(val id: Long) : Event
-        data class OnAlbumCardClicked(val id: Long) : Event
     }
 }

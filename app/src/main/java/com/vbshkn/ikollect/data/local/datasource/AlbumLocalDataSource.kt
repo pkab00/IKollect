@@ -32,6 +32,10 @@ class AlbumLocalDataSource @Inject constructor(
         return dao.getAllWithPhotocards()
     }
 
+    fun getWithFullDetail(id: Long): Flow<AlbumFullDetail?> {
+        return dao.getWithFullDetail(id)
+    }
+
     fun getAllWithFullDetail(): Flow<List<AlbumFullDetail>> {
         return dao.getAllWithFullDetail()
     }

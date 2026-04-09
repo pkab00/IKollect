@@ -10,16 +10,11 @@ import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 
 data class AlbumFullDetail(
     @Embedded
-    val album: AlbumEntity,
+    val album: AlbumWithArtists,
     @Relation(
+        entity = PhotocardEntity::class,
         parentColumn = "albumId",
-        entityColumn = "artistId",
-        associateBy = Junction(AlbumArtistCrossRef::class)
+        entityColumn = "photocardId",
     )
-    val artists: List<ArtistEntity>,
-    @Relation(
-        parentColumn = "albumId",
-        entityColumn = "photocardId"
-    )
-    val photocards: List<PhotocardEntity>
+    val photocards: List<PhotocardWithArtists>
 )

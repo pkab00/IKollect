@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.composable
+package com.vbshkn.ikollect.presentation.composable.profile
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

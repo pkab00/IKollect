@@ -10,6 +10,8 @@ import com.vbshkn.ikollect.presentation.feature.camera.AlbumCameraScreen
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsScreen
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsViewModel
+import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileScreen
+import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileViewModel
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardScreen
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileScreen
@@ -32,7 +34,8 @@ fun AppNavHost(navController: NavHostController) {
             val viewModel = hiltViewModel<AlbumsViewModel>()
             AlbumsScreen(
                 viewModel = viewModel,
-                onGoToWizard = { navController.navigate(Route.AlbumWizard(it)) }
+                onGoToWizard = { navController.navigate(Route.AlbumWizard(it)) },
+                onAlbumClick = { navController.navigate(Route.AlbumProfile(it)) }
             )
         }
         composable<Route.Photocards> {
@@ -71,8 +74,18 @@ fun AppNavHost(navController: NavHostController) {
             val viewModel = hiltViewModel<ArtistProfileViewModel>()
             ArtistProfileScreen(
                 viewModel = viewModel,
-                onAnotherArtistClick = { navController.navigate(Route.ArtistProfile(it)) },
-                onBackClick = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
+                onNavigateToAlbum = { navController.navigate(Route.AlbumProfile(it)) }
+            )
+        }
+
+        composable<Route.AlbumProfile> {
+            val viewModel = hiltViewModel<AlbumProfileViewModel>()
+            AlbumProfileScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) }
             )
         }
 

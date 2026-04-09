@@ -19,13 +19,13 @@ class TagRepository @Inject constructor(
             }
     }
 
-    suspend fun linkTagsToPhotocard(
+    suspend fun linkPhotocard(
         photocardId: Long,
-        tagIds: List<Long>
+        tagIds: List<Long>,
     ) {
-        val relations = tagIds.map { tagId ->
+        val tagRelations = tagIds.map { tagId ->
             PhotocardTagCrossRef(photocardId, tagId)
         }
-        tagLocalDS.insertPhotocardLinks(relations)
+        tagLocalDS.insertTagLinks(tagRelations)
     }
 }

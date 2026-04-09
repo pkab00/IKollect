@@ -96,4 +96,14 @@
     <string name="photocard_wizard_subtitle_notes">Заметки</string>
     <string name="tag_selector_title">Выберите тэги</string>
     <string name="error_loading_photocards">Не удалось загрузить ваши фотокарты.</string>
+    <string name="profile_title_featuring">При участии</string>
+    <string name="status_group">Группа</string>
+    <string name="status_soloist">Солист</string>
+    <string name="album_profile_label_title">Название</string>
+    <string name="album_profile_label_version">Версия</string>
+    <string name="album_profile_label_release_year">Год выхода</string>
+    <string name="album_profile_label_added_on">Добавлен</string>
+    <string name="album_profile_label_artists">Исполнители</string>
+    <string name="profile_title_notes">Заметки</string>
+    <string name="placeholder_no_notes">Нет заметок.</string>
 </resources>

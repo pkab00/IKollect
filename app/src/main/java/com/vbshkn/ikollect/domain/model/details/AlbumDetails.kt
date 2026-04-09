@@ -6,6 +6,7 @@ data class AlbumDetails (
     val albumId: Long,
     val masterId: Long,
     val barcodeNumber: String,
+    val komcaNumber: String?,
     val name: String,
     val artists: List<ArtistListItem>,
     val version: String,

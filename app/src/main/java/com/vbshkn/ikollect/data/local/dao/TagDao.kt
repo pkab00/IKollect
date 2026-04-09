@@ -17,5 +17,5 @@ interface TagDao {
     suspend fun insert(entity: TagEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPhotocardLinks(links: List<PhotocardTagCrossRef>)
+    suspend fun insertTagLinks(links: List<PhotocardTagCrossRef>)
 }

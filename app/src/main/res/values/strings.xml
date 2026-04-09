@@ -102,4 +102,15 @@
     <string name="photocard_wizard_subtitle_notes">Notes</string>
     <string name="tag_selector_title">Select tags</string>
     <string name="error_loading_photocards">Failed to load your photocards.</string>
+    <string name="profile_title_featuring">Featuring</string>
+    <string name="status_group">Group</string>
+    <string name="status_soloist">Soloist</string>
+    <string name="album_profile_label_title">Title</string>
+    <string name="album_profile_label_version">Version</string>
+    <string name="album_profile_label_release_year">Release year</string>
+    <string name="album_profile_label_komca" translatable="false">KOMCA</string>
+    <string name="album_profile_label_added_on">Added on</string>
+    <string name="album_profile_label_artists">Atrists</string>
+    <string name="profile_title_notes">Notes</string>
+    <string name="placeholder_no_notes">No notes.</string>
 </resources>

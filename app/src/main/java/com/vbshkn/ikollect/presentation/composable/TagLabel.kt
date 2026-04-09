@@ -37,6 +37,7 @@ fun TagLabel(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(2.dp)
         ) {
             Text(
                 text = tag.name.asString(),

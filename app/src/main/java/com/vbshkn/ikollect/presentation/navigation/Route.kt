@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Route {
+    @Serializable data class AlbumProfile(val id: Long) : Route
     @Serializable data object Albums : Route
     @Serializable data object Photocards : Route
 

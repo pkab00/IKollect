@@ -3,6 +3,7 @@ package com.vbshkn.ikollect.data.mapper
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.entity.TagEntity
+import com.vbshkn.ikollect.data.local.model.pojo.AlbumFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.PhotocardWithArtists
@@ -18,6 +19,7 @@ import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
 import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
 import com.vbshkn.ikollect.domain.model.TagItem
 import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
+import com.vbshkn.ikollect.domain.model.profile.AlbumProfileData
 import com.vbshkn.ikollect.util.ArtistNameHelper
 import com.vbshkn.ikollect.util.UiText
 
@@ -84,6 +86,7 @@ object DataMappers {
             albumId = this.album.albumId,
             masterId = this.album.masterId,
             barcodeNumber = this.album.barcodeNumber,
+            komcaNumber = this.album.komcaNumber,
             name = this.album.name,
             artists = this.artists.map { it.toListItem() },
             version = this.album.version ?: "No data",
@@ -153,6 +156,13 @@ object DataMappers {
                 groups = this.groups.map { it.toListItem() }
             )
         }
+    }
+    
+    fun AlbumFullDetail.toProfile(): AlbumProfileData {
+        return AlbumProfileData(
+            album = this.album.toDetails(),
+            photocards = this.photocards.map { it.toListItem() }
+        )
     }
 
     fun TagEntity.toDomain(): TagItem {

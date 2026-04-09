@@ -32,7 +32,17 @@ class ArtistProfileViewModel @Inject constructor(
     }
 
     override fun onEvent(event: ArtistProfileContract.Event) {
-        // TODO
+        when (event) {
+            is ArtistProfileContract.Event.OnBackClicked -> {
+                sendEffect(ArtistProfileContract.Effect.NavigateBack)
+            }
+            is ArtistProfileContract.Event.OnAlbumCardClicked -> {
+                sendEffect(ArtistProfileContract.Effect.NavigateToAlbum(event.id))
+            }
+            is ArtistProfileContract.Event.OnArtistCardClicked -> {
+                sendEffect(ArtistProfileContract.Effect.NavigateToArtist(event.id))
+            }
+        }
     }
 
     private fun observeProfileData() = collectFlowIntoState(
