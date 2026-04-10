@@ -28,5 +28,6 @@ data class PhotocardEntity(
     val displayName: String,
     val isFavorite: Boolean,
     val imageUrl: String?,
-    val userNote: String?
+    val userNote: String?,
+    val savingTimestamp: Long = System.currentTimeMillis()
 )

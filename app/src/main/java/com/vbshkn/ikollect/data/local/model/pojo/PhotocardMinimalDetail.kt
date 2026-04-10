@@ -4,12 +4,11 @@ import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
-import com.vbshkn.ikollect.data.local.model.entity.PhotocardArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardTagCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.TagEntity
 
-data class PhotocardWithArtists(
+data class PhotocardMinimalDetail(
     @Embedded
     val photocard: PhotocardEntity,
     @Relation(

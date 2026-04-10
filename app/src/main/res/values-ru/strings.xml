@@ -106,4 +106,9 @@
     <string name="album_profile_label_artists">Исполнители</string>
     <string name="profile_title_notes">Заметки</string>
     <string name="placeholder_no_notes">Нет заметок.</string>
+    <string name="no_album_placeholder">Нет альбома</string>
+    <string name="profile_label_name">Название</string>
+    <string name="profile_label_tags">Тэги</string>
+    <string name="placeholder_no_tags">Нет тэгов.</string>
+    <string name="wizard_title_on_the_card">На карте</string>
 </resources>

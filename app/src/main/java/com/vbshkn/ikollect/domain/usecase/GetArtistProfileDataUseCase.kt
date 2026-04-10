@@ -6,5 +6,5 @@ import javax.inject.Inject
 class GetArtistProfileDataUseCase @Inject constructor(
     private val artistRepository: ArtistRepository
 ) {
-    operator fun invoke(artistId: Long) = artistRepository.getArtistProfileData(artistId)
+    operator fun invoke(artistId: Long) = artistRepository.getArtistProfile(artistId)
 }

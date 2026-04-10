@@ -8,7 +8,8 @@ import androidx.room.Transaction
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistWithPhotocards
-import com.vbshkn.ikollect.data.local.model.pojo.PhotocardWithArtists
+import com.vbshkn.ikollect.data.local.model.pojo.PhotocardFullDetail
+import com.vbshkn.ikollect.data.local.model.pojo.PhotocardMinimalDetail
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,11 +19,15 @@ interface PhotocardDao {
 
     @Transaction
     @Query("SELECT * FROM PhotocardEntity")
-    fun getAllWithArtists(): Flow<List<PhotocardWithArtists>>
+    fun getAllWithArtists(): Flow<List<PhotocardMinimalDetail>>
 
     @Transaction
     @Query("SELECT * FROM ArtistEntity WHERE artistId = :artistId")
     fun getAllByArtist(artistId: Long): Flow<ArtistWithPhotocards?>
+
+    @Transaction
+    @Query("SELECT * FROM PhotocardEntity WHERE photocardId = :id")
+    fun getWithFullDetail(id: Long): Flow<PhotocardFullDetail?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPhotocard(photocardEntity: PhotocardEntity): Long

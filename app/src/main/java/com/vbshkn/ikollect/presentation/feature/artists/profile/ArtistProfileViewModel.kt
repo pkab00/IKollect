@@ -42,6 +42,9 @@ class ArtistProfileViewModel @Inject constructor(
             is ArtistProfileContract.Event.OnArtistCardClicked -> {
                 sendEffect(ArtistProfileContract.Effect.NavigateToArtist(event.id))
             }
+            is ArtistProfileContract.Event.OnPhotocardCardClicked -> {
+                sendEffect(ArtistProfileContract.Effect.NavigateToPhotocard(event.id))
+            }
         }
     }
 

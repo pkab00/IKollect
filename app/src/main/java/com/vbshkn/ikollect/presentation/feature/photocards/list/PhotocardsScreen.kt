@@ -54,14 +54,16 @@ import com.vbshkn.ikollect.presentation.composable.TagLabel
 @Composable
 fun PhotocardsScreen(
     viewModel: PhotocardsViewModel,
-    onGoToWizard: () -> Unit
+    onNavigateToWizard: () -> Unit,
+    onNavigateToPhotocard: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is PhotocardsContract.Effect.GoToWizard -> onGoToWizard()
+                is PhotocardsContract.Effect.GoToWizard -> onNavigateToWizard()
+                is PhotocardsContract.Effect.GoToPhotocard -> onNavigateToPhotocard(effect.id)
             }
         }
     }
@@ -126,7 +128,7 @@ fun PhotocardCard(
     onEvent: (PhotocardsContract.Event) -> Unit
 ) {
     Card(
-        onClick = {},
+        onClick = { onEvent(PhotocardsContract.Event.OnPhotocardClicked(photocard.photocardId)) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)

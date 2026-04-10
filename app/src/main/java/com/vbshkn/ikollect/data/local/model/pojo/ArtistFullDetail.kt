@@ -30,13 +30,13 @@ data class ArtistFullDetail(
             entityColumn = "photocardId"
         )
     )
-    val photocardsDepicted: List<PhotocardWithArtists>,
+    val photocardsDepicted: List<PhotocardMinimalDetail>,
     @Relation(
         entity = PhotocardEntity::class,
         parentColumn = "artistId",
         entityColumn = "ownerId"
     )
-    val photocardsOwned: List<PhotocardWithArtists>,
+    val photocardsOwned: List<PhotocardMinimalDetail>,
     @Relation(
         entity = ArtistEntity::class,
         parentColumn = "artistId",

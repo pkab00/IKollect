@@ -21,12 +21,14 @@ class PhotocardsViewModel @Inject constructor(
             is PhotocardsContract.Event.OnWizardClicked -> {
                 sendEffect(PhotocardsContract.Effect.GoToWizard)
             }
+            is PhotocardsContract.Event.OnPhotocardClicked -> {
+                sendEffect(PhotocardsContract.Effect.GoToPhotocard(event.id))
+            }
             is PhotocardsContract.Event.OnPhotocardPreviewPressed -> updateState {
                 it.copy(fullScreenPreview = event.imageUrl)
             }
             is PhotocardsContract.Event.OnPhotocardPreviewReleased -> updateState {
                 it.copy(fullScreenPreview = null)
-
             }
         }
     }

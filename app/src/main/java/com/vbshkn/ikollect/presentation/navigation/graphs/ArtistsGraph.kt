@@ -15,12 +15,12 @@ import com.vbshkn.ikollect.presentation.navigation.Route
 import com.vbshkn.ikollect.util.sharedHiltViewModel
 
 fun NavGraphBuilder.artistsGraph(navController: NavHostController) {
-    navigation<Route.ArtistsRoute>(
+    navigation<Route.Artists>(
         startDestination = Route.ArtistsFlow.Main
     ) {
         composable<Route.ArtistsFlow.Main> { backStackEntry ->
             val sharedViewModel =
-                backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.ArtistsRoute>(navController)
+                backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.Artists>(navController)
             AccountScreen(
                 viewModel = sharedViewModel,
                 onShowAllGroupsClick = { navController.navigate(Route.ArtistsFlow.AllGroups) },
@@ -30,7 +30,7 @@ fun NavGraphBuilder.artistsGraph(navController: NavHostController) {
         }
         composable<Route.ArtistsFlow.AllGroups> { backStackEntry ->
             val sharedViewModel =
-                backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.ArtistsRoute>(navController)
+                backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.Artists>(navController)
             val state by sharedViewModel.uiState.collectAsStateWithLifecycle()
 
             AllArtistsScreen(
@@ -42,7 +42,7 @@ fun NavGraphBuilder.artistsGraph(navController: NavHostController) {
         }
         composable<Route.ArtistsFlow.AllSoloists> { backStackEntry ->
             val sharedViewModel =
-                backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.ArtistsRoute>(navController)
+                backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.Artists>(navController)
             val state by sharedViewModel.uiState.collectAsStateWithLifecycle()
 
             AllArtistsScreen(

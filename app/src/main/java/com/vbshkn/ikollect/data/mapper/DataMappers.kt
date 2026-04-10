@@ -6,7 +6,8 @@ import com.vbshkn.ikollect.data.local.model.entity.TagEntity
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistFullDetail
-import com.vbshkn.ikollect.data.local.model.pojo.PhotocardWithArtists
+import com.vbshkn.ikollect.data.local.model.pojo.PhotocardFullDetail
+import com.vbshkn.ikollect.data.local.model.pojo.PhotocardMinimalDetail
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse
 import com.vbshkn.ikollect.data.remote.dao.FormatDao
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
@@ -19,7 +20,9 @@ import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
 import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
 import com.vbshkn.ikollect.domain.model.TagItem
 import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
+import com.vbshkn.ikollect.domain.model.details.PhotocardDetails
 import com.vbshkn.ikollect.domain.model.profile.AlbumProfileData
+import com.vbshkn.ikollect.domain.model.profile.PhotocardProfileData
 import com.vbshkn.ikollect.util.ArtistNameHelper
 import com.vbshkn.ikollect.util.UiText
 
@@ -120,13 +123,25 @@ object DataMappers {
         )
     }
 
-    fun PhotocardWithArtists.toListItem(): PhotocardListItem {
+    fun PhotocardMinimalDetail.toListItem(): PhotocardListItem {
         return PhotocardListItem(
             photocardId = this.photocard.photocardId,
             owner = this.owner.toListItem(),
             displayName = this.photocard.displayName,
             tags = this.tags.map { it.toDomain() },
             imageUrl = this.photocard.imageUrl
+        )
+    }
+
+    fun PhotocardMinimalDetail.toDetails(): PhotocardDetails {
+        return PhotocardDetails(
+            photocardId = this.photocard.photocardId,
+            owner = this.owner.toListItem(),
+            displayName = this.photocard.displayName,
+            tags = this.tags.map { it.toDomain() },
+            imageUrl = this.photocard.imageUrl,
+            savingTimestamp = this.photocard.savingTimestamp,
+            userNotes = this.photocard.userNote ?: ""
         )
     }
 
@@ -162,6 +177,14 @@ object DataMappers {
         return AlbumProfileData(
             album = this.album.toDetails(),
             photocards = this.photocards.map { it.toListItem() }
+        )
+    }
+
+    fun PhotocardFullDetail.toProfile(): PhotocardProfileData {
+        return PhotocardProfileData(
+            photocard = this.photocard.toDetails(),
+            album = this.album?.toDetails(),
+            depictedArtists = this.artists.map { it.toListItem() }
         )
     }
 

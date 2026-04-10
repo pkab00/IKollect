@@ -13,7 +13,6 @@ import com.vbshkn.ikollect.presentation.composable.profile.ProfileItemWrapper
 import com.vbshkn.ikollect.presentation.composable.profile.AlbumList
 import com.vbshkn.ikollect.presentation.composable.profile.ArtistList
 import com.vbshkn.ikollect.presentation.composable.profile.InfoRowItem
-import com.vbshkn.ikollect.presentation.composable.profile.NotesField
 import com.vbshkn.ikollect.presentation.composable.profile.PhotocardList
 import com.vbshkn.ikollect.presentation.composable.profile.ProfileInfoSection
 import com.vbshkn.ikollect.presentation.composable.profile.ProfileScaffold
@@ -27,7 +26,8 @@ fun ArtistProfileScreen(
     viewModel: ArtistProfileViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToArtist: (Long) -> Unit,
-    onNavigateToAlbum: (Long) -> Unit
+    onNavigateToAlbum: (Long) -> Unit,
+    onNavigateToPhotocard: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val topBarState = rememberProfileTopBarState()
@@ -39,6 +39,7 @@ fun ArtistProfileScreen(
                 is ArtistProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ArtistProfileContract.Effect.NavigateToAlbum -> onNavigateToAlbum(effect.id)
                 is ArtistProfileContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
+                is ArtistProfileContract.Effect.NavigateToPhotocard -> onNavigateToPhotocard(effect.id)
             }
         }
     }
@@ -51,7 +52,7 @@ fun ArtistProfileScreen(
 
     ProfileScaffold(
         topBarState = topBarState,
-        onNavigate = onNavigateBack,
+        onNavigate = { viewModel.onEvent(ArtistProfileContract.Event.OnBackClicked) },
         imageUrl = profile?.artist?.profileImage,
         title = profile?.artist?.name ?: ""
     ) {
@@ -131,7 +132,7 @@ fun ArtistProfileScreen(
             PhotocardList(
                 title = UiText.StringResource(R.string.artist_profile_title_photocards),
                 photocards = uiState.profileData?.photocards,
-                onClick = {}
+                onClick = { viewModel.onEvent(ArtistProfileContract.Event.OnPhotocardCardClicked(it)) }
             )
         }
     }

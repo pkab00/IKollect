@@ -23,7 +23,8 @@ import com.vbshkn.ikollect.util.UiText
 fun AlbumProfileScreen(
     viewModel: AlbumProfileViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToArtist: (Long) -> Unit
+    onNavigateToArtist: (Long) -> Unit,
+    onNavigateToPhotocard: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val profile = uiState.profile
@@ -34,6 +35,7 @@ fun AlbumProfileScreen(
             when (effect) {
                 is AlbumProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is AlbumProfileContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
+                is AlbumProfileContract.Effect.NavigateToPhotocard -> onNavigateToPhotocard(effect.id)
             }
         }
     }
@@ -85,7 +87,7 @@ fun AlbumProfileScreen(
         imageUrl = profile?.album?.coverImage,
         title = profile?.album?.name ?: "",
         topBarState = topBarState,
-        onNavigate = onNavigateBack,
+        onNavigate = { viewModel.onEvent(AlbumProfileContract.Event.OnBackClicked) },
     ) {
         item {
             ProfileItemWrapper(
@@ -108,16 +110,13 @@ fun AlbumProfileScreen(
             PhotocardList(
                 title = UiText.StringResource(R.string.artist_profile_title_photocards),
                 photocards = profile?.photocards,
-                onClick = {}
+                onClick = { viewModel.onEvent(AlbumProfileContract.Event.OnPhotocardCardClicked(it)) }
             )
         }
         item {
             NotesField(
                 title = UiText.StringResource(R.string.profile_title_notes),
-                text = uiState.profile?.album?.userNote?.let {
-                    if (it.isBlank()) UiText.StringResource(R.string.placeholder_no_notes)
-                    else UiText.DynamicString(it)
-                } ?: UiText.StringResource(R.string.placeholder_no_notes)
+                text = uiState.profile?.album?.userNote?.let { UiText.DynamicString(it) }
             )
         }
     }

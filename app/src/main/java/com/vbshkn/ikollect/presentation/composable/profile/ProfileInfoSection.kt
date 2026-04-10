@@ -1,11 +1,13 @@
 package com.vbshkn.ikollect.presentation.composable.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.util.UiText
 
@@ -144,8 +147,15 @@ private fun ImageStatCard(
                 model = item.imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.clip(CircleShape)
-            )
+                modifier = Modifier
+                    .size(120.dp)
+                    .background(
+                        MaterialTheme.colorScheme.secondary.copy(
+                            alpha = if (item.imageUrl == null) 1f else 0f
+                        ),
+                        CircleShape
+                    )
+                    .clip(CircleShape))
             Text(
                 text = item.label.asString(),
                 style = MaterialTheme.typography.titleSmall,
@@ -175,9 +185,7 @@ private fun InfoRow(item: InfoRowItem) {
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.End,
-            modifier = Modifier.weight(1.5f),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            modifier = Modifier.weight(1.5f)
         )
     }
 }

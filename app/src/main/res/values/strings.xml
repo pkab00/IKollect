@@ -113,4 +113,9 @@
     <string name="album_profile_label_artists">Atrists</string>
     <string name="profile_title_notes">Notes</string>
     <string name="placeholder_no_notes">No notes.</string>
+    <string name="no_album_placeholder">No album</string>
+    <string name="profile_label_name">Name</string>
+    <string name="profile_label_tags">Tags</string>
+    <string name="placeholder_no_tags">No tags.</string>
+    <string name="wizard_title_on_the_card">On the card</string>
 </resources>

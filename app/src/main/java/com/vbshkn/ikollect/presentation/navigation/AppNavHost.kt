@@ -19,6 +19,8 @@ import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileVie
 import com.vbshkn.ikollect.presentation.feature.camera.KomcaScannerScreen
 import com.vbshkn.ikollect.presentation.feature.camera.PhotocardCameraScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsViewModel
+import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileScreen
+import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileViewModel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardScreen
 import com.vbshkn.ikollect.presentation.navigation.graphs.artistsGraph
@@ -42,7 +44,8 @@ fun AppNavHost(navController: NavHostController) {
             val viewModel = hiltViewModel<PhotocardsViewModel>()
             PhotocardsScreen(
                 viewModel = viewModel,
-                onGoToWizard = { navController.navigate(Route.PhotocardWizard) }
+                onNavigateToWizard = { navController.navigate(Route.PhotocardWizard) },
+                onNavigateToPhotocard = { navController.navigate(Route.PhotocardProfile(it)) }
             )
         }
 
@@ -76,7 +79,8 @@ fun AppNavHost(navController: NavHostController) {
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
-                onNavigateToAlbum = { navController.navigate(Route.AlbumProfile(it)) }
+                onNavigateToAlbum = { navController.navigate(Route.AlbumProfile(it)) },
+                onNavigateToPhotocard = { navController.navigate(Route.PhotocardProfile(it)) }
             )
         }
 
@@ -85,7 +89,18 @@ fun AppNavHost(navController: NavHostController) {
             AlbumProfileScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) }
+                onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
+                onNavigateToPhotocard = { navController.navigate(Route.PhotocardProfile(it)) }
+            )
+        }
+
+        composable<Route.PhotocardProfile> {
+            val viewModel = hiltViewModel<PhotocardProfileViewModel>()
+            PhotocardProfileScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
+                onNavigateToAlbum = { navController.navigate(Route.AlbumProfile(it)) }
             )
         }
 
