@@ -1,25 +1,13 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.list
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,23 +21,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
-import com.vbshkn.ikollect.presentation.composable.TagLabel
+import com.vbshkn.ikollect.presentation.composable.PhotocardItem
 
 @Composable
 fun PhotocardsScreen(
@@ -98,7 +76,7 @@ fun PhotocardsScreen(
                 )
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                    columns = GridCells.Adaptive(100.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.fillMaxSize()
@@ -107,115 +85,22 @@ fun PhotocardsScreen(
                         items = uiState.photocards,
                         key = { it.photocardId }
                     ) { photocard ->
-                        PhotocardCard(
-                            photocard = photocard,
-                            onEvent = viewModel::onEvent
+                        PhotocardItem(
+                            item = photocard,
+                            height = 150.dp,
+                            onClick = { viewModel.onEvent(PhotocardsContract.Event.OnPhotocardClicked(photocard.photocardId)) },
+                            onHold = { viewModel.onEvent(PhotocardsContract.Event.OnPhotocardPreviewPressed(photocard.imageUrl)) }
                         )
                     }
                 }
             }
         }
     }
-    ImageZoomOverlay(
-        enable = uiState.fullScreenPreview != null,
-        contentUrl = uiState.fullScreenPreview
-    )
-}
-
-@Composable
-fun PhotocardCard(
-    photocard: PhotocardListItem,
-    onEvent: (PhotocardsContract.Event) -> Unit
-) {
-    Card(
-        onClick = { onEvent(PhotocardsContract.Event.OnPhotocardClicked(photocard.photocardId)) },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        ),
-        modifier = Modifier.heightIn(250.dp)
-    ) {
-        val haptic = LocalHapticFeedback.current
-
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Brush.verticalGradient(
-                        colors = buildList {
-                            for (v in 1..10) {
-                                add(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = v/10f))
-                            }
-                        }
-                    ))
-                    .pointerInput(Unit) {
-                        detectTapGestures (
-                            onLongPress = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onEvent(PhotocardsContract.Event.OnPhotocardPreviewPressed(photocard.imageUrl))
-                            },
-                            onPress = {
-                                val release = tryAwaitRelease()
-                                if (release) {
-                                    onEvent(PhotocardsContract.Event.OnPhotocardPreviewReleased)
-                                }
-                            }
-                        )
-                    }
-            ) {
-                AsyncImage(
-                    model = photocard.imageUrl,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1.59f)
-                        .clip(RoundedCornerShape(16.dp)),
-                    contentScale = ContentScale.Fit
-                )
-            }
-
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = photocard.displayName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.height(46.dp)
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(
-                        text = photocard.owner.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    maxItemsInEachRow = 2,
-                    maxLines = 2,
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                    photocard.tags.forEach { tagItem ->
-                        TagLabel(
-                            tag = tagItem,
-                            isSelected = false,
-                            modifier = Modifier.size(height = 24.dp, width = 75.dp)
-                        )
-                    }
-                }
-            }
-        }
+    if (uiState.fullScreenPreview != null) {
+        ImageZoomOverlay(
+            contentUrl = uiState.fullScreenPreview,
+            onDismiss = { viewModel.onEvent(PhotocardsContract.Event.OnPhotocardPreviewReleased) }
+        )
     }
 }
 

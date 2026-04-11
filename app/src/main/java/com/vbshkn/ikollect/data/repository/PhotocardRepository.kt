@@ -15,7 +15,7 @@ class PhotocardRepository @Inject constructor(
     private val photocardLocalDS: PhotocardLocalDataSource
 ) {
     fun getAll(): Flow<NetworkResult<List<PhotocardListItem>>> {
-        return photocardLocalDS.getAllWithArtists()
+        return photocardLocalDS.getAll()
             .asLocalResult { photocards ->
                 photocards.map { it.toListItem() }
             }

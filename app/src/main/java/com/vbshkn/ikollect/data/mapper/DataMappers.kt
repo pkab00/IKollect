@@ -2,6 +2,7 @@ package com.vbshkn.ikollect.data.mapper
 
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
+import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 import com.vbshkn.ikollect.data.local.model.entity.TagEntity
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
@@ -123,13 +124,12 @@ object DataMappers {
         )
     }
 
-    fun PhotocardMinimalDetail.toListItem(): PhotocardListItem {
+    fun PhotocardEntity.toListItem(): PhotocardListItem {
         return PhotocardListItem(
-            photocardId = this.photocard.photocardId,
-            owner = this.owner.toListItem(),
-            displayName = this.photocard.displayName,
-            tags = this.tags.map { it.toDomain() },
-            imageUrl = this.photocard.imageUrl
+            photocardId = this.photocardId,
+            displayName = this.displayName,
+            imageUrl = this.imageUrl,
+            isFavorite = this.isFavorite
         )
     }
 

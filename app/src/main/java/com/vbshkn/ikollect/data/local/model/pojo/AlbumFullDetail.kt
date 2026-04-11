@@ -12,5 +12,5 @@ data class AlbumFullDetail(
         parentColumn = "albumId",
         entityColumn = "photocardId",
     )
-    val photocards: List<PhotocardMinimalDetail>
+    val photocards: List<PhotocardEntity>
 )

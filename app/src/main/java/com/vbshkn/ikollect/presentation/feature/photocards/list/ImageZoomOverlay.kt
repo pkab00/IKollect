@@ -16,23 +16,21 @@ import coil3.compose.AsyncImage
 
 @Composable
 fun ImageZoomOverlay(
-    enable: Boolean,
-    contentUrl: String?
+    contentUrl: String?,
+    onDismiss: () -> Unit
 ) {
-    if (enable) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable(enabled = false) {},
-            contentAlignment = Alignment.Center
-        ) {
-            AsyncImage(
-                model = contentUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.padding(36.dp)
-            )
-        }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable { onDismiss() },
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = contentUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.padding(36.dp)
+        )
     }
 }
