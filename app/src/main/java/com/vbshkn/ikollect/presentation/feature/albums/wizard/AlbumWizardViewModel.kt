@@ -7,7 +7,6 @@ import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.presentation.navigation.AlbumCandidateType
 import com.vbshkn.ikollect.presentation.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.reflect.typeOf
@@ -51,22 +50,20 @@ class AlbumWizardViewModel @Inject constructor(
             is AlbumWizardContract.Event.OnStepChanged -> updateState {
                 it.copy(stepIndex = event.newStep)
             }
-            is AlbumWizardContract.Event.OnPictureCaptured -> updateState {
+            is AlbumWizardContract.Event.OnNewAlbumPrevirew -> updateState {
                 it.copy(
-                    versionCandidate = it.versionCandidate?.copy(coverImage = event.uri),
-                    isCoverCached = true
+                    albumCoverPreviews = it.albumCoverPreviews + event.uri,
+                    coverImage = event.uri
                 )
             }
-            is AlbumWizardContract.Event.OnUpdateVersion -> updateState {
-                it.copy(versionCandidate = event.candidate)
+            is AlbumWizardContract.Event.OnVersionSelected -> updateState {
+                it.copy(
+                    versionCandidate = event.candidate,
+                    coverImage = event.candidate.coverImage
+                )
             }
-            is AlbumWizardContract.Event.OnExistingPhotoSelected -> updateState { state ->
-                state.versionCandidate?.let { candidate ->
-                    state.copy(
-                        versionCandidate = candidate.copy(coverImage = event.path),
-                        isCoverCached = false
-                    )
-                } ?: state
+            is AlbumWizardContract.Event.OnAlbumPreviewSelected -> updateState { state ->
+                state.copy(coverImage = event.path)
             }
             is AlbumWizardContract.Event.OnVersionNameChanged -> updateState { state ->
                 state.versionCandidate?.let { candidate ->

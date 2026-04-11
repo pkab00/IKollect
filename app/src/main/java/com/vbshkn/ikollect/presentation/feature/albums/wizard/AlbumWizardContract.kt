@@ -23,9 +23,9 @@ sealed interface AlbumWizardContract {
         object OnShowCameraRationale : Event
         object OnShowKomcaHint : Event
         data class OnStepChanged(val newStep: Int) : Event
-        data class OnPictureCaptured(val uri: String) : Event
-        data class OnUpdateVersion(val candidate: VersionCandidate) : Event
-        data class OnExistingPhotoSelected(val path: String) : Event
+        data class OnNewAlbumPrevirew(val uri: String) : Event
+        data class OnVersionSelected(val candidate: VersionCandidate) : Event
+        data class OnAlbumPreviewSelected(val path: String) : Event
         data class OnVersionNameChanged(val newName: String) : Event
         data class OnKomcaCodeChanged(val newCode: String) : Event
         data class OnUserNotesChanged(val newValue: String) : Event

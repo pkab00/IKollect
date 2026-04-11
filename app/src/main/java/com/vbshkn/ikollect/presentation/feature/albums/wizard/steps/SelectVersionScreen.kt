@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -66,7 +65,7 @@ private fun VersionPreview(
     onEvent: (AlbumWizardContract.Event) -> Unit
 ) {
     OutlinedCard(
-        onClick = { onEvent(AlbumWizardContract.Event.OnUpdateVersion(version)) },
+        onClick = { onEvent(AlbumWizardContract.Event.OnVersionSelected(version)) },
         border = CardDefaults.outlinedCardBorder(enabled = version == selectedVersion),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if (version == selectedVersion)

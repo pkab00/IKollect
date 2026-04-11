@@ -1,14 +1,21 @@
 package com.vbshkn.ikollect.presentation.feature.wizard
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -37,9 +44,11 @@ import com.vbshkn.ikollect.util.PaletteUtil
 
 @Composable
 fun WizardImageSelector(
-    imageUrl: String?,
+    displayedImage: String?,
+    imageOptions: List<String>,
     onSelectPicture: () -> Unit,
     onTakePicture: () -> Unit,
+    onImageClicked: (String) -> Unit,
     imagePreview: @Composable (String?) -> Unit
 ) {
     OutlinedCard(
@@ -58,7 +67,7 @@ fun WizardImageSelector(
         ) {
             Text(
                 text = stringResource(
-                    if (imageUrl != null) R.string.add_details_caption_has_cover
+                    if (displayedImage != null) R.string.add_details_caption_has_cover
                     else R.string.add_details_caption_no_image
                 ),
                 style = MaterialTheme.typography.bodySmall,
@@ -75,7 +84,14 @@ fun WizardImageSelector(
                     Text(text = stringResource(R.string.add_details_take_picture))
                 }
             }
-            imagePreview(imageUrl)
+            imagePreview(displayedImage)
+            if (imageOptions.isNotEmpty()) {
+                PreviewsRow(
+                    previews = imageOptions,
+                    onPreviewSelected = { onImageClicked(it) },
+                    selectedPreview = displayedImage
+                )
+            }
         }
     }
 }
@@ -93,21 +109,51 @@ fun ImageSelectorPreview(
         contentAlignment = Alignment.Center,
         modifier = modifier.background(boxGradient)
     ) {
-        if (imageUrl != null) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .allowHardware(false)
+                .build(),
+            onSuccess = { result ->
+                val bitmap = result.result.image.toBitmap()
+                boxGradient = PaletteUtil.getSoftGradient(
+                    bitmap = bitmap,
+                    defaultColors = listOf(Color.Transparent, Color.Transparent)
+                )
+            },
+            contentDescription = null,
+            contentScale = ContentScale.FillHeight
+        )
+    }
+}
+
+@Composable
+private fun PreviewsRow(
+    previews: List<String>,
+    selectedPreview: String?,
+    onPreviewSelected: (String) -> Unit
+) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp)
+    ) {
+        items(previews) { preview ->
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
-                    .allowHardware(false)
-                    .build(),
-                onSuccess = { result ->
-                    val bitmap = result.result.image.toBitmap()
-                    boxGradient = PaletteUtil.getSoftGradient(
-                        bitmap = bitmap,
-                        defaultColors = listOf(Color.Transparent, Color.Transparent)
-                    )
-                },
+                model = preview,
                 contentDescription = null,
-                contentScale = ContentScale.FillHeight
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .width(120.dp)
+                    .fillMaxHeight()
+                    .border(
+                        BorderStroke(
+                            width = if (selectedPreview == preview) 1f.dp else 0f.dp,
+                            color = if (selectedPreview == preview) MaterialTheme.colorScheme.primary else Color.Transparent
+                        )
+                    )
+                    .clickable { onPreviewSelected(preview) }
             )
         }
     }

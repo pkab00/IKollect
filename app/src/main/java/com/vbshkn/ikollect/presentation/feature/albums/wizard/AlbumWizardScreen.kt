@@ -11,23 +11,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavBackStackEntry
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.steps.AlbumWizardSteps
@@ -78,7 +72,7 @@ fun AlbumWizardScreen(
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                viewModel.onEvent(AlbumWizardContract.Event.OnExistingPhotoSelected(uri.toString()))
+                viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPrevirew(uri.toString()))
             }
         }
     )
@@ -171,7 +165,7 @@ private fun CameraResultObserver(
 
     LaunchedEffect(cameraResult, scannerResult) {
         if (cameraResult != null) {
-            viewModel.onEvent(AlbumWizardContract.Event.OnPictureCaptured(cameraResult!!))
+            viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPrevirew(cameraResult!!))
             savedStateHandle["camera_result"] = null
         }
         if (scannerResult != null) {

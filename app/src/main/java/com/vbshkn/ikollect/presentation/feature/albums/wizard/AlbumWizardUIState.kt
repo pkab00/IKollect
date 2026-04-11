@@ -10,5 +10,7 @@ data class AlbumWizardUIState(
     val versionCandidate: VersionCandidate? = null,
     val komcaNumber: String? = null,
     val dialogState: AlbumWizardDialogState = AlbumWizardDialogState.None,
-    val isCoverCached: Boolean = false
+    val coverImage: String? = null,
+    val isCoverCached: Boolean = false,
+    val albumCoverPreviews: List<String> = emptyList()
 )

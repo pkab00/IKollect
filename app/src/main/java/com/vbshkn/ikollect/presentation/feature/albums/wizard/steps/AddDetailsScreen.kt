@@ -1,7 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.albums.wizard.steps
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,21 +16,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
@@ -67,10 +59,13 @@ fun AddDetailsScreen(viewModel: AlbumWizardViewModel) {
 
         item {
             WizardItemWrapper(UiText.StringResource(R.string.add_details_title_image)) {
+                val defaultCover = uiState.versionCandidate?.coverImage
                 WizardImageSelector(
-                    imageUrl = uiState.versionCandidate!!.coverImage,
+                    displayedImage = uiState.coverImage,
+                    imageOptions = (defaultCover?.let { listOf(it) } ?: emptyList()) + uiState.albumCoverPreviews,
                     onSelectPicture = { viewModel.onEvent(AlbumWizardContract.Event.OnSelectPicture) },
-                    onTakePicture = { viewModel.onEvent(AlbumWizardContract.Event.OnTakePicture) }
+                    onTakePicture = { viewModel.onEvent(AlbumWizardContract.Event.OnTakePicture) },
+                    onImageClicked = { viewModel.onEvent(AlbumWizardContract.Event.OnAlbumPreviewSelected(it)) }
                 ) { url ->
                     ImageSelectorPreview(
                         imageUrl = url,

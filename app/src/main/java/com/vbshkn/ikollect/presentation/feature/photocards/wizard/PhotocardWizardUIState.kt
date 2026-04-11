@@ -8,6 +8,7 @@ import com.vbshkn.ikollect.domain.model.TagItem
 data class PhotocardWizardUIState(
     val currentStep: Int = 0,
     val isLoading: Boolean = false,
+    val photocardImagePreviews: List<String> = emptyList(),
     val enableTagSelector: Boolean = false,
     val dialogState: PhotocardWizardDialogState = PhotocardWizardDialogState.None,
     val photocardCandidate: PhotocardCandidate = PhotocardCandidate(),

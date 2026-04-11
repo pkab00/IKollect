@@ -22,9 +22,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -59,6 +61,7 @@ fun PhotocardCameraScreen(
             setEnabledUseCases(CameraController.IMAGE_CAPTURE)
         }
     }
+    val torchState by controller.torchState.observeAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -96,6 +99,25 @@ fun PhotocardCameraScreen(
         ) {
             CameraPreview(controller, Modifier.fillMaxSize())
             Overlay()
+            IconButton(
+                onClick = { controller.enableTorch(torchState == 0) },
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = if (torchState == 1) MaterialTheme.colorScheme.secondary
+                                    else MaterialTheme.colorScheme.primary,
+                    contentColor = if (torchState == 1) MaterialTheme.colorScheme.onSecondary
+                                    else MaterialTheme.colorScheme.onPrimary,
+                ),
+                modifier = Modifier
+                    .size(56.dp)
+                    .padding(12.dp)
+                    .align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_light),
+                    contentDescription = null
+                )
+            }
+
         }
     }
     if (isLoading) {
@@ -178,9 +200,19 @@ private fun processImage(
     val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     val rotation = image.imageInfo.rotationDegrees
     val matrix = Matrix().apply { postRotate(rotation.toFloat()) }
-    val rotatedBitmap = Bitmap.createBitmap(
+    var rotatedBitmap = Bitmap.createBitmap(
         bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
     )
+
+    // Фикс на случай если изображение случайно получилось горизонтальным
+    if (rotatedBitmap.width > rotatedBitmap.height) {
+        val fixMatrix = Matrix().apply { postRotate(90f) }
+        val fixedBitmap = Bitmap.createBitmap(
+            rotatedBitmap, 0, 0, rotatedBitmap.width, rotatedBitmap.height, fixMatrix, true
+        )
+        rotatedBitmap.recycle()
+        rotatedBitmap = fixedBitmap
+    }
     image.close()
 
     // 2. Вычисляем размеры и координаты обработанного изображения
