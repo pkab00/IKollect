@@ -2,7 +2,6 @@ package com.vbshkn.ikollect.di
 
 import android.content.Context
 import coil3.ImageLoader
-import coil3.disk.DiskCache
 import coil3.disk.DiskCache.*
 import coil3.disk.directory
 import coil3.memory.MemoryCache
@@ -25,7 +24,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RemoteModule {
-
     @Provides @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor()

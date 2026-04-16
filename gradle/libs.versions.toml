@@ -1,6 +1,6 @@
 [versions]
 accompanistPermissions = "0.37.3"
-agp = "9.0.1"
+agp = "9.1.1"
 cameraCore = "1.5.3"
 coilCompose = "3.4.0"
 converterKotlinxSerialization = "3.0.0"
