@@ -1,5 +1,9 @@
 package com.vbshkn.ikollect.presentation.feature.albums.profile
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -88,6 +92,15 @@ fun AlbumProfileScreen(
         title = profile?.album?.name ?: "",
         topBarState = topBarState,
         onNavigate = { viewModel.onEvent(AlbumProfileContract.Event.OnBackClicked) },
+        actions = { animatedColor ->
+            IconButton(onClick = {}) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    tint = animatedColor
+                )
+            }
+        }
     ) {
         item {
             ProfileItemWrapper(

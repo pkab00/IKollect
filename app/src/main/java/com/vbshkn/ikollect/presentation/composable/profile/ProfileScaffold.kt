@@ -42,9 +42,12 @@ fun ProfileScaffold(
     title: String,
     topBarState: ProfileTopBarState,
     onNavigate: () -> Unit,
+    actions: @Composable (Color) -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
     val state = rememberCollapsingToolbarScaffoldState()
+    val progress = state.toolbarState.progress
+    val titleHorizontalPadding = (56 - 40 * progress).dp
 
     CollapsingToolbarScaffold(
         state = state,
@@ -57,6 +60,7 @@ fun ProfileScaffold(
                 title = title,
                 toolbarState = state.toolbarState,
                 onBackClick = onNavigate,
+                actions = actions,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(topBarState.expandedHeight)
@@ -66,7 +70,8 @@ fun ProfileScaffold(
                         whenCollapsed = Alignment.CenterStart,
                         whenExpanded = Alignment.BottomStart
                     )
-                    .padding(start = 56.dp, end = 16.dp, top = topBarState.collapsedHeight, bottom = 16.dp),
+                    .padding(horizontal = titleHorizontalPadding)
+                    .padding(top = topBarState.collapsedHeight, bottom = 16.dp),
                 backModifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
@@ -93,11 +98,13 @@ private fun CollapsingToolbar(
     imageUrl: String?,
     title: String,
     onBackClick: () -> Unit,
+    actions: @Composable (Color) -> Unit,
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
     backModifier: Modifier = Modifier,
 ) {
     val textSize = (20f + (12f * toolbarState.progress)).sp
+    val animatedColor = if (toolbarState.progress < 0.3f) MaterialTheme.colorScheme.onSurfaceVariant else Color.White
 
 
     // Основной фон с картинкой
@@ -138,9 +145,7 @@ private fun CollapsingToolbar(
     // 3. Анимированный заголовок (Имя)
     Text(
         text = title,
-        color = if (toolbarState.progress < 0.3f)
-            MaterialTheme.colorScheme.onSurfaceVariant
-        else Color.White,
+        color = animatedColor,
         fontSize = textSize,
         fontWeight = FontWeight.Bold,
         maxLines = 1,
@@ -151,6 +156,7 @@ private fun CollapsingToolbar(
     // 4. Кнопка "Назад" (закреплена всегда сверху)
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = backModifier
     ) {
         IconButton(onClick = onBackClick) {
@@ -160,6 +166,13 @@ private fun CollapsingToolbar(
                 tint = if (toolbarState.progress < 0.3f) MaterialTheme.colorScheme.onSurfaceVariant
                 else Color.White
             )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.padding(end = 8.dp)
+        ) {
+            actions(animatedColor)
         }
     }
 }

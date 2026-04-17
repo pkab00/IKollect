@@ -16,6 +16,10 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGri
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -92,7 +96,16 @@ fun PhotocardProfileScreen(
         imageUrl = profile?.photocard?.imageUrl,
         title = profile?.photocard?.displayName ?: "",
         topBarState = topBarState,
-        onNavigate = { viewModel.onEvent(PhotocardProfileContract.Event.OnBackClicked) }
+        onNavigate = { viewModel.onEvent(PhotocardProfileContract.Event.OnBackClicked) },
+        actions = { animatedColor ->
+            IconButton(onClick = {}) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    tint = animatedColor
+                )
+            }
+        }
     ) {
         item {
             ProfileInfoSection(statItems, infoItems)
