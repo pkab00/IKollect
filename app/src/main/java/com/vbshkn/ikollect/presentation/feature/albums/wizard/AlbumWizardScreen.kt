@@ -25,6 +25,7 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.steps.AlbumWizardSteps
+import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 import com.vbshkn.ikollect.presentation.feature.wizard.GenericWizard
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardState
 import com.vbshkn.ikollect.presentation.feature.wizard.dialog.CameraRationaleDialog
@@ -158,19 +159,21 @@ private fun CameraResultObserver(
     viewModel: AlbumWizardViewModel,
     savedStateHandle: SavedStateHandle
 ) {
-    val cameraResult by savedStateHandle.getStateFlow<String?>("camera_result", null)
+    val cameraResult by savedStateHandle
+        .getStateFlow<String?>(CameraResultContract.CAMERA_RESULT, null)
         .collectAsStateWithLifecycle()
-    val scannerResult by savedStateHandle.getStateFlow<String?>("scanner_result", null)
+    val scannerResult by savedStateHandle
+        .getStateFlow<String?>(CameraResultContract.SCANNER_RESULT, null)
         .collectAsStateWithLifecycle()
 
     LaunchedEffect(cameraResult, scannerResult) {
         if (cameraResult != null) {
             viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPrevirew(cameraResult!!))
-            savedStateHandle["camera_result"] = null
+            savedStateHandle[CameraResultContract.CAMERA_RESULT] = null
         }
         if (scannerResult != null) {
             viewModel.onEvent(AlbumWizardContract.Event.OnKomcaCodeChanged(scannerResult!!))
-            savedStateHandle["scanner_result"] = null
+            savedStateHandle[CameraResultContract.SCANNER_RESULT] = null
         }
     }
 }

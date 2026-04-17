@@ -5,10 +5,12 @@ sealed interface AlbumProfileContract {
         object NavigateBack : Effect
         data class NavigateToArtist(val id: Long) : Effect
         data class NavigateToPhotocard(val id: Long) : Effect
+        object NavigateToEdit : Effect
     }
     sealed interface Event {
         object OnBackClicked : Event
         object OnOwnerClicked : Event
+        object OnEditClicked : Event
         data class OnArtistCardClicked(val id: Long) : Event
         data class OnPhotocardCardClicked(val id: Long) : Event
     }

@@ -16,6 +16,7 @@ import com.vbshkn.ikollect.domain.model.list.AlbumListItem
 import com.vbshkn.ikollect.domain.model.profile.AlbumProfileData
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -73,5 +74,30 @@ class AlbumRepository @Inject constructor(
         artistIds: List<Long>
     ) {
         albumLocalDS.insertAlbumWithArtists(album, artistIds)
+    }
+
+    suspend fun updateAlbum(
+        id: Long,
+        name: String,
+        version: String,
+        komcaNumber: String,
+        userNotes: String,
+        imagePath: String?
+    ) {
+        val original = albumLocalDS.getById(id).first() ?: return
+        val updated = AlbumEntity(
+            albumId = original.albumId,
+            masterId = original.masterId,
+            barcodeNumber = original.barcodeNumber,
+            komcaNumber = komcaNumber,
+            name = name,
+            version = version,
+            releaseDate = original.releaseDate,
+            isFavorite = original.isFavorite,
+            imageUrl = imagePath,
+            userNote = userNotes,
+            timestamp = original.timestamp
+        )
+        albumLocalDS.updateAlbum(updated)
     }
 }

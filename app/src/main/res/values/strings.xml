@@ -118,4 +118,5 @@
     <string name="profile_label_tags">Tags</string>
     <string name="placeholder_no_tags">No tags.</string>
     <string name="wizard_title_on_the_card">On the card</string>
+    <string name="title_edit_album">Edit album</string>
 </resources>

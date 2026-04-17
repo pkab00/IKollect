@@ -17,7 +17,7 @@ class AlbumProfileViewModel @Inject constructor(
         AlbumProfileContract.Event,
         AlbumProfileContract.Effect
         >(initialState = AlbumProfileUIState()) {
-    private val args = savedStateHandle.toRoute<Route.AlbumProfile>()
+    private val args = savedStateHandle.toRoute<Route.AlbumFlow.Profile>()
     private val albumId = args.id
 
     init {
@@ -38,6 +38,9 @@ class AlbumProfileViewModel @Inject constructor(
             }
             is AlbumProfileContract.Event.OnPhotocardCardClicked -> {
                 sendEffect(AlbumProfileContract.Effect.NavigateToPhotocard(event.id))
+            }
+            is AlbumProfileContract.Event.OnEditClicked -> {
+                sendEffect(AlbumProfileContract.Effect.NavigateToEdit)
             }
         }
     }

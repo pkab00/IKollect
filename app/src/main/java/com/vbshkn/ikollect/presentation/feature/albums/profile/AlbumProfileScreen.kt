@@ -28,7 +28,8 @@ fun AlbumProfileScreen(
     viewModel: AlbumProfileViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToArtist: (Long) -> Unit,
-    onNavigateToPhotocard: (Long) -> Unit
+    onNavigateToPhotocard: (Long) -> Unit,
+    onNavigateToEdit: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val profile = uiState.profile
@@ -40,6 +41,7 @@ fun AlbumProfileScreen(
                 is AlbumProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is AlbumProfileContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
                 is AlbumProfileContract.Effect.NavigateToPhotocard -> onNavigateToPhotocard(effect.id)
+                is AlbumProfileContract.Effect.NavigateToEdit -> onNavigateToEdit()
             }
         }
     }
@@ -93,7 +95,7 @@ fun AlbumProfileScreen(
         topBarState = topBarState,
         onNavigate = { viewModel.onEvent(AlbumProfileContract.Event.OnBackClicked) },
         actions = { animatedColor ->
-            IconButton(onClick = {}) {
+            IconButton(onClick = { viewModel.onEvent(AlbumProfileContract.Event.OnEditClicked) }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = null,

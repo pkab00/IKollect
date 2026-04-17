@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.vbshkn.ikollect.data.local.model.entity.AlbumArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumFullDetail
@@ -17,6 +18,9 @@ import kotlinx.coroutines.flow.Flow
 interface AlbumDao {
     @Query("SELECT * FROM AlbumEntity")
     fun getAll(): Flow<List<AlbumEntity>>
+
+    @Query("SELECT * FROM AlbumEntity WHERE albumId = :id")
+    fun getById(id: Long): Flow<AlbumEntity?>
 
     @Transaction
     @Query("SELECT * FROM AlbumEntity")
@@ -59,4 +63,7 @@ interface AlbumDao {
         }
         insertArtistLinks(links)
     }
+
+    @Update
+    suspend fun updateAlbum(albumEntity: AlbumEntity)
 }

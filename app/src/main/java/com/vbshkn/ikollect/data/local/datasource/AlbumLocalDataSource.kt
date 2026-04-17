@@ -16,6 +16,10 @@ class AlbumLocalDataSource @Inject constructor(
         return dao.getAll()
     }
 
+    fun getById(id: Long): Flow<AlbumEntity?> {
+        return dao.getById(id)
+    }
+
     fun getAllWithArtists(): Flow<List<AlbumWithArtists>> {
         return dao.getAllWithArtists()
     }
@@ -45,5 +49,9 @@ class AlbumLocalDataSource @Inject constructor(
         artistIds: List<Long>
     ) {
         dao.insertAlbumWithArtists(albumEntity, artistIds)
+    }
+
+    suspend fun updateAlbum(albumEntity: AlbumEntity) {
+        dao.updateAlbum(albumEntity)
     }
 }

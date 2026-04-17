@@ -20,7 +20,7 @@ class SavePhotocardUseCase @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope
 ) {
     operator fun invoke(candidate: PhotocardCandidate) = scope.launch {
-        val savedImage = imageRepository.saveCacheToInternalStorage(candidate.imageUrl!!)
+        val savedImage = imageRepository.saveToInternalStorage(candidate.imageUrl!!)
         val photocardEntity = PhotocardEntity(
             albumId = candidate.albumId,
             ownerId = candidate.ownerId!!,

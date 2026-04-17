@@ -10,12 +10,11 @@ import com.vbshkn.ikollect.presentation.feature.camera.AlbumCameraScreen
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsScreen
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsViewModel
-import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileScreen
-import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileViewModel
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardScreen
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileScreen
 import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileViewModel
+import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 import com.vbshkn.ikollect.presentation.feature.camera.KomcaScannerScreen
 import com.vbshkn.ikollect.presentation.feature.camera.PhotocardCameraScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsViewModel
@@ -23,6 +22,7 @@ import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProf
 import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileViewModel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardScreen
+import com.vbshkn.ikollect.presentation.navigation.graphs.albumProfileGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.artistsGraph
 import kotlin.reflect.typeOf
 
@@ -37,7 +37,7 @@ fun AppNavHost(navController: NavHostController) {
             AlbumsScreen(
                 viewModel = viewModel,
                 onGoToWizard = { navController.navigate(Route.AlbumWizard(it)) },
-                onAlbumClick = { navController.navigate(Route.AlbumProfile(it)) }
+                onAlbumClick = { navController.navigate(Route.AlbumFlow.Profile(it)) }
             )
         }
         composable<Route.Photocards> {
@@ -52,14 +52,14 @@ fun AppNavHost(navController: NavHostController) {
         composable<Route.AlbumCameraScreen> {
             AlbumCameraScreen { image ->
                 navController.previousBackStackEntry
-                    ?.savedStateHandle["camera_result"] = image
+                    ?.savedStateHandle[CameraResultContract.CAMERA_RESULT] = image
                 navController.popBackStack()
             }
         }
         composable<Route.PhotocardCameraScreen> {
             PhotocardCameraScreen { image ->
                 navController.previousBackStackEntry
-                    ?.savedStateHandle["camera_result"] = image
+                    ?.savedStateHandle[CameraResultContract.CAMERA_RESULT] = image
                 navController.popBackStack()
             }
         }
@@ -67,7 +67,7 @@ fun AppNavHost(navController: NavHostController) {
             KomcaScannerScreen(
                 onNumberRecognized = { number ->
                     navController.previousBackStackEntry
-                        ?.savedStateHandle["scanner_result"] = number
+                        ?.savedStateHandle[CameraResultContract.SCANNER_RESULT] = number
                     navController.popBackStack()
                 }
             )
@@ -79,20 +79,12 @@ fun AppNavHost(navController: NavHostController) {
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
-                onNavigateToAlbum = { navController.navigate(Route.AlbumProfile(it)) },
+                onNavigateToAlbum = { navController.navigate(Route.AlbumFlow.Profile(it)) },
                 onNavigateToPhotocard = { navController.navigate(Route.PhotocardProfile(it)) }
             )
         }
 
-        composable<Route.AlbumProfile> {
-            val viewModel = hiltViewModel<AlbumProfileViewModel>()
-            AlbumProfileScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
-                onNavigateToPhotocard = { navController.navigate(Route.PhotocardProfile(it)) }
-            )
-        }
+        albumProfileGraph(navController)
 
         composable<Route.PhotocardProfile> {
             val viewModel = hiltViewModel<PhotocardProfileViewModel>()
@@ -100,7 +92,7 @@ fun AppNavHost(navController: NavHostController) {
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
-                onNavigateToAlbum = { navController.navigate(Route.AlbumProfile(it)) }
+                onNavigateToAlbum = { navController.navigate(Route.AlbumFlow.Profile(it)) }
             )
         }
 
@@ -132,5 +124,6 @@ fun AppNavHost(navController: NavHostController) {
         }
 
         artistsGraph(navController)
+        albumProfileGraph(navController)
     }
 }

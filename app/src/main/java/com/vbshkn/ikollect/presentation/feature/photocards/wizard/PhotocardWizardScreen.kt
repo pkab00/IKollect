@@ -22,6 +22,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.dialog.InfoDialog
+import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.steps.PhotocardWizardSteps
 import com.vbshkn.ikollect.presentation.feature.wizard.GenericWizard
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardState
@@ -139,13 +140,14 @@ private fun CameraResultObserver(
     savedStateHandle: SavedStateHandle,
     viewModel: PhotocardWizardViewModel
 ) {
-    val cameraResult by savedStateHandle.getStateFlow<String?>("camera_result", null)
+    val cameraResult by savedStateHandle
+        .getStateFlow<String?>(CameraResultContract.CAMERA_RESULT, null)
         .collectAsStateWithLifecycle()
 
     LaunchedEffect(cameraResult) {
         if (cameraResult != null) {
             viewModel.onEvent(PhotocardWizardContract.Event.OnPhotoSelected(cameraResult!!))
-            savedStateHandle["camera_result"] = null
+            savedStateHandle[CameraResultContract.CAMERA_RESULT] = null
         }
     }
 }
