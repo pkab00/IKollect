@@ -24,6 +24,7 @@ import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizar
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardScreen
 import com.vbshkn.ikollect.presentation.navigation.graphs.albumProfileGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.artistsGraph
+import com.vbshkn.ikollect.presentation.navigation.graphs.photocardProfileGraph
 import kotlin.reflect.typeOf
 
 @Composable
@@ -45,7 +46,7 @@ fun AppNavHost(navController: NavHostController) {
             PhotocardsScreen(
                 viewModel = viewModel,
                 onNavigateToWizard = { navController.navigate(Route.PhotocardWizard) },
-                onNavigateToPhotocard = { navController.navigate(Route.PhotocardProfile(it)) }
+                onNavigateToPhotocard = { navController.navigate(Route.PhotocardFlow.Profile(it)) }
             )
         }
 
@@ -80,19 +81,7 @@ fun AppNavHost(navController: NavHostController) {
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
                 onNavigateToAlbum = { navController.navigate(Route.AlbumFlow.Profile(it)) },
-                onNavigateToPhotocard = { navController.navigate(Route.PhotocardProfile(it)) }
-            )
-        }
-
-        albumProfileGraph(navController)
-
-        composable<Route.PhotocardProfile> {
-            val viewModel = hiltViewModel<PhotocardProfileViewModel>()
-            PhotocardProfileScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
-                onNavigateToAlbum = { navController.navigate(Route.AlbumFlow.Profile(it)) }
+                onNavigateToPhotocard = { navController.navigate(Route.PhotocardFlow.Profile(it)) }
             )
         }
 
@@ -125,5 +114,6 @@ fun AppNavHost(navController: NavHostController) {
 
         artistsGraph(navController)
         albumProfileGraph(navController)
+        photocardProfileGraph(navController)
     }
 }

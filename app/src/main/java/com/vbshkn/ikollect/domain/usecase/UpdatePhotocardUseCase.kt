@@ -1,0 +1,44 @@
+package com.vbshkn.ikollect.domain.usecase
+
+import androidx.room.withTransaction
+import com.vbshkn.ikollect.data.local.database.AppDatabase
+import com.vbshkn.ikollect.data.repository.ImageRepository
+import com.vbshkn.ikollect.data.repository.PhotocardRepository
+import com.vbshkn.ikollect.data.repository.TagRepository
+import javax.inject.Inject
+
+class UpdatePhotocardUseCase @Inject constructor(
+    private val photocardRepository: PhotocardRepository,
+    private val tagRepository: TagRepository,
+    private val imageRepository: ImageRepository,
+    private val db: AppDatabase
+) {
+    suspend operator fun invoke(
+        id: Long,
+        image: String?,
+        oldImage: String?,
+        photocardName: String,
+        userNotes: String,
+        oldTagIds: Set<Long>,
+        selectedTagIds: Set<Long>
+    ) = db.withTransaction {
+        var imagePath: String? = null
+        if (image != oldImage) {
+            imagePath = image?.let { imageRepository.saveToInternalStorage(it) }
+            oldImage?.let { imageRepository.deleteFromInternalStorage(it) }
+        }
+
+        photocardRepository.updatePhotocard(
+            id = id,
+            image = imagePath,
+            photocardName = photocardName,
+            userNotes = userNotes
+        )
+
+        tagRepository.updateLinks(
+            photocardId = id,
+            oldTagIds = oldTagIds.toList(),
+            newTagIds = selectedTagIds.toList()
+        )
+    }
+}

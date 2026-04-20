@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.TagItem
 import com.vbshkn.ikollect.presentation.composable.TagLabel
+import com.vbshkn.ikollect.presentation.composable.TagsField
 import com.vbshkn.ikollect.presentation.composable.profile.ArtistList
 import com.vbshkn.ikollect.presentation.composable.profile.InfoRowItem
 import com.vbshkn.ikollect.presentation.composable.profile.NotesField
@@ -49,6 +50,7 @@ import com.vbshkn.ikollect.util.UiText
 fun PhotocardProfileScreen(
     viewModel: PhotocardProfileViewModel,
     onNavigateBack: () -> Unit,
+    onNavigateToEdit: (Long) -> Unit,
     onNavigateToArtist: (Long) -> Unit,
     onNavigateToAlbum: (Long) -> Unit
 ) {
@@ -62,6 +64,7 @@ fun PhotocardProfileScreen(
                 is PhotocardProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is PhotocardProfileContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
                 is PhotocardProfileContract.Effect.NavigateToAlbum -> onNavigateToAlbum(effect.id)
+                is PhotocardProfileContract.Effect.NavigateToEdit -> onNavigateToEdit(effect.id)
             }
         }
     }
@@ -98,7 +101,7 @@ fun PhotocardProfileScreen(
         topBarState = topBarState,
         onNavigate = { viewModel.onEvent(PhotocardProfileContract.Event.OnBackClicked) },
         actions = { animatedColor ->
-            IconButton(onClick = {}) {
+            IconButton(onClick = { viewModel.onEvent(PhotocardProfileContract.Event.OnEditClicked) }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = null,
@@ -121,7 +124,10 @@ fun PhotocardProfileScreen(
             ProfileItemWrapper(
                 title = UiText.StringResource(R.string.profile_label_tags)
             ) {
-                TagsPanel(tags = profile?.photocard?.tags ?: emptyList())
+                TagsField(
+                    tags = uiState.profile?.photocard?.tags ?: emptyList(),
+                    onTagClick = { /* No actions on tag click in profile view */ },
+                )
             }
         }
         item {
@@ -129,51 +135,6 @@ fun PhotocardProfileScreen(
                 title = UiText.StringResource(R.string.artist_profile_title_notes),
                 text = profile?.photocard?.userNotes?.let { UiText.DynamicString(it) }
             )
-        }
-    }
-}
-
-@Composable
-fun TagsPanel(tags: List<TagItem>) {
-    OutlinedCard(
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-    ) {
-        if (tags.isEmpty()) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(
-                    text = stringResource(R.string.placeholder_no_tags),
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
-        }
-        else {
-            LazyHorizontalStaggeredGrid(
-                rows = StaggeredGridCells.Adaptive(20.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                horizontalItemSpacing = 6.dp,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)
-            ) {
-                items(
-                    items = tags,
-                    key = { it.id }
-                ) { tag ->
-                    TagLabel(
-                        tag = tag,
-                        isSelected = false,
-                        modifier = Modifier
-                            .widthIn(min = 60.dp)
-                            .height(20.dp)
-                    )
-                }
-            }
         }
     }
 }

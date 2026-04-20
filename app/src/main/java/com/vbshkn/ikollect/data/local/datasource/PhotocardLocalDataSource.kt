@@ -15,6 +15,10 @@ class PhotocardLocalDataSource @Inject constructor(
         return dao.getAll()
     }
 
+    fun getById(id: Long): Flow<PhotocardEntity?> {
+        return dao.getById(id)
+    }
+
     fun getAllWithArtists(): Flow<List<PhotocardMinimalDetail>> {
         return dao.getAllWithArtists()
     }
@@ -25,6 +29,10 @@ class PhotocardLocalDataSource @Inject constructor(
 
     fun getWithFullDetail(id: Long): Flow<PhotocardFullDetail?> {
         return dao.getWithFullDetail(id)
+    }
+
+    suspend fun update(photocardEntity: PhotocardEntity) {
+        dao.updatePhotocard(photocardEntity)
     }
 
     suspend fun insertPhotocardWithArtists(

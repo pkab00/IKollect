@@ -1,12 +1,13 @@
-package com.vbshkn.ikollect.presentation.feature.albums.profile.edit
+package com.vbshkn.ikollect.presentation.feature.photocards.profile.edit
 
+import com.vbshkn.ikollect.presentation.feature.photocards.profile.edit.EditPhotocardProfileContract.Event
+import com.vbshkn.ikollect.presentation.feature.photocards.profile.edit.EditPhotocardProfileContract.Effect
 import android.Manifest
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -32,33 +33,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.ImageChangerItem
 import com.vbshkn.ikollect.presentation.composable.PlainTextField
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
 import com.vbshkn.ikollect.presentation.feature.wizard.dialog.CameraRationaleDialog
 import com.vbshkn.ikollect.util.UiText
-import androidx.lifecycle.SavedStateHandle
-import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
+import com.vbshkn.ikollect.presentation.composable.TagSelectionSheet
+import com.vbshkn.ikollect.presentation.composable.TagsField
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun EditAlbumProfileScreen(
-    viewModel: EditAlbumProfileViewModel,
-    onNavigateBack: () -> Unit,
-    onOpenScanner: () -> Unit = {},
-    savedStateHandle: SavedStateHandle
+fun EditPhotocardProfileScreen(
+    viewModel: EditPhotocardProfileViewModel,
+    onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -73,11 +68,11 @@ fun EditAlbumProfileScreen(
                         uri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
-                } catch (e: SecurityException) {
+                } catch (_: SecurityException) {
                     // Some content providers don't support persistable URI permissions
                     // App will still work with temporary URI permissions
                 }
-                viewModel.onEvent(EditAlbumProfileContract.Event.OnImageChanged(uri.toString()))
+                viewModel.onEvent(EditPhotocardProfileContract.Event.OnImageChanged(uri.toString()))
             }
         }
     )
@@ -85,24 +80,8 @@ fun EditAlbumProfileScreen(
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is EditAlbumProfileContract.Effect.NavigateBack -> onNavigateBack()
-                is EditAlbumProfileContract.Effect.OpenGallery -> galleryLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                )
-                is EditAlbumProfileContract.Effect.TryOpenScanner -> {
-                    val status = cameraPermissionState.status
-                    when {
-                        status.isGranted -> {
-                            onOpenScanner()
-                        }
-                        status.shouldShowRationale -> {
-                            viewModel.onEvent(EditAlbumProfileContract.Event.OnShowCameraRationale)
-                        }
-                        else -> {
-                            cameraPermissionState.launchPermissionRequest()
-                        }
-                    }
-                }
+                is Effect.NavigateBack -> onNavigateBack()
+                is Effect.OpenGallery -> galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             }
         }
     }
@@ -113,9 +92,12 @@ fun EditAlbumProfileScreen(
         onRequestPermission = { cameraPermissionState.launchPermissionRequest() }
     )
 
-    ScannerResultObserver(
-        savedStateHandle = savedStateHandle,
-        viewModel = viewModel
+    TagSelectionSheet(
+        allTags = uiState.allTags,
+        selectedTagIds = uiState.selectedTagIds,
+        enabled = uiState.enableTagSelector,
+        onTagClick = { viewModel.onEvent(Event.OnTagClick(it)) },
+        onDismiss = { viewModel.onEvent(Event.OnDismissTagSelector) }
     )
 
     Scaffold(
@@ -132,7 +114,7 @@ fun EditAlbumProfileScreen(
                     title = stringResource(R.string.title_change_image),
                     imageUrl = uiState.image,
                     blurRadius = 60.dp,
-                    onClick = { viewModel.onEvent(EditAlbumProfileContract.Event.OnOpenGalleryClicked) },
+                    onClick = { viewModel.onEvent(Event.OnOpenGalleryClicked) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
@@ -143,14 +125,18 @@ fun EditAlbumProfileScreen(
 
             item {
                 WizardItemWrapper(UiText.StringResource(R.string.album_profile_label_title)) {
-                    AlbumNameField(value = uiState.albumName, onEvent = viewModel::onEvent)
-                    AlbumVersionField(value = uiState.albumVersion, onEvent = viewModel::onEvent)
+                    PhotocardNameField(value = uiState.photocardName, onEvent = viewModel::onEvent)
                 }
             }
 
             item {
-                WizardItemWrapper(UiText.StringResource(R.string.album_profile_label_komca)) {
-                    KomcaNumberField(value = uiState.komcaNumber, onEvent = viewModel::onEvent)
+                WizardItemWrapper(UiText.StringResource(R.string.profile_label_tags)) {
+                    TagsField(
+                        tags = uiState.allTags.filter { it.id in uiState.selectedTagIds },
+                        onTagClick = { viewModel.onEvent(Event.OnTagClick(it)) },
+                        displaySelectTagsButton = true,
+                        onSelectTagsClick = { viewModel.onEvent(Event.OnSelectTagsClick) }
+                    )
                 }
             }
 
@@ -166,17 +152,17 @@ fun EditAlbumProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
-    onEvent: (EditAlbumProfileContract.Event) -> Unit
+    onEvent: (Event) -> Unit
 ) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(R.string.title_edit_album),
+                text = stringResource(R.string.title_edit_photocard),
                 style = MaterialTheme.typography.titleLarge
             )
         },
         navigationIcon = {
-            IconButton(onClick = { onEvent(EditAlbumProfileContract.Event.OnBackClicked) }) {
+            IconButton(onClick = { onEvent(Event.OnBackClicked) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null
@@ -184,7 +170,7 @@ private fun TopBar(
             }
         },
         actions = {
-            IconButton(onClick = { onEvent(EditAlbumProfileContract.Event.OnSaveChangesClicked) }) {
+            IconButton(onClick = { onEvent(Event.OnSaveChangesClicked) }) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = null
@@ -201,13 +187,13 @@ private fun TopBar(
 }
 
 @Composable
-fun AlbumNameField(
+fun PhotocardNameField(
     value: String,
-    onEvent: (EditAlbumProfileContract.Event) -> Unit
+    onEvent: (Event) -> Unit
 ) {
     PlainTextField(
         value = value,
-        onValueChange = { onEvent(EditAlbumProfileContract.Event.OnAlbumNameChanged(it)) },
+        onValueChange = { onEvent(Event.OnPhotocardNameChanged(it)) },
         title = UiText.StringResource(R.string.album_profile_label_title),
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
@@ -215,71 +201,15 @@ fun AlbumNameField(
 }
 
 @Composable
-fun AlbumVersionField(
-    value: String,
-    onEvent: (EditAlbumProfileContract.Event) -> Unit
-) {
-    PlainTextField(
-        value = value,
-        onValueChange = { onEvent(EditAlbumProfileContract.Event.OnAlbumVersionChanged(it)) },
-        title = UiText.StringResource(R.string.album_profile_label_version),
-        modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
-    )
-}
-
-@Composable
-fun KomcaNumberField(
-    value: String,
-    onEvent: (EditAlbumProfileContract.Event) -> Unit
-) {
-    val isError = value.isNotEmpty() && value.length < 8
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = { newValue ->
-            if (newValue.all { it.isDigit() } && newValue.length <= 12) {
-                onEvent(EditAlbumProfileContract.Event.OnKomcaNumberChanged(newValue))
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(PaddingValues()),
-        label = { Text("KOMCA") },
-        placeholder = { Text("12345678") },
-        prefix = { Text("№ ") },
-        trailingIcon = {
-            IconButton(onClick = { onEvent(EditAlbumProfileContract.Event.OnKomcaScannerClicked) }) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_scanner),
-                    contentDescription = null
-                )
-            }
-        },
-        isError = isError,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ),
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp)
-    )
-}
-
-@Composable
 fun UserNotesField(
     value: String,
-    onEvent: (EditAlbumProfileContract.Event) -> Unit
+    onEvent: (Event) -> Unit
 ) {
     val maxChar = 2000
 
     OutlinedTextField(
         value = value,
-        onValueChange = {
-            if (it.length <= maxChar) {
-                onEvent(EditAlbumProfileContract.Event.OnUserNotesChanged(it))
-            }
-        },
+        onValueChange = { if (it.length <= maxChar) { onEvent(Event.OnUserNotesChanged(it)) } },
         placeholder = { Text(stringResource(R.string.album_notes_placeholder)) },
         modifier = Modifier
             .fillMaxWidth()
@@ -300,34 +230,25 @@ fun UserNotesField(
 
 @Composable
 private fun DialogHost(
-    dialogState: EditAlbumProfileDialogState,
-    onEvent: (EditAlbumProfileContract.Event) -> Unit,
+    dialogState: EditPhotocardProfileDialogState,
+    onEvent: (Event) -> Unit,
     onRequestPermission: () -> Unit
 ) {
     when (dialogState) {
-        is EditAlbumProfileDialogState.CameraRationale -> {
+        is EditPhotocardProfileDialogState.CameraRationale -> {
             CameraRationaleDialog {
-                onEvent(EditAlbumProfileContract.Event.OnDismissDialog)
+                onEvent(Event.OnDismissDialog)
                 onRequestPermission()
             }
         }
-        is EditAlbumProfileDialogState.None -> {}
+        is EditPhotocardProfileDialogState.None -> {}
     }
 }
 
-@Composable
-private fun ScannerResultObserver(
-    savedStateHandle: SavedStateHandle,
-    viewModel: EditAlbumProfileViewModel
-) {
-    val scannerResult by savedStateHandle
-        .getStateFlow<String?>(CameraResultContract.SCANNER_RESULT, null)
-        .collectAsStateWithLifecycle()
 
-    LaunchedEffect(scannerResult) {
-        if (scannerResult != null) {
-            viewModel.onEvent(EditAlbumProfileContract.Event.OnKomcaNumberChanged(scannerResult!!))
-            savedStateHandle[CameraResultContract.SCANNER_RESULT] = null
-        }
-    }
-}
+
+
+
+
+
+

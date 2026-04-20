@@ -19,7 +19,11 @@ sealed interface Route {
         @Serializable data class Edit(val id: Long) : AlbumFlow()
     }
 
-    @Serializable data class PhotocardProfile(val id: Long) : Route
+    @Serializable data object PhotocardProfile : Route
+    @Serializable sealed class PhotocardFlow : Route {
+        @Serializable data class Profile(val id: Long) : PhotocardFlow()
+        @Serializable data class Edit(val id: Long) : PhotocardFlow()
+    }
     @Serializable data class ArtistProfile(val id: Long) : Route
     @Serializable sealed class ArtistsFlow : Route {
         @Serializable data object Main : ArtistsFlow()

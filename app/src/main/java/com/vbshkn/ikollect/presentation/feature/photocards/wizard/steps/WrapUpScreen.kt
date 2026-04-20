@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.TagItem
 import com.vbshkn.ikollect.presentation.composable.TagLabel
+import com.vbshkn.ikollect.presentation.composable.TagSelectionSheet
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardUIState
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
@@ -177,56 +178,6 @@ fun PhotocardTags(
                         modifier = Modifier.size(12.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
-@Composable
-private fun TagSelectionSheet(
-    allTags: List<TagItem>,
-    selectedTagIds: Set<Long>,
-    enabled: Boolean,
-    onTagClick: (Long) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-
-    if (enabled) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                onDismiss()
-                scope.launch { sheetState.hide() }
-            },
-            sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surface
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.tag_selector_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(100.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(allTags) { tag ->
-                        TagLabel(
-                            tag = tag,
-                            isSelected = tag.id in selectedTagIds,
-                            onClick = { onTagClick(tag.id) }
-                        )
-                    }
                 }
             }
         }

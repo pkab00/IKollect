@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistWithPhotocards
@@ -17,6 +18,9 @@ interface PhotocardDao {
     @Query("SELECT * FROM PhotocardEntity")
     fun getAll(): Flow<List<PhotocardEntity>>
 
+    @Query("SELECT * FROM PhotocardEntity WHERE photocardId = :id")
+    fun getById(id: Long): Flow<PhotocardEntity?>
+
     @Transaction
     @Query("SELECT * FROM PhotocardEntity")
     fun getAllWithArtists(): Flow<List<PhotocardMinimalDetail>>
@@ -28,6 +32,9 @@ interface PhotocardDao {
     @Transaction
     @Query("SELECT * FROM PhotocardEntity WHERE photocardId = :id")
     fun getWithFullDetail(id: Long): Flow<PhotocardFullDetail?>
+
+    @Update
+    suspend fun updatePhotocard(photocardEntity: PhotocardEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPhotocard(photocardEntity: PhotocardEntity): Long

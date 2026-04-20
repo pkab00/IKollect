@@ -1,6 +1,7 @@
 package com.vbshkn.ikollect.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -18,4 +19,7 @@ interface TagDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTagLinks(links: List<PhotocardTagCrossRef>)
+
+    @Delete
+    suspend fun deleteLink(link: PhotocardTagCrossRef)
 }

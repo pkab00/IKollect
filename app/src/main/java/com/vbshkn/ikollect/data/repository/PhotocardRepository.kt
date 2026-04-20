@@ -9,6 +9,7 @@ import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
 import com.vbshkn.ikollect.domain.model.profile.PhotocardProfileData
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class PhotocardRepository @Inject constructor(
@@ -23,6 +24,26 @@ class PhotocardRepository @Inject constructor(
 
     fun getPhotocardProfile(id: Long): Flow<NetworkResult<PhotocardProfileData?>> {
         return photocardLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
+    }
+
+    suspend fun updatePhotocard(
+        id: Long,
+        image: String?,
+        photocardName: String,
+        userNotes: String,
+    ) {
+        val original = photocardLocalDS.getById(id).first() ?: return
+        val updated = PhotocardEntity(
+            photocardId = id,
+            albumId = original.albumId,
+            ownerId = original.ownerId,
+            displayName = photocardName,
+            isFavorite = original.isFavorite,
+            imageUrl = image,
+            userNote = userNotes,
+            savingTimestamp = original.savingTimestamp
+        )
+        photocardLocalDS.update(updated)
     }
 
     suspend fun insertWithArtists(

@@ -23,7 +23,7 @@ fun NavGraphBuilder.albumProfileGraph(navController: NavHostController) {
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) },
-                onNavigateToPhotocard = { navController.navigate(Route.PhotocardProfile(it)) },
+                onNavigateToPhotocard = { navController.navigate(Route.PhotocardFlow.Profile(it)) },
                 onNavigateToEdit = { navController.navigate(Route.AlbumFlow.Edit(albumId)) }
             )
         }
