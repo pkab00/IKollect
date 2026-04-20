@@ -11,16 +11,24 @@ class ImageRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     fun saveToInternalStorage(uriString: String): String {
-        val cacheUri = uriString.toUri()
-
+        val uri = uriString.toUri()
         val permanentName = "cover_${System.currentTimeMillis()}.jpg"
         val permanentFile = File(context.filesDir, permanentName)
 
-        context.contentResolver.openInputStream(cacheUri)?.use { input ->
-            permanentFile.outputStream().use { output ->
-                input.copyTo(output)
+        if (uri.scheme == "content") {
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                permanentFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            } ?: throw IllegalArgumentException("Unable to open content URI: $uri")
+        } else {
+            val filePath = uri.path ?: uriString
+            File(filePath).inputStream().use { input ->
+                permanentFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
             }
-        } ?: throw IllegalArgumentException("Unable to open URI: $cacheUri")
+        }
 
         android.util.Log.d("ImageRepository", "Saved file $permanentName")
         return Uri.fromFile(permanentFile).toString()
