@@ -114,4 +114,6 @@
     <string name="title_edit_album">Редактировать альбом</string>
     <string name="title_change_image">Изменить изображение</string>
     <string name="title_edit_photocard">Изменить фотокарту</string>
+    <string name="title_show_all">Показать всё</string>
+    <string name="title_collapse">Свернуть</string>
 </resources>

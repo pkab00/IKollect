@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +32,10 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
+import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 import com.vbshkn.ikollect.presentation.composable.CardGrid
+import com.vbshkn.ikollect.presentation.composable.ExpandedCardGrid
 import com.vbshkn.ikollect.util.PaletteUtil
 import com.vbshkn.ikollect.util.UiText
 
@@ -41,19 +45,33 @@ fun ArtistList(
     artists: List<ArtistListItem>,
     onClick: (Long) -> Unit
 ) {
+    var expand by rememberSaveable { mutableStateOf(false) }
+
     ProfileItemWrapper(
         title = title,
-        enabled = artists.isNotEmpty()
+        enabled = artists.isNotEmpty(),
+        showAction = true,
+        actionText = UiText.StringResource(if (expand) R.string.title_collapse else R.string.title_show_all),
+        onAction = { expand = !expand }
     ) {
-        CardGrid(
-            height = 200.dp,
-            modifier = Modifier.padding(8.dp)
-        ) {
-            items(artists) { artist ->
-                ArtistCard(
-                    artist = artist,
-                    onClick = { onClick(artist.artistId) }
-                )
+        if (!expand) {
+            CardGrid(modifier = Modifier.padding(8.dp)) {
+                items(artists) { artist ->
+                    ArtistCard(
+                        artist = artist,
+                        onClick = { onClick(artist.artistId) }
+                    )
+                }
+            }
+        }
+        else {
+            ExpandedCardGrid(modifier = Modifier.padding(8.dp)) {
+                items(artists) { artist ->
+                    ArtistCard(
+                        artist = artist,
+                        onClick = { onClick(artist.artistId) }
+                    )
+                }
             }
         }
     }

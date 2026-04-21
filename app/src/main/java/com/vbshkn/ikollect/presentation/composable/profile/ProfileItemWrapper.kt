@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +27,9 @@ fun ProfileItemWrapper(
     enabled: Boolean = true,
     showHint: Boolean = false,
     onHint: () -> Unit = {},
+    showAction: Boolean = false,
+    actionText: UiText? = null,
+    onAction: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     if (enabled) {
@@ -48,8 +52,8 @@ fun ProfileItemWrapper(
                         .weight(1f)
                         .padding(start = 6.dp)
                 )
-                Box(modifier = Modifier.size(24.dp)) {
-                    if (showHint) {
+                if (showHint) {
+                    Box(modifier = Modifier.size(24.dp)) {
                         Icon(
                             painter = painterResource(R.drawable.ic_info),
                             contentDescription = null,
@@ -57,6 +61,20 @@ fun ProfileItemWrapper(
                         )
                     }
                 }
+                else if (showAction && actionText != null) {
+                    Text(
+                        text = actionText.asString(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { onAction() }
+                    )
+                }
+            }
+            if (showHint || showAction) {
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+                )
             }
             content()
         }

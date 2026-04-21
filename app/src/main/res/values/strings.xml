@@ -121,4 +121,6 @@
     <string name="title_edit_album">Edit album</string>
     <string name="title_change_image">Change image</string>
     <string name="title_edit_photocard">Edit photocard</string>
+    <string name="title_show_all">Show all</string>
+    <string name="title_collapse">Collapse</string>
 </resources>
