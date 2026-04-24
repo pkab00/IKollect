@@ -116,4 +116,25 @@
     <string name="title_edit_photocard">Изменить фотокарту</string>
     <string name="title_show_all">Показать всё</string>
     <string name="title_collapse">Свернуть</string>
+    <string name="navigation_profile">Профиль</string>
+    <string name="screen_title_user_profile">Ваш профиль</string>
+    <string name="action_login">Войти</string>
+    <string name="filler_login">Войдите. чтобы связать свою коллекцию с аккаунтом Google.</string>
+    <string name="title_registration">Регистрация</string>
+    <string name="subtitle_create_new_account">Создайте новый аккаунт</string>
+    <string name="label_password">Пароль</string>
+    <string name="action_register">Зарегистрироваться</string>
+    <string name="label_already_have_account">Уже есть аккаунт?</string>
+    <string name="placeholder_password">Введите пароль</string>
+    <string name="title_login">Вход</string>
+    <string name="subtitle_connect_to_account">Подключите существующий аккаунт</string>
+    <string name="label_dont_have_account">Ещё нет аккаунта?</string>
+    <string name="email_validation_error_empty">Email не может быть пустым.</string>
+    <string name="email_validation_error_format">Неверный формат email.</string>
+    <string name="password_validation_error_empty">Пароль не может быть пустым.</string>
+    <string name="password_validation_error_format">Пароль должен быть не менее 8 символов и содержать хотя бы одну цифру.</string>
+    <string name="error_email_in_use">Email уже используется.</string>
+    <string name="unknown_error_prefix">"Ошибка: "</string>
+    <string name="action_logout">Выйти</string>
+    <string name="error_user_not_found">Неверный email или пароль.</string>
 </resources>

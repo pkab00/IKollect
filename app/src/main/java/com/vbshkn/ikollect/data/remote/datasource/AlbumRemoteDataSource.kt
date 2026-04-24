@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.data.remote.datasource
 
-import com.vbshkn.ikollect.data.AppError
+import com.vbshkn.ikollect.domain.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.api.DiscogsApi
 import com.vbshkn.ikollect.data.remote.dao.ArtistDetailsResponse

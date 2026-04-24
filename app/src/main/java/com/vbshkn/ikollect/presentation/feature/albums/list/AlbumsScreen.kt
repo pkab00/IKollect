@@ -41,6 +41,7 @@ import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.details.AlbumDetails
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
+import com.vbshkn.ikollect.presentation.composable.CommonTopBar
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
@@ -71,7 +72,19 @@ fun AlbumsScreen(
     )
 
     Scaffold(
-        topBar = { TopBar(onEvent) },
+        topBar = {
+            CommonTopBar(
+                title = UiText.StringResource(R.string.screen_title_albums),
+                actions = {
+                    IconButton({ onEvent(AlbumsContract.Event.OnStartScanningClicked) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_scanner),
+                            contentDescription = ""
+                        )
+                    }
+                }
+            )
+        },
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
@@ -138,36 +151,6 @@ fun ErrorScreen() {
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.error,
         textAlign = TextAlign.Center
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(
-    onEvent: (AlbumsContract.Event) -> Unit
-) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.screen_title_albums),
-                style = MaterialTheme.typography.titleLarge
-            )
-        },
-        actions = {
-            IconButton(
-                onClick = { onEvent(AlbumsContract.Event.OnStartScanningClicked) }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_scanner),
-                    contentDescription = ""
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     )
 }
 

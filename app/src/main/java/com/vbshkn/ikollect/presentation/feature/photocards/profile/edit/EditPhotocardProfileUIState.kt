@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.profile.edit
 
-import com.vbshkn.ikollect.data.AppError
+import com.vbshkn.ikollect.domain.AppError
 import com.vbshkn.ikollect.domain.model.TagItem
 import com.vbshkn.ikollect.domain.model.profile.PhotocardProfileData
 

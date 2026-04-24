@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.albums.list
 
-import com.vbshkn.ikollect.data.AppError
+import com.vbshkn.ikollect.domain.AppError
 import com.vbshkn.ikollect.domain.model.details.AlbumDetails
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 

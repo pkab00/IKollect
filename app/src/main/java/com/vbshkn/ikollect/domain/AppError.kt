@@ -1,6 +1,7 @@
-package com.vbshkn.ikollect.data
+package com.vbshkn.ikollect.domain
 
 sealed interface AppError {
+    object ProfileNotFound : AppError
     object ScanningFailed : AppError
     object ReleaseNotFound : AppError
     object InvalidAlbumStyle : AppError

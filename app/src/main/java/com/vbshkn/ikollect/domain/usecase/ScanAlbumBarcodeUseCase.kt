@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.domain.usecase
 
-import com.vbshkn.ikollect.data.AppError
+import com.vbshkn.ikollect.domain.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.service.BarcodeScannerService

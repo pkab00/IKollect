@@ -42,7 +42,7 @@
     <string name="komca_scanner_tip">Focus the camera on the KOMCA sticker</string>
     <string name="komca_scanner_confirm">Confirm the number?</string>
     <string name="add_details_title_komca">KOMCA Number</string>
-    <string name="komca_textfield_supporting_text">8-12 dights from the sticker</string>
+    <string name="komca_textfield_supporting_text">8–12 dights from the sticker</string>
     <string name="dialog_about_komca_title">About KOMCA</string>
     <string name="dialog_about_komca_body">Every copy of the music album produced in Korea has a KOMCA sticker on it. This yellow or white sticker contains your unique copy number. It\'s usually located on the back of the packaging. If your album doesn\'t have a KOMCA sticker, leave this field blank.</string>
     <string name="komca_textfield_number_too_short">The number is too short.</string>
@@ -123,4 +123,26 @@
     <string name="title_edit_photocard">Edit photocard</string>
     <string name="title_show_all">Show all</string>
     <string name="title_collapse">Collapse</string>
+    <string name="navigation_profile">Profile</string>
+    <string name="screen_title_user_profile">User profile</string>
+    <string name="action_login">Log in</string>
+    <string name="filler_login">Log in to link your collection to the Google account.</string>
+    <string name="title_registration">Registration</string>
+    <string name="subtitle_create_new_account">Create a new account</string>
+    <string name="label_email" translatable="false">Email</string>
+    <string name="label_password">Password</string>
+    <string name="action_register">Register</string>
+    <string name="label_already_have_account">Already have an account?</string>
+    <string name="placeholder_password">Enter a password</string>
+    <string name="title_login">Log in</string>
+    <string name="subtitle_connect_to_account">Connect to an existing account</string>
+    <string name="label_dont_have_account">Don\'t have an account yet?</string>
+    <string name="email_validation_error_empty">Email can\'t be empty.</string>
+    <string name="email_validation_error_format">Invalid email format.</string>
+    <string name="password_validation_error_empty">Password can\'t be empty.</string>
+    <string name="password_validation_error_format">The password must be at least 8 characters long and contain at least one number.</string>
+    <string name="error_email_in_use">Email is already in use.</string>
+    <string name="unknown_error_prefix">Error:</string>
+    <string name="action_logout">Log out</string>
+    <string name="error_user_not_found">Invalid email or password.</string>
 </resources>

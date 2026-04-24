@@ -2,6 +2,14 @@ package com.vbshkn.ikollect.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.vbshkn.ikollect.domain.AppError
+import com.vbshkn.ikollect.data.remote.NetworkResult
+import com.vbshkn.ikollect.domain.model.AppUser
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 private const val TAG = "AuthRepository"
@@ -9,52 +17,37 @@ private const val TAG = "AuthRepository"
 class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth
 ) {
-    fun getUser(): FirebaseUser? {
-        return auth.currentUser
+    fun getUser(): Flow<NetworkResult<AppUser?>> = callbackFlow {
+        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            trySend(NetworkResult.Loading)
+            trySend(NetworkResult.Success(firebaseAuth.currentUser?.let {
+                AppUser(
+                    uid = it.uid,
+                    email = it.email ?: "",
+                    username = it.displayName,
+                    profilePictureUrl = it.photoUrl?.toString()
+                )
+            }))
+        }
+        auth.addAuthStateListener(authStateListener)
+
+        awaitClose {
+            auth.removeAuthStateListener(authStateListener)
+        }
     }
 
-    fun createUser(
+    suspend fun createUser(
         email: String,
-        password: String,
-        onSuccess: (FirebaseUser) -> Unit,
-        onFailure: (Exception) -> Unit
+        password: String
     ) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                android.util.Log.d(TAG, "createUser: ${task.isSuccessful}")
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    if (user != null) {
-                        onSuccess(user)
-                    } else {
-                        onFailure(Exception("User is null after successful creation"))
-                    }
-                } else {
-                    onFailure(task.exception ?: Exception("Unknown error during user creation"))
-                }
-            }
+        auth.createUserWithEmailAndPassword(email, password).await()
     }
 
-    fun signIn(
+    suspend fun signIn(
         email: String,
-        password: String,
-        onSuccess: (FirebaseUser) -> Unit,
-        onFailure: (Exception) -> Unit
+        password: String
     ) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                android.util.Log.d(TAG, "signIn: ${task.isSuccessful}")
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    if (user != null) {
-                        onSuccess(user)
-                    } else {
-                        onFailure(Exception("User is null after successful sign-in"))
-                    }
-                } else {
-                    onFailure(task.exception ?: Exception("Unknown error during sign-in"))
-                }
-            }
+        auth.signInWithEmailAndPassword(email, password).await()
     }
 
     fun signOut() {
@@ -94,7 +87,9 @@ class AuthRepository @Inject constructor(
                     if (task.isSuccessful) {
                         onSuccess()
                     } else {
-                        onFailure(task.exception ?: Exception("Unknown error during password update"))
+                        onFailure(
+                            task.exception ?: Exception("Unknown error during password update")
+                        )
                     }
                 }
         } else {

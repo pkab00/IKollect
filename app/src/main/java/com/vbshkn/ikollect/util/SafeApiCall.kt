@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.util
 
-import com.vbshkn.ikollect.data.AppError
+import com.vbshkn.ikollect.domain.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import retrofit2.Response
 

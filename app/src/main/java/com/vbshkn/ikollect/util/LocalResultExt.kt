@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.util
 
-import com.vbshkn.ikollect.data.AppError
+import com.vbshkn.ikollect.domain.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

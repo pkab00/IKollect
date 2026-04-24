@@ -27,7 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.presentation.composable.CommonTopBar
 import com.vbshkn.ikollect.presentation.composable.PhotocardItem
+import com.vbshkn.ikollect.util.UiText
 
 @Composable
 fun PhotocardsScreen(
@@ -48,7 +50,17 @@ fun PhotocardsScreen(
 
     Scaffold(
         topBar = {
-            TopBar(onEvent = viewModel::onEvent)
+            CommonTopBar(
+                title = UiText.StringResource(R.string.screen_title_photocards),
+                actions = {
+                    IconButton({ viewModel.onEvent(PhotocardsContract.Event.OnWizardClicked) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add),
+                            contentDescription = ""
+                        )
+                    }
+                }
+            )
         },
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -102,34 +114,4 @@ fun PhotocardsScreen(
             onDismiss = { viewModel.onEvent(PhotocardsContract.Event.OnPhotocardPreviewReleased) }
         )
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(
-    onEvent: (PhotocardsContract.Event) -> Unit
-) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.screen_title_photocards),
-                style = MaterialTheme.typography.titleLarge
-            )
-        },
-        actions = {
-            IconButton(
-                onClick = { onEvent(PhotocardsContract.Event.OnWizardClicked) }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_add),
-                    contentDescription = ""
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    )
 }

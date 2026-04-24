@@ -8,6 +8,7 @@ sealed interface Route {
     @Serializable data object Albums : Route
     @Serializable data object Photocards : Route
     @Serializable data object Artists : Route
+    @Serializable data object UserProfile : Route
     @Serializable data object AlbumCameraScreen : Route
 
     @Serializable data object KomcaScanner : Route
@@ -29,6 +30,11 @@ sealed interface Route {
         @Serializable data object Main : ArtistsFlow()
         @Serializable data object AllGroups : ArtistsFlow()
         @Serializable data object AllSoloists : ArtistsFlow()
+    }
+    @Serializable data object Auth : Route
+    @Serializable sealed class AuthFlow : Route {
+        @Serializable data object Login : AuthFlow()
+        @Serializable data object Register : AuthFlow()
     }
     @Serializable data class AlbumWizard(val candidate: AlbumCandidate) : Route
     @Serializable data object PhotocardWizard : Route

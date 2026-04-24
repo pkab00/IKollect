@@ -47,11 +47,12 @@ fun IKollectApp() {
     val bachStackEntity by navController.currentBackStackEntryAsState()
     val currentDestination = bachStackEntity?.destination
     val hideBottomNavBar = currentDestination?.hierarchy?.any {
-        it.hasRoute<Route.AlbumWizard>()
+                it.hasRoute<Route.AlbumWizard>()
                 || it.hasRoute<Route.PhotocardWizard>()
                 || it.hasRoute<Route.AlbumCameraScreen>()
                 || it.hasRoute<Route.PhotocardCameraScreen>()
                 || it.hasRoute<Route.KomcaScanner>()
+                || it.hasRoute<Route.Auth>()
     } == true
     val navSuiteType = if (hideBottomNavBar) {
         NavigationSuiteType.None

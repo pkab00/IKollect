@@ -41,6 +41,7 @@ import coil3.toBitmap
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 import com.vbshkn.ikollect.presentation.composable.CardGrid
+import com.vbshkn.ikollect.presentation.composable.CommonTopBar
 import com.vbshkn.ikollect.presentation.composable.EmptyCardGridFiller
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
@@ -57,7 +58,7 @@ fun AccountScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = { TopBar() },
+        topBar = { CommonTopBar(title = UiText.StringResource(R.string.screen_title_artists)) },
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
@@ -210,23 +211,4 @@ private fun ArtistBox(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar() {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.screen_title_artists),
-                style = MaterialTheme.typography.titleLarge
-            )
-        },
-        actions = {},
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    )
 }

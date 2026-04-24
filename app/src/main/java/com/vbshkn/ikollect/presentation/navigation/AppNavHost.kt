@@ -18,12 +18,13 @@ import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 import com.vbshkn.ikollect.presentation.feature.camera.KomcaScannerScreen
 import com.vbshkn.ikollect.presentation.feature.camera.PhotocardCameraScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsViewModel
-import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileScreen
-import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileViewModel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardScreen
+import com.vbshkn.ikollect.presentation.feature.userprofile.UserProfileScreen
+import com.vbshkn.ikollect.presentation.feature.userprofile.UserProfileViewModel
 import com.vbshkn.ikollect.presentation.navigation.graphs.albumProfileGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.artistsGraph
+import com.vbshkn.ikollect.presentation.navigation.graphs.authGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.photocardProfileGraph
 import kotlin.reflect.typeOf
 
@@ -47,6 +48,14 @@ fun AppNavHost(navController: NavHostController) {
                 viewModel = viewModel,
                 onNavigateToWizard = { navController.navigate(Route.PhotocardWizard) },
                 onNavigateToPhotocard = { navController.navigate(Route.PhotocardFlow.Profile(it)) }
+            )
+        }
+
+        composable<Route.UserProfile> {
+            val viewModel = hiltViewModel<UserProfileViewModel>()
+            UserProfileScreen(
+                viewModel = viewModel,
+                onNavigateToAuth = { navController.navigate(Route.AuthFlow.Login) }
             )
         }
 
@@ -115,5 +124,6 @@ fun AppNavHost(navController: NavHostController) {
         artistsGraph(navController)
         albumProfileGraph(navController)
         photocardProfileGraph(navController)
+        authGraph(navController)
     }
 }

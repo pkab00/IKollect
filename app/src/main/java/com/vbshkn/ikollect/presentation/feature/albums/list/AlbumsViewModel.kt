@@ -3,7 +3,7 @@ package com.vbshkn.ikollect.presentation.feature.albums.list
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.data.AppError
+import com.vbshkn.ikollect.domain.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.usecase.GetAllAlbumsUseCase
 import com.vbshkn.ikollect.domain.usecase.ScanAlbumBarcodeUseCase
