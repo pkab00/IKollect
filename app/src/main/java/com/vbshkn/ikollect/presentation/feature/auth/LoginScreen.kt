@@ -1,6 +1,9 @@
 package com.vbshkn.ikollect.presentation.feature.auth
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +21,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,8 +32,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -41,9 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.presentation.auth.GoogleAuthUIClient
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Effect
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Event
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @Composable
 fun LoginScreen(
@@ -52,11 +61,25 @@ fun LoginScreen(
     exitFlow: () -> Unit
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val googleAuthUIClient = viewModel.googleAuthUIClient
     val passwordVisible = remember { mutableStateOf(false) }
     val emailError = uiState.emailValidationError?.let { emailErrorHandler(it) }
     val passwordError = uiState.passwordValidationError?.let { passwordErrorHandler(it) }
 
+    val googleAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK) {
+                val intent = result.data ?: return@rememberLauncherForActivityResult
+                scope.launch {
+                    googleAuthUIClient.signInWithIntent(intent, onFinished = exitFlow)
+                }
+            }
+        }
+    )
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
@@ -65,6 +88,14 @@ fun LoginScreen(
                 is Effect.ExitAuthFlow -> exitFlow()
                 is Effect.ShowToast -> {
                     Toast.makeText(context, effect.message.asString(context), Toast.LENGTH_SHORT).show()
+                }
+                is Effect.StartGoogleSignIn -> {
+                    val intentSender = googleAuthUIClient.signIn()
+                    googleAuthLauncher.launch(
+                        IntentSenderRequest.Builder(
+                            intentSender ?: return@collect
+                        ).build()
+                    )
                 }
                 else -> {}
             }
@@ -163,6 +194,21 @@ fun LoginScreen(
                 .height(48.dp)
         ) {
             Text(stringResource(R.string.action_login), fontSize = 16.sp)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { viewModel.onEvent(Event.OnSignInWithGoogleClick) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF4285F4),
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+        ) {
+            Text(stringResource(R.string.action_google_sign_in), fontSize = 16.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))

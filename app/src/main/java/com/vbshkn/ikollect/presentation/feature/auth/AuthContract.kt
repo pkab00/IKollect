@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.auth
 
+import android.content.Intent
 import com.vbshkn.ikollect.util.UiText
 
 sealed interface AuthContract {
@@ -8,6 +9,7 @@ sealed interface AuthContract {
         object GoToLogin : Effect
         object ExitAuthFlow : Effect
         data class ShowToast(val message: UiText) : Effect
+        object StartGoogleSignIn : Effect
     }
 
     sealed interface Event {
@@ -17,5 +19,6 @@ sealed interface AuthContract {
         object OnDontHaveAccountClicked : Event
         object OnLoginClicked : Event
         object OnRegisterClicked : Event
+        object OnSignInWithGoogleClick : Event
     }
 }

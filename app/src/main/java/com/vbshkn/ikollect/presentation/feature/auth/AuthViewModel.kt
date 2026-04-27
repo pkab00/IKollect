@@ -10,7 +10,9 @@ import com.vbshkn.ikollect.domain.usecase.LogInUseCase
 import com.vbshkn.ikollect.domain.usecase.RegisterUserUseCase
 import com.vbshkn.ikollect.domain.usecase.ValidateEmailUseCase
 import com.vbshkn.ikollect.domain.usecase.ValidatePasswordUseCase
-import com.vbshkn.ikollect.util.UiText
+import com.vbshkn.ikollect.presentation.auth.GoogleAuthUIClient
+import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Effect.*
+import com.vbshkn.ikollect.util.UiText.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +22,8 @@ class AuthViewModel @Inject constructor(
     private val validateEmailUseCase: ValidateEmailUseCase,
     private val validatePasswordUseCase: ValidatePasswordUseCase,
     private val registerUserUseCase: RegisterUserUseCase,
-    private val logInUseCase: LogInUseCase
+    private val logInUseCase: LogInUseCase,
+    val googleAuthUIClient: GoogleAuthUIClient
 ) : BaseViewModel<AuthUIState, Event, Effect>(initialState = AuthUIState()) {
     init {
         validateInput()
@@ -35,25 +38,27 @@ class AuthViewModel @Inject constructor(
                 updateState { it.copy(password = event.password) }
             }
             is Event.OnAlreadyHaveAccountClicked -> {
-                sendEffect(Effect.GoToLogin)
+                sendEffect(GoToLogin)
             }
             is Event.OnDontHaveAccountClicked -> {
-                sendEffect(Effect.GoToRegistration)
+                sendEffect(GoToRegistration)
             }
             is Event.OnLoginClicked -> viewModelScope.launch {
                 updateState { it.copy(isLoading = true) }
                 val loginError = logInUseCase(uiState.value.email, uiState.value.password)
                 if (loginError == null) {
-                    sendEffect(Effect.ExitAuthFlow)
+                    sendEffect(ExitAuthFlow)
                 } else {
                     when (loginError) {
                         is UserAuthError.Login.InvalidUser -> {
-                            sendEffect(Effect.ShowToast(UiText.StringResource(R.string.error_user_not_found)))
+                            sendEffect(ShowToast(StringResource(R.string.error_user_not_found)))
                         }
                         is UserAuthError.Login.UnknownError -> {
-                            sendEffect(Effect.ShowToast(
-                                UiText.StringResource(R.string.unknown_error_prefix) + UiText.DynamicString(loginError.message)
-                            ))
+                            sendEffect(
+                                ShowToast(
+                                    StringResource(R.string.unknown_error_prefix) + DynamicString(loginError.message)
+                                )
+                            )
                         }
                     }
                 }
@@ -63,22 +68,27 @@ class AuthViewModel @Inject constructor(
                 updateState { it.copy(isLoading = true) }
                 val registrationError = registerUserUseCase(uiState.value.email, uiState.value.password)
                  if (registrationError == null) {
-                     sendEffect(Effect.ExitAuthFlow)
+                     sendEffect(ExitAuthFlow)
                  } else {
                      when (registrationError) {
                          is UserAuthError.Registration.EmailAlreadyInUse -> {
-                             sendEffect(Effect.ShowToast(UiText.StringResource(R.string.error_email_in_use)))
+                             sendEffect(ShowToast(StringResource(R.string.error_email_in_use)))
                              updateState { it.copy(email = "") }
                          }
                          is UserAuthError.Registration.UnknownError -> {
-                             sendEffect(Effect.ShowToast(
-                                 UiText.StringResource(R.string.unknown_error_prefix) + UiText.DynamicString(registrationError.message)
-                             ))
+                             sendEffect(
+                                 ShowToast(
+                                     StringResource(R.string.unknown_error_prefix) + DynamicString(registrationError.message)
+                                 )
+                             )
                          }
                          else -> {}
                      }
                  }
                 updateState { it.copy(isLoading = false) }
+            }
+            is Event.OnSignInWithGoogleClick -> {
+                sendEffect(StartGoogleSignIn)
             }
         }
     }

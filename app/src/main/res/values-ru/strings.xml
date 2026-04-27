@@ -137,4 +137,5 @@
     <string name="unknown_error_prefix">"Ошибка: "</string>
     <string name="action_logout">Выйти</string>
     <string name="error_user_not_found">Неверный email или пароль.</string>
+    <string name="action_google_sign_in">Войти с помощью Google</string>
 </resources>

@@ -145,4 +145,6 @@
     <string name="unknown_error_prefix">Error:</string>
     <string name="action_logout">Log out</string>
     <string name="error_user_not_found">Invalid email or password.</string>
+    <string name="default_web_client_id" translatable="false">1039899092925-9v1d0hkmcgfvm7jajnche9865gr4s6lb.apps.googleusercontent.com</string>
+    <string name="action_google_sign_in">Sign in with Google</string>
 </resources>

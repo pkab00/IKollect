@@ -11,7 +11,7 @@ class LogInUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(email: String, password: String): UserAuthError.Login? {
         return try {
-            authRepository.signIn(email, password)
+            authRepository.signInWithEmail(email, password)
             null
         } catch (e: Exception) {
             when (e) {
