@@ -13,6 +13,7 @@ sealed interface AuthContract {
     }
 
     sealed interface Event {
+        data class OnNicknameChanged(val nickname: String) : Event
         data class OnEmailChanged(val email: String) : Event
         data class OnPasswordChanged(val password: String) : Event
         object OnAlreadyHaveAccountClicked : Event

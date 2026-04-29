@@ -1,9 +1,11 @@
 package com.vbshkn.ikollect.presentation.feature.userprofile
 
+import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.GetUserProfileUseCase
 import com.vbshkn.ikollect.domain.usecase.LogOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,7 +32,7 @@ class UserProfileViewModel @Inject constructor(
             is UserProfileContract.Event.OnLogInClick -> {
                 sendEffect(UserProfileContract.Effect.GoToAuthScreen)
             }
-            is UserProfileContract.Event.OnLogOutClick -> {
+            is UserProfileContract.Event.OnLogOutClick -> viewModelScope.launch {
                 logOutUseCase()
             }
         }

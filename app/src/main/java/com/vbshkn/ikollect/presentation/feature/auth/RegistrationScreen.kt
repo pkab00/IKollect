@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -54,8 +55,13 @@ fun RegistrationScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val passwordVisible = remember { mutableStateOf(false) }
+
+    val nicknameError = uiState.nicknameValidationError?.let { nicknameErrorHandler(it) }
     val emailError = uiState.emailValidationError?.let { emailErrorHandler(it) }
     val passwordError = uiState.passwordValidationError?.let { passwordErrorHandler(it) }
+    val showNicknameError = nicknameError != null
+    val showEmailError = emailError != null && nicknameError == null
+    val showPasswordError = passwordError != null && emailError == null && nicknameError == null
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
@@ -96,6 +102,30 @@ fun RegistrationScreen(
         )
 
         OutlinedTextField(
+            value = uiState.nickname,
+            onValueChange = { viewModel.onEvent(Event.OnNicknameChanged(it)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            label = { Text(stringResource(R.string.label_nickname)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Nickname icon"
+                )
+            },
+            singleLine = true,
+            isError = showNicknameError,
+            supportingText = {
+                if (showNicknameError) {
+                    Text(text = nicknameError.asString(), color = MaterialTheme.colorScheme.error)
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
             value = uiState.email,
             onValueChange = { viewModel.onEvent(Event.OnEmailChanged(it)) },
             modifier = Modifier
@@ -111,9 +141,9 @@ fun RegistrationScreen(
             placeholder = { Text("example@mail.com") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
-            isError = emailError != null,
+            isError = showEmailError,
             supportingText = {
-                if (emailError != null) {
+                if (showEmailError) {
                     Text(text = emailError.asString(), color = MaterialTheme.colorScheme.error)
                 }
             }
@@ -144,9 +174,9 @@ fun RegistrationScreen(
                 }
             },
             singleLine = true,
-            isError = passwordError != null && emailError == null,
+            isError = showPasswordError,
             supportingText = {
-                if (passwordError != null && emailError == null) {
+                if (showPasswordError) {
                     Text(text = passwordError.asString(), color = MaterialTheme.colorScheme.error)
                 }
             }

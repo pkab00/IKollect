@@ -1,9 +1,8 @@
 package com.vbshkn.ikollect.domain.usecase
 
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.vbshkn.ikollect.data.repository.AuthRepository
 import com.vbshkn.ikollect.domain.UserAuthError
+import io.github.jan.supabase.auth.exception.AuthRestException
 import javax.inject.Inject
 
 class LogInUseCase @Inject constructor(
@@ -15,7 +14,7 @@ class LogInUseCase @Inject constructor(
             null
         } catch (e: Exception) {
             when (e) {
-                is FirebaseAuthInvalidUserException, is FirebaseAuthInvalidCredentialsException -> UserAuthError.Login.InvalidUser
+                is AuthRestException -> UserAuthError.Login.InvalidUser
                 else -> UserAuthError.Login.UnknownError(e.localizedMessage ?: "Unknown error")
             }
         }

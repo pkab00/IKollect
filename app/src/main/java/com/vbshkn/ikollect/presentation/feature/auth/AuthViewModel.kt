@@ -7,8 +7,10 @@ import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Effect
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Event
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.LogInUseCase
+import com.vbshkn.ikollect.domain.usecase.LogOutUseCase
 import com.vbshkn.ikollect.domain.usecase.RegisterUserUseCase
 import com.vbshkn.ikollect.domain.usecase.ValidateEmailUseCase
+import com.vbshkn.ikollect.domain.usecase.ValidateNicknameUseCase
 import com.vbshkn.ikollect.domain.usecase.ValidatePasswordUseCase
 import com.vbshkn.ikollect.presentation.auth.GoogleAuthUIClient
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Effect.*
@@ -19,10 +21,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    private val validateNicknameUseCase: ValidateNicknameUseCase,
     private val validateEmailUseCase: ValidateEmailUseCase,
     private val validatePasswordUseCase: ValidatePasswordUseCase,
     private val registerUserUseCase: RegisterUserUseCase,
     private val logInUseCase: LogInUseCase,
+    private val logOutUseCase: LogOutUseCase,
     val googleAuthUIClient: GoogleAuthUIClient
 ) : BaseViewModel<AuthUIState, Event, Effect>(initialState = AuthUIState()) {
     init {
@@ -31,6 +35,9 @@ class AuthViewModel @Inject constructor(
 
     override fun onEvent(event: Event) {
         when (event) {
+            is Event.OnNicknameChanged -> {
+                updateState { it.copy(nickname = event.nickname) }
+            }
             is Event.OnEmailChanged -> {
                 updateState { it.copy(email = event.email) }
             }
@@ -66,9 +73,12 @@ class AuthViewModel @Inject constructor(
             }
             is Event.OnRegisterClicked -> viewModelScope.launch {
                 updateState { it.copy(isLoading = true) }
-                val registrationError = registerUserUseCase(uiState.value.email, uiState.value.password)
+                val registrationError = registerUserUseCase(
+                    uiState.value.email, uiState.value.password, uiState.value.nickname
+                )
                  if (registrationError == null) {
-                     sendEffect(ExitAuthFlow)
+                     logOutUseCase()
+                     sendEffect(GoToLogin)
                  } else {
                      when (registrationError) {
                          is UserAuthError.Registration.EmailAlreadyInUse -> {
@@ -94,6 +104,14 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun validateInput() {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                val validationError = validateNicknameUseCase(state.nickname)
+                if (validationError != state.nicknameValidationError) {
+                    updateState { it.copy(nicknameValidationError = validationError) }
+                }
+            }
+        }
         viewModelScope.launch {
             uiState.collect { state ->
                 val validationError = validateEmailUseCase(state.email)

@@ -147,4 +147,7 @@
     <string name="error_user_not_found">Invalid email or password.</string>
     <string name="default_web_client_id" translatable="false">1039899092925-9v1d0hkmcgfvm7jajnche9865gr4s6lb.apps.googleusercontent.com</string>
     <string name="action_google_sign_in">Sign in with Google</string>
+    <string name="label_nickname">Nickname</string>
+    <string name="nickname_validation_error_empty">Enter a nickname.</string>
+    <string name="nickname_validation_error_format">Nickname should contain 3-25 letters, dights or special symbols (-, _,).</string>
 </resources>

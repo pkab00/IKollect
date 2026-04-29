@@ -110,6 +110,7 @@ fun LoggedInContent(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
+            Text(text = username ?: "")
             Text(text = email ?: "")
         }
         item {

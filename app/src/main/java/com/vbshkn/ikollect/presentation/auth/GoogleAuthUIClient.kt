@@ -6,20 +6,20 @@ import android.content.IntentSender
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.firebase.Firebase
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
-import com.vbshkn.ikollect.data.repository.AuthRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.builtin.IDToken
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class GoogleAuthUIClient @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val supabase: SupabaseClient
 ) {
     val oneTapClient: SignInClient by lazy { Identity.getSignInClient(context) }
-    private val auth = Firebase.auth
 
     suspend fun signIn(): IntentSender? {
         val result = try {
@@ -47,8 +47,10 @@ class GoogleAuthUIClient @Inject constructor(
     }
 
     suspend fun signInWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential).await()
+        supabase.auth.signInWith(IDToken) {
+            provider = Google
+            this.idToken = idToken
+        }
     }
 
     private fun buildSignInRequest(): BeginSignInRequest {

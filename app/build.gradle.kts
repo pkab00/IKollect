@@ -105,10 +105,10 @@ dependencies {
     // --- COLLAPSING TOOLBAR (by onebone on github) ---
     implementation(libs.toolbar.compose)
 
-    // --- FIREBASE ---
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
+    // --- SUPABASE ---
+    implementation(platform(libs.bom.supabase.kt))
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.ktor.client.android)
     implementation(libs.play.services.auth)
 
     testImplementation(libs.junit)

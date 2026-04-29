@@ -1,6 +1,5 @@
 package com.vbshkn.ikollect.domain.usecase
 
-import com.google.firebase.auth.FirebaseUser
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.repository.AuthRepository
 import com.vbshkn.ikollect.domain.model.AppUser

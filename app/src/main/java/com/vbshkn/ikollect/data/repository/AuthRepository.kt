@@ -1,122 +1,122 @@
 package com.vbshkn.ikollect.data.repository
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.model.AppUser
-import kotlinx.coroutines.channels.awaitClose
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.providers.builtin.IDToken
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.postgrest.from
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
 private const val TAG = "AuthRepository"
+private const val PROFILES_TABLE = "profiles"
 
 class AuthRepository @Inject constructor(
-    private val auth: FirebaseAuth
+    private val supabase: SupabaseClient
 ) {
-    fun getUser(): Flow<NetworkResult<AppUser?>> = callbackFlow {
-        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            trySend(NetworkResult.Loading)
-            trySend(NetworkResult.Success(firebaseAuth.currentUser?.let {
-                AppUser(
-                    uid = it.uid,
-                    email = it.email ?: "",
-                    username = it.displayName,
-                    profilePictureUrl = it.photoUrl?.toString()
-                )
-            }))
-        }
-        auth.addAuthStateListener(authStateListener)
+    private val auth = supabase.auth
+    private val postgrest = supabase.from(PROFILES_TABLE)
 
-        awaitClose {
-            auth.removeAuthStateListener(authStateListener)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getUser(): Flow<NetworkResult<AppUser?>> = auth.sessionStatus
+        .flatMapLatest { status ->
+            flow {
+                emit(NetworkResult.Loading)
+                when (status) {
+                    is SessionStatus.Authenticated -> {
+                        val user = status.session.user
+                        if (user != null) {
+                            try {
+                                val profile = postgrest
+                                    .select { filter { eq("id", user.id) } }
+                                    .decodeSingleOrNull<ProfileRemote>()
+
+                                emit(NetworkResult.Success(AppUser(
+                                    uid = user.id,
+                                    email = user.email ?: "",
+                                    username = profile?.nickname,
+                                    profilePictureUrl = null
+                                )))
+                            } catch (e: Exception) {
+                                emit(NetworkResult.Success(AppUser(
+                                    uid = user.id,
+                                    email = user.email ?: "",
+                                    username = null,
+                                    profilePictureUrl = null
+                                )))
+                            }
+                        } else {
+                            emit(NetworkResult.Success(null))
+                        }
+                    }
+                    else -> emit(NetworkResult.Success(null))
+                }
+            }
+        }
+
+    suspend fun createUser(email: String, password: String, nickname: String) {
+        auth.signUpWith(Email) {
+            this.email = email
+            this.password = password
+        }
+
+        val userId = auth.currentUserOrNull()?.id
+        if (userId != null) {
+            postgrest.insert(ProfileRemote(id = userId, nickname = nickname))
         }
     }
 
-    suspend fun createUser(
-        email: String,
-        password: String
-    ) {
-        auth.createUserWithEmailAndPassword(email, password).await()
-    }
-
-    suspend fun signInWithEmail(
-        email: String,
-        password: String
-    ) {
-        auth.signInWithEmailAndPassword(email, password).await()
+    suspend fun signInWithEmail(email: String, password: String) {
+        auth.signInWith(Email) {
+            this.email = email
+            this.password = password
+        }
     }
 
     suspend fun signInWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential).await()
+        auth.signInWith(IDToken) {
+            this.idToken = idToken
+            provider = Google
+        }
     }
 
-    fun signOut() {
+    suspend fun signOut() {
         auth.signOut()
     }
 
     fun isUserSignedIn(): Boolean {
-        return auth.currentUser != null
+        return auth.currentSessionOrNull() != null
     }
 
-    fun sendPasswordResetEmail(
-        email: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                android.util.Log.d(TAG, "sendPasswordResetEmail: ${task.isSuccessful}")
-                if (task.isSuccessful) {
-                    onSuccess()
-                } else {
-                    onFailure(task.exception ?: Exception("Unknown error during password reset"))
-                }
-            }
+    suspend fun sendPasswordResetEmail(email: String) {
+        auth.resetPasswordForEmail(email)
     }
 
-    fun updatePassword(
-        newPassword: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        val user = auth.currentUser
-        if (user != null) {
-            user.updatePassword(newPassword)
-                .addOnCompleteListener { task ->
-                    android.util.Log.d(TAG, "updatePassword: ${task.isSuccessful}")
-                    if (task.isSuccessful) {
-                        onSuccess()
-                    } else {
-                        onFailure(
-                            task.exception ?: Exception("Unknown error during password update")
-                        )
-                    }
-                }
-        } else {
-            onFailure(Exception("No user is currently signed in"))
+    suspend fun updatePassword(newPassword: String) {
+        auth.updateUser {
+            password = newPassword
         }
     }
 
-    fun deleteUser(
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        val user = auth.currentUser
-        if (user != null) {
-            user.delete()
-                .addOnCompleteListener { task ->
-                    android.util.Log.d(TAG, "deleteUser: ${task.isSuccessful}")
-                    if (task.isSuccessful) {
-                        onSuccess()
-                    } else {
-                        onFailure(task.exception ?: Exception("Unknown error during user deletion"))
-                    }
-                }
-        } else {
-            onFailure(Exception("No user is currently signed in"))
+    suspend fun deleteUser() {
+        val userId = auth.currentUserOrNull()?.id
+        if (userId != null) {
+            postgrest.delete { filter { eq("id", userId) } }
+            // Для полного удаления аккаунта (Auth) потребуется админский доступ или Edge Function
         }
     }
 }
+
+@Serializable
+data class ProfileRemote(
+    val id: String,
+    val nickname: String? = null
+)
