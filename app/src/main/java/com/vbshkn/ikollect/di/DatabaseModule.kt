@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.vbshkn.ikollect.data.local.dao.AlbumDao
 import com.vbshkn.ikollect.data.local.dao.ArtistDao
+import com.vbshkn.ikollect.data.local.dao.CrossRefDao
 import com.vbshkn.ikollect.data.local.dao.PhotocardDao
 import com.vbshkn.ikollect.data.local.dao.TagDao
 import com.vbshkn.ikollect.data.local.model.entity.TagEntity
@@ -84,4 +85,7 @@ object DatabaseModule {
 
     @Provides
     fun provideTagDao(db: AppDatabase): TagDao = db.tagDao()
+
+    @Provides
+    fun provideCrossRefDao(db: AppDatabase): CrossRefDao = db.crossRefDao()
 }

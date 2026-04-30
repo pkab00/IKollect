@@ -2,6 +2,7 @@ package com.vbshkn.ikollect.presentation.feature.auth
 
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.data.SyncManager
 import com.vbshkn.ikollect.domain.UserAuthError
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Effect
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Event
@@ -27,7 +28,8 @@ class AuthViewModel @Inject constructor(
     private val registerUserUseCase: RegisterUserUseCase,
     private val logInUseCase: LogInUseCase,
     private val logOutUseCase: LogOutUseCase,
-    val googleAuthUIClient: GoogleAuthUIClient
+    val googleAuthUIClient: GoogleAuthUIClient,
+    private val syncManager: SyncManager
 ) : BaseViewModel<AuthUIState, Event, Effect>(initialState = AuthUIState()) {
     init {
         validateInput()
@@ -54,6 +56,7 @@ class AuthViewModel @Inject constructor(
                 updateState { it.copy(isLoading = true) }
                 val loginError = logInUseCase(uiState.value.email, uiState.value.password)
                 if (loginError == null) {
+                    syncManager.performInitialSync().join()
                     sendEffect(ExitAuthFlow)
                 } else {
                     when (loginError) {
@@ -99,6 +102,12 @@ class AuthViewModel @Inject constructor(
             }
             is Event.OnSignInWithGoogleClick -> {
                 sendEffect(StartGoogleSignIn)
+            }
+            is Event.OnSignInWithGoogleSucceed -> viewModelScope.launch {
+                updateState { it.copy(isLoading = true) }
+                syncManager.performInitialSync().join()
+                updateState { it.copy(isLoading = false) }
+                sendEffect(ExitAuthFlow)
             }
         }
     }

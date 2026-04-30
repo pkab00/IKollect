@@ -47,6 +47,9 @@ interface AlbumDao {
     fun getWithFullDetail(id: Long): Flow<AlbumFullDetail?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: List<AlbumEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlbum(albumEntity: AlbumEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -66,4 +69,7 @@ interface AlbumDao {
 
     @Update
     suspend fun updateAlbum(albumEntity: AlbumEntity)
+
+    @Query("DELETE FROM AlbumEntity")
+    suspend fun clearAll()
 }

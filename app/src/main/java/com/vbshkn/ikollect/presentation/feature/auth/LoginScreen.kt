@@ -75,7 +75,10 @@ fun LoginScreen(
             if (result.resultCode == android.app.Activity.RESULT_OK) {
                 val intent = result.data ?: return@rememberLauncherForActivityResult
                 scope.launch {
-                    googleAuthUIClient.signInWithIntent(intent, onFinished = exitFlow)
+                    googleAuthUIClient.signInWithIntent(
+                        intent = intent,
+                        onFinished = { viewModel.onEvent(Event.OnSignInWithGoogleSucceed) }
+                    )
                 }
             }
         }

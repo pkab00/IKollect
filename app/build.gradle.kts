@@ -108,6 +108,7 @@ dependencies {
     // --- SUPABASE ---
     implementation(platform(libs.bom.supabase.kt))
     implementation(libs.supabase.postgrest.kt)
+    implementation(libs.supabase.storage.kt)
     implementation(libs.ktor.client.android)
     implementation(libs.play.services.auth)
 

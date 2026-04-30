@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistWithPhotocards
@@ -40,6 +41,9 @@ interface PhotocardDao {
     suspend fun insertPhotocard(photocardEntity: PhotocardEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: List<PhotocardEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertArtistLinks(links: List<PhotocardArtistCrossRef>)
 
     @Transaction
@@ -54,4 +58,7 @@ interface PhotocardDao {
         insertArtistLinks(links)
         return photocardId
     }
+
+    @Query("DELETE FROM PhotocardEntity")
+    suspend fun clearAll()
 }

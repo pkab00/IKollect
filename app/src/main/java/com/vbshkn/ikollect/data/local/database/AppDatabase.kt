@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.vbshkn.ikollect.data.local.dao.AlbumDao
 import com.vbshkn.ikollect.data.local.dao.ArtistDao
+import com.vbshkn.ikollect.data.local.dao.CrossRefDao
 import com.vbshkn.ikollect.data.local.dao.PhotocardDao
 import com.vbshkn.ikollect.data.local.dao.TagDao
 import com.vbshkn.ikollect.data.local.model.entity.AlbumArtistCrossRef
@@ -36,4 +37,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun albumDao(): AlbumDao
     abstract fun photocardDao(): PhotocardDao
     abstract fun tagDao(): TagDao
+    abstract fun crossRefDao(): CrossRefDao
 }

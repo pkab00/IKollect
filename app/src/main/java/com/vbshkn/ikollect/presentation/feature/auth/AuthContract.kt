@@ -21,5 +21,6 @@ sealed interface AuthContract {
         object OnLoginClicked : Event
         object OnRegisterClicked : Event
         object OnSignInWithGoogleClick : Event
+        object OnSignInWithGoogleSucceed : Event
     }
 }

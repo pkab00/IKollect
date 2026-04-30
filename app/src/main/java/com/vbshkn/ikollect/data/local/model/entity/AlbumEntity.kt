@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-class AlbumEntity(
+data class AlbumEntity(
     @PrimaryKey(autoGenerate = true)
     val albumId: Long = 0,
     val masterId: Long,

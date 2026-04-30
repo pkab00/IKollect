@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.vbshkn.ikollect" />
+                  <option name="mobileSdkAppId" value="1:1039899092925:android:85b8ea194ddf55564414d4" />
+                  <option name="projectId" value="ikllct" />
+                  <option name="projectNumber" value="1039899092925" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
