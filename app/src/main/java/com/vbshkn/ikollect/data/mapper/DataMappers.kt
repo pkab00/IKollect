@@ -120,7 +120,8 @@ object DataMappers {
             name = this.name,
             isGroup = this.isGroup,
             isFavorite = this.isFavorite,
-            imageUrl = this.profileImage
+            imageUrl = this.profileImage,
+            isSynchronized = false
         )
     }
 

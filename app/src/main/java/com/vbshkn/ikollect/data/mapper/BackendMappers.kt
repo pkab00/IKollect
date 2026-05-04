@@ -121,7 +121,7 @@ object BackendMappers {
         return PhotocardTagCrossRefBackend(
             photocardId = this.photocardId,
             tagId = this.tagId,
-            userId = userId
+            ownerId = userId
         )
     }
 

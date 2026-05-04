@@ -22,5 +22,6 @@ import androidx.room.ForeignKey
 )
 data class ArtistArtistCrossRef (
     val groupId: Long,
-    val memberId: Long
+    val memberId: Long,
+    val isSynchronized: Boolean = false
 )

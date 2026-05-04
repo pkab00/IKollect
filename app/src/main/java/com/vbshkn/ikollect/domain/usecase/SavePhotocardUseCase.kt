@@ -28,6 +28,7 @@ class SavePhotocardUseCase @Inject constructor(
             isFavorite = false,
             imageUrl = savedImage,
             userNote = candidate.userNote,
+            isSynchronized = false
         )
 
         db.withTransaction {

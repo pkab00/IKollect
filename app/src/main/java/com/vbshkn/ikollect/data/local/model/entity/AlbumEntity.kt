@@ -16,5 +16,6 @@ data class AlbumEntity(
     val isFavorite: Boolean,
     val imageUrl: String?,
     val userNote: String?,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val isSynchronized: Boolean = false
 )

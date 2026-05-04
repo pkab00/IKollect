@@ -42,10 +42,11 @@ object DatabaseModule {
             "tag_duplicate" to 0xFFB0BEC5     // Muted Slate
         ).mapIndexed { index, pair ->
                 TagEntity(
-                    tagId = (index + 1).toLong(),
+                    tagId = -(index + 1).toLong(),
                     isSystemTag = true,
                     tagName = pair.first,
-                    tagColor = Color(pair.second)
+                    tagColor = Color(pair.second),
+                    isSynchronized = true
                 )
             }
 

@@ -22,5 +22,6 @@ import androidx.room.ForeignKey
 )
 data class AlbumArtistCrossRef(
     val albumId: Long,
-    val artistId: Long
+    val artistId: Long,
+    val isSynchronized: Boolean = false
 )

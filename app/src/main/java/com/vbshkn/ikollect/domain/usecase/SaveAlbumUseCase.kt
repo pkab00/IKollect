@@ -42,7 +42,8 @@ class SaveAlbumUseCase @Inject constructor(
                 releaseDate = albumCandidate.releaseDate,
                 isFavorite = albumCandidate.isFavorite,
                 imageUrl = coverUri,
-                userNote = albumCandidate.userNote
+                userNote = albumCandidate.userNote,
+                isSynchronized = false
             )
             val artistIds = albumCandidate.artistCandidates.map { it.artistId }
             albumRepository.insertToDatabase(albumEntity, artistIds)

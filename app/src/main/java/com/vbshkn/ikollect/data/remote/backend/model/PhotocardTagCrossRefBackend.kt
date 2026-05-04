@@ -9,6 +9,8 @@ data class PhotocardTagCrossRefBackend(
     val photocardId: Long,
     @SerialName("tag_id")
     val tagId: Long,
-    @SerialName("user_id")
-    val userId: String? = null
+    @SerialName("creator_id")
+    val creatorId: String? = null,
+    @SerialName("owner_id")
+    val ownerId: String? = null
 )

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistMinimalDetail
 import com.vbshkn.ikollect.data.local.model.entity.ArtistArtistCrossRef
@@ -50,6 +51,9 @@ interface ArtistDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(entities: List<ArtistEntity>)
 
+    @Update
+    suspend fun updateAll(entities: List<ArtistEntity>)
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertGroupLinks(links: List<ArtistArtistCrossRef>)
 
@@ -59,7 +63,7 @@ interface ArtistDao {
         groupId: Long
     ) {
         insert(member)
-        insertGroupLinks(listOf(ArtistArtistCrossRef(groupId, member.artistId)))
+        insertGroupLinks(listOf(ArtistArtistCrossRef(groupId, member.artistId, false)))
     }
 
     @Query("DELETE FROM ArtistEntity")

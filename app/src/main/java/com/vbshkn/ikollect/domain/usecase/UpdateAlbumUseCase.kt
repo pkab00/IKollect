@@ -1,12 +1,16 @@
 package com.vbshkn.ikollect.domain.usecase
 
+import androidx.room.withTransaction
+import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.repository.ImageRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class UpdateAlbumUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
-    private val imageRepository: ImageRepository
+    private val imageRepository: ImageRepository,
+    private val db: AppDatabase
 ) {
     suspend operator fun invoke(
         id: Long,
@@ -16,19 +20,22 @@ class UpdateAlbumUseCase @Inject constructor(
         userNotes: String,
         image: String?,
         oldImage: String?
-    ) {
+    ) = db.withTransaction {
         var imagePath: String? = null
         if (image != oldImage) {
             imagePath = image?.let { imageRepository.saveToInternalStorage(it) }
             oldImage?.let { imageRepository.deleteFromInternalStorage(it) }
         }
-        albumRepository.updateAlbum(
-            id = id,
-            name = name,
-            version = version,
-            komcaNumber = komcaNumber,
-            userNotes = userNotes,
-            imagePath = imagePath ?: oldImage
-        )
+
+        val updatedEntity = albumRepository
+            .getEntity(id).first()?.copy(
+                name = name,
+                version = version,
+                komcaNumber = komcaNumber,
+                userNote = userNotes,
+                imageUrl = imagePath ?: oldImage,
+                isSynchronized = false
+            ) ?: return@withTransaction
+        albumRepository.updateAlbum(updatedEntity)
     }
 }

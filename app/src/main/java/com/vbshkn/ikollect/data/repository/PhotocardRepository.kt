@@ -26,23 +26,11 @@ class PhotocardRepository @Inject constructor(
         return photocardLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
     }
 
-    suspend fun updatePhotocard(
-        id: Long,
-        image: String?,
-        photocardName: String,
-        userNotes: String,
-    ) {
-        val original = photocardLocalDS.getById(id).first() ?: return
-        val updated = PhotocardEntity(
-            photocardId = id,
-            albumId = original.albumId,
-            ownerId = original.ownerId,
-            displayName = photocardName,
-            isFavorite = original.isFavorite,
-            imageUrl = image,
-            userNote = userNotes,
-            savingTimestamp = original.savingTimestamp
-        )
+    fun getEntity(id: Long): Flow<PhotocardEntity?> {
+        return photocardLocalDS.getById(id)
+    }
+
+    suspend fun updatePhotocard(updated: PhotocardEntity) {
         photocardLocalDS.update(updated)
     }
 

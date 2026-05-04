@@ -5,6 +5,7 @@ import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.repository.ImageRepository
 import com.vbshkn.ikollect.data.repository.PhotocardRepository
 import com.vbshkn.ikollect.data.repository.TagRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class UpdatePhotocardUseCase @Inject constructor(
@@ -28,12 +29,15 @@ class UpdatePhotocardUseCase @Inject constructor(
             oldImage?.let { imageRepository.deleteFromInternalStorage(it) }
         }
 
-        photocardRepository.updatePhotocard(
-            id = id,
-            image = imagePath,
-            photocardName = photocardName,
-            userNotes = userNotes
-        )
+        val updatedEntity = photocardRepository
+            .getEntity(id).first()?.copy(
+                imageUrl = imagePath,
+                displayName = photocardName,
+                userNote = userNotes,
+                isSynchronized = false
+            ) ?: return@withTransaction
+
+        photocardRepository.updatePhotocard(updatedEntity)
 
         tagRepository.updateLinks(
             photocardId = id,

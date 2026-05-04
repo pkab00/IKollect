@@ -27,7 +27,7 @@ class TagRepository @Inject constructor(
         tagIds: List<Long>,
     ) {
         val tagRelations = tagIds.map { tagId ->
-            PhotocardTagCrossRef(photocardId, tagId)
+            PhotocardTagCrossRef(photocardId, tagId, false)
         }
         tagLocalDS.insertTagLinks(tagRelations)
     }

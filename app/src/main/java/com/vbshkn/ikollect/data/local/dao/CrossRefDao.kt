@@ -3,6 +3,7 @@ package com.vbshkn.ikollect.data.local.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.vbshkn.ikollect.data.local.model.entity.AlbumArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.ArtistArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardArtistCrossRef
@@ -22,6 +23,18 @@ interface CrossRefDao {
 
     @Query("SELECT * FROM PhotocardTagCrossRef")
     fun getPhotocardTag(): Flow<List<PhotocardTagCrossRef>>
+
+    @Update
+    suspend fun updateAlbumArtist(updated: List<AlbumArtistCrossRef>)
+
+    @Update
+    suspend fun updateArtistArtist(updated: List<ArtistArtistCrossRef>)
+
+    @Update
+    suspend fun updatePhotocardArtist(updated: List<PhotocardArtistCrossRef>)
+
+    @Update
+    suspend fun updatePhotocardTag(updated: List<PhotocardTagCrossRef>)
 
     @Query("DELETE FROM AlbumArtistCrossRef")
     suspend fun clearAlbumArtist()

@@ -22,5 +22,6 @@ import androidx.room.ForeignKey
 )
 data class PhotocardTagCrossRef(
     val photocardId: Long,
-    val tagId: Long
+    val tagId: Long,
+    val isSynchronized: Boolean = false
 )

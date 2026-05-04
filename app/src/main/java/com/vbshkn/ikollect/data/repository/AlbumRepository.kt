@@ -49,6 +49,10 @@ class AlbumRepository @Inject constructor(
         return data.releaseDetailsResponse.styles.any { style -> validStyles.contains(style.lowercase()) }
     }
 
+    fun getEntity(id: Long): Flow<AlbumEntity?> {
+        return albumLocalDS.getById(id)
+    }
+
     fun getAllAlbums(): Flow<NetworkResult<List<AlbumDetails>>> {
         return albumLocalDS.getAllWithArtists()
             .asLocalResult { albums ->
@@ -76,28 +80,7 @@ class AlbumRepository @Inject constructor(
         albumLocalDS.insertAlbumWithArtists(album, artistIds)
     }
 
-    suspend fun updateAlbum(
-        id: Long,
-        name: String,
-        version: String,
-        komcaNumber: String,
-        userNotes: String,
-        imagePath: String?
-    ) {
-        val original = albumLocalDS.getById(id).first() ?: return
-        val updated = AlbumEntity(
-            albumId = original.albumId,
-            masterId = original.masterId,
-            barcodeNumber = original.barcodeNumber,
-            komcaNumber = komcaNumber,
-            name = name,
-            version = version,
-            releaseDate = original.releaseDate,
-            isFavorite = original.isFavorite,
-            imageUrl = imagePath,
-            userNote = userNotes,
-            timestamp = original.timestamp
-        )
+    suspend fun updateAlbum(updated: AlbumEntity) {
         albumLocalDS.updateAlbum(updated)
     }
 }

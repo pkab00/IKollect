@@ -49,6 +49,9 @@ interface AlbumDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(entities: List<AlbumEntity>)
 
+    @Update
+    suspend fun updateAll(entities: List<AlbumEntity>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlbum(albumEntity: AlbumEntity): Long
 
@@ -62,7 +65,7 @@ interface AlbumDao {
     ) {
         val generatedId = insertAlbum(albumEntity)
         val links = artistIds.map { artistId ->
-            AlbumArtistCrossRef(albumId = generatedId, artistId = artistId)
+            AlbumArtistCrossRef(albumId = generatedId, artistId = artistId, isSynchronized = false)
         }
         insertArtistLinks(links)
     }

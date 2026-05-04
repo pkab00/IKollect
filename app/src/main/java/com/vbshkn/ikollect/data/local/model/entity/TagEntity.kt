@@ -10,5 +10,6 @@ data class TagEntity (
     val tagId: Long = 0,
     val isSystemTag: Boolean = false,
     val tagName: String,
-    val tagColor: Color
+    val tagColor: Color,
+    val isSynchronized: Boolean = false
 )

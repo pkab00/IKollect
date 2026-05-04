@@ -2,7 +2,7 @@ package com.vbshkn.ikollect.presentation.feature.auth
 
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.data.SyncManager
+import com.vbshkn.ikollect.data.background.SyncManager
 import com.vbshkn.ikollect.domain.UserAuthError
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Effect
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Event

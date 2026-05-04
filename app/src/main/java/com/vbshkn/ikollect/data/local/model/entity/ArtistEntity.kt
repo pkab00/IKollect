@@ -10,5 +10,6 @@ data class ArtistEntity(
     val name: String,
     val isGroup: Boolean,
     val isFavorite: Boolean,
-    val imageUrl: String?
+    val imageUrl: String?,
+    val isSynchronized: Boolean = false
 )

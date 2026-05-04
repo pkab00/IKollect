@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.material3)
     ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // --- RETROFIT ---
@@ -111,6 +112,10 @@ dependencies {
     implementation(libs.supabase.storage.kt)
     implementation(libs.ktor.client.android)
     implementation(libs.play.services.auth)
+
+    // --- WORKMANAGER ---
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
