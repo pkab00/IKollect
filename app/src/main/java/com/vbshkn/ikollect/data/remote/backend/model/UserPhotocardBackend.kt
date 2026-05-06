@@ -21,6 +21,10 @@ data class UserPhotocardBackend(
     val imageUrl: String? = null,
     @SerialName("user_note")
     val userNote: String? = null,
-    @SerialName("saving_timestamp")
-    val savingTimestamp: String? = null
+    @SerialName("created_at")
+    val createdAt: String? = null,
+    @SerialName("updated_at")
+    val updatedAt: String? = null,
+    @SerialName("is_deleted")
+    val isDeleted: Boolean = false
 )

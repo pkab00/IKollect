@@ -6,15 +6,18 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
+import androidx.room.Upsert
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardTagCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.TagEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TagDao {
-    @Query("SELECT * FROM TagEntity")
+    @Query("SELECT * FROM TagEntity WHERE isDeleted = 0")
     fun getAll(): Flow<List<TagEntity>>
+
+    @Query("SELECT * FROM TagEntity WHERE isSynchronized = 0 AND isSystemTag = 0")
+    fun getUnSynchronized(): Flow<List<TagEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: TagEntity)
@@ -25,12 +28,18 @@ interface TagDao {
     @Update
     suspend fun updateAll(entities: List<TagEntity>)
 
+    @Upsert
+    suspend fun upsertAll(entities: List<TagEntity>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTagLinks(links: List<PhotocardTagCrossRef>)
+    suspend fun upsertTagLinks(links: List<PhotocardTagCrossRef>)
 
     @Delete
     suspend fun deleteLink(link: PhotocardTagCrossRef)
 
     @Query("DELETE FROM tagentity")
     suspend fun clearAll()
+
+    @Query("DELETE FROM tagentity WHERE isDeleted = 1")
+    suspend fun clearDeleted()
 }

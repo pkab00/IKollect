@@ -10,5 +10,11 @@ data class UserArtistSettingsBackend(
     @SerialName("artist_id")
     val artistId: Long,
     @SerialName("is_favorite")
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    @SerialName("created_at")
+    val createdAt: String? = null,
+    @SerialName("updated_at")
+    val updatedAt: String? = null,
+    @SerialName("is_deleted")
+    val isDeleted: Boolean = false
 )

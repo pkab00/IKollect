@@ -26,5 +26,9 @@ data class UserAlbumBackend(
     @SerialName("user_note")
     val userNote: String? = null,
     @SerialName("created_at")
-    val createdAt: String? = null // ISO string
+    val createdAt: String? = null,
+    @SerialName("updated_at")
+    val updatedAt: String? = null,
+    @SerialName("is_deleted")
+    val isDeleted: Boolean = false
 )

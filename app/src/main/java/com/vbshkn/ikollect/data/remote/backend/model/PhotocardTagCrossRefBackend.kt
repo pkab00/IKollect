@@ -12,5 +12,11 @@ data class PhotocardTagCrossRefBackend(
     @SerialName("creator_id")
     val creatorId: String? = null,
     @SerialName("owner_id")
-    val ownerId: String? = null
+    val ownerId: String? = null,
+    @SerialName("created_at")
+    val createdAt: String? = null,
+    @SerialName("updated_at")
+    val updatedAt: String? = null,
+    @SerialName("is_deleted")
+    val isDeleted: Boolean = false
 )

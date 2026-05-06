@@ -26,21 +26,30 @@ object BackendMappers {
     fun AlbumArtistCrossRefBackend.toEntity(): AlbumArtistCrossRef {
         return AlbumArtistCrossRef(
             albumId = this.albumId,
-            artistId = this.artistId
+            artistId = this.artistId,
+            createdAt = this.createdAt.toTimeMillis(),
+            updatedAt = this.updatedAt.toTimeMillis(),
+            isDeleted = this.isDeleted
         )
     }
 
     fun PhotocardArtistCrossRefBackend.toEntity(): PhotocardArtistCrossRef {
         return PhotocardArtistCrossRef(
             photocardId = this.photocardId,
-            artistId = this.artistId
+            artistId = this.artistId,
+            createdAt = this.createdAt.toTimeMillis(),
+            updatedAt = this.updatedAt.toTimeMillis(),
+            isDeleted = this.isDeleted
         )
     }
 
     fun PhotocardTagCrossRefBackend.toEntity(): PhotocardTagCrossRef {
         return PhotocardTagCrossRef(
             photocardId = this.photocardId,
-            tagId = this.tagId
+            tagId = this.tagId,
+            createdAt = this.createdAt.toTimeMillis(),
+            updatedAt = this.updatedAt.toTimeMillis(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -50,14 +59,18 @@ object BackendMappers {
             name = this.name,
             isGroup = this.isGroup,
             isFavorite = settings.isFavorite,
-            imageUrl = this.imageUrl
+            imageUrl = this.imageUrl,
+            createdAt = this.createdAt.toTimeMillis(),
+            updatedAt = this.updatedAt.toTimeMillis()
         )
     }
 
     fun GlobalArtistHierarchyBackend.toEntity(): ArtistArtistCrossRef {
         return ArtistArtistCrossRef(
             groupId = this.groupId,
-            memberId = this.memberId
+            memberId = this.memberId,
+            createdAt = this.createdAt.toTimeMillis(),
+            updatedAt = this.updatedAt.toTimeMillis()
         )
     }
 
@@ -66,7 +79,10 @@ object BackendMappers {
             tagId = this.tagId ?: 0L,
             isSystemTag = this.isSystemTag,
             tagName = this.tagName,
-            tagColor = Color(this.tagColor)
+            tagColor = Color(this.tagColor),
+            createdAt = this.createdAt.toTimeMillis(),
+            updatedAt = this.updatedAt.toTimeMillis(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -82,7 +98,9 @@ object BackendMappers {
             isFavorite = this.isFavorite,
             imageUrl = this.imageUrl,
             userNote = this.userNote,
-            timestamp = this.createdAt?.let { Instant.parse(it).toEpochMilliseconds() } ?: 0L
+            createdAt = this.createdAt.toTimeMillis(),
+            updatedAt = this.updatedAt.toTimeMillis(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -95,7 +113,9 @@ object BackendMappers {
             isFavorite = this.isFavorite,
             imageUrl = this.imageUrl,
             userNote = this.userNote,
-            savingTimestamp = this.savingTimestamp?.let { Instant.parse(it).toEpochMilliseconds() } ?: 0L
+            createdAt = this.createdAt.toTimeMillis(),
+            updatedAt = this.updatedAt.toTimeMillis(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -105,7 +125,10 @@ object BackendMappers {
         return AlbumArtistCrossRefBackend(
             albumId = this.albumId,
             artistId = this.artistId,
-            userId = userId
+            userId = userId,
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -113,7 +136,10 @@ object BackendMappers {
         return PhotocardArtistCrossRefBackend(
             photocardId = this.photocardId,
             artistId = this.artistId,
-            userId = userId
+            userId = userId,
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -121,7 +147,10 @@ object BackendMappers {
         return PhotocardTagCrossRefBackend(
             photocardId = this.photocardId,
             tagId = this.tagId,
-            ownerId = userId
+            ownerId = userId,
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -138,14 +167,18 @@ object BackendMappers {
             isFavorite = this.isFavorite,
             imageUrl = this.imageUrl,
             userNote = this.userNote,
-            createdAt = Instant.fromEpochMilliseconds(this.timestamp).toString()
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz(),
+            isDeleted = this.isDeleted
         )
     }
 
     fun ArtistArtistCrossRef.toBackend(): GlobalArtistHierarchyBackend {
         return GlobalArtistHierarchyBackend(
             groupId = this.groupId,
-            memberId = this.memberId
+            memberId = this.memberId,
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz()
         )
     }
 
@@ -154,7 +187,9 @@ object BackendMappers {
             artistId = this.artistId,
             name = this.name,
             isGroup = this.isGroup,
-            imageUrl = this.imageUrl
+            imageUrl = this.imageUrl,
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz()
         )
     }
 
@@ -162,7 +197,10 @@ object BackendMappers {
         return UserArtistSettingsBackend(
             userId = userId,
             artistId = this.artistId,
-            isFavorite = this.isFavorite
+            isFavorite = this.isFavorite,
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -176,7 +214,9 @@ object BackendMappers {
             isFavorite = this.isFavorite,
             imageUrl = this.imageUrl,
             userNote = this.userNote,
-            savingTimestamp = Instant.fromEpochMilliseconds(this.savingTimestamp).toString()
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz(),
+            isDeleted = this.isDeleted
         )
     }
 
@@ -186,7 +226,18 @@ object BackendMappers {
             userId = userId,
             isSystemTag = false,
             tagName = this.tagName,
-            tagColor = this.tagColor.value.toLong()
+            tagColor = this.tagColor.value.toLong(),
+            createdAt = this.createdAt.toTimestamptz(),
+            updatedAt = this.updatedAt.toTimestamptz(),
+            isDeleted = this.isDeleted
         )
     }
+}
+
+fun String?.toTimeMillis(): Long {
+    return this?.let { Instant.parse(it).toEpochMilliseconds() } ?: 0L
+}
+
+fun Long.toTimestamptz(): String {
+    return Instant.fromEpochMilliseconds(this).toString()
 }

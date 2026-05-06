@@ -18,7 +18,7 @@ class TagLocalDataSource @Inject constructor(
     }
 
     suspend fun insertTagLinks(links: List<PhotocardTagCrossRef>) {
-        dao.insertTagLinks(links)
+        dao.upsertTagLinks(links)
     }
 
     suspend fun deleteLink(link: PhotocardTagCrossRef) {

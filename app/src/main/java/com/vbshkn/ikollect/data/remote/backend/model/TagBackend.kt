@@ -14,5 +14,11 @@ data class TagBackend(
     @SerialName("tag_name")
     val tagName: String,
     @SerialName("tag_color")
-    val tagColor: Long
+    val tagColor: Long,
+    @SerialName("created_at")
+    val createdAt: String? = null,
+    @SerialName("updated_at")
+    val updatedAt: String? = null,
+    @SerialName("is_deleted")
+    val isDeleted: Boolean = false
 )

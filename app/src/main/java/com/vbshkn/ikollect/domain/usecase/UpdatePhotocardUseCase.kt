@@ -5,6 +5,7 @@ import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.repository.ImageRepository
 import com.vbshkn.ikollect.data.repository.PhotocardRepository
 import com.vbshkn.ikollect.data.repository.TagRepository
+import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -34,7 +35,8 @@ class UpdatePhotocardUseCase @Inject constructor(
                 imageUrl = imagePath,
                 displayName = photocardName,
                 userNote = userNotes,
-                isSynchronized = false
+                isSynchronized = false,
+                updatedAt = now()
             ) ?: return@withTransaction
 
         photocardRepository.updatePhotocard(updatedEntity)

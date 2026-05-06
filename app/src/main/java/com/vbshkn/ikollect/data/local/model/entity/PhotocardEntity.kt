@@ -3,6 +3,7 @@ package com.vbshkn.ikollect.data.local.model.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import kotlin.time.Instant
 
 @Entity(foreignKeys = [
     ForeignKey(
@@ -30,5 +31,8 @@ data class PhotocardEntity(
     val imageUrl: String?,
     val userNote: String?,
     val savingTimestamp: Long = System.currentTimeMillis(),
-    val isSynchronized: Boolean = false
+    val isSynchronized: Boolean = false,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis(),
+    val isDeleted: Boolean = false
 )

@@ -17,7 +17,7 @@ class BackgroundSyncWorker @AssistedInject constructor(
         val userId = inputData.getString("USER_ID") ?: return Result.failure()
 
         return try {
-            syncManager.performScheduledSync(userId)
+            syncManager.performHandshake(userId)
             Result.success()
         } catch (e: Exception) {
             if (runAttemptCount < 3) Result.retry() else Result.failure()

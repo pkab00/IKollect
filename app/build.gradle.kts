@@ -110,12 +110,16 @@ dependencies {
     implementation(platform(libs.bom.supabase.kt))
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.supabase.storage.kt)
+    implementation(libs.supabase.realtime.kt)
     implementation(libs.ktor.client.android)
     implementation(libs.play.services.auth)
 
     // --- WORKMANAGER ---
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
+
+    // ---DATASTORE ---
+    implementation(libs.androidx.datastore.preferences)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

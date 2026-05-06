@@ -8,6 +8,7 @@ import com.vbshkn.ikollect.data.local.dao.CrossRefDao
 import com.vbshkn.ikollect.data.local.dao.PhotocardDao
 import com.vbshkn.ikollect.data.local.dao.TagDao
 import com.vbshkn.ikollect.data.local.database.AppDatabase
+import com.vbshkn.ikollect.data.local.datastore.ServiceLogStorage
 import com.vbshkn.ikollect.data.local.model.entity.AlbumArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.entity.ArtistArtistCrossRef
@@ -18,6 +19,8 @@ import com.vbshkn.ikollect.data.local.model.entity.PhotocardTagCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.TagEntity
 import com.vbshkn.ikollect.data.mapper.BackendMappers.toBackend
 import com.vbshkn.ikollect.data.mapper.BackendMappers.toEntity
+import com.vbshkn.ikollect.data.mapper.toTimeMillis
+import com.vbshkn.ikollect.data.mapper.toTimestamptz
 import com.vbshkn.ikollect.data.remote.backend.BackendTables
 import com.vbshkn.ikollect.data.remote.backend.dao.BackendStorageDao
 import com.vbshkn.ikollect.data.remote.backend.model.AlbumArtistCrossRefBackend
@@ -40,6 +43,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.time.Instant
 
 private const val TAG = "SyncManager"
 
@@ -52,7 +57,8 @@ class SyncManager @Inject constructor(
     private val photocardDao: PhotocardDao,
     private val tagDao: TagDao,
     private val crossRefDao: CrossRefDao,
-    private val backendStorageDao: BackendStorageDao
+    private val backendStorageDao: BackendStorageDao,
+    private val serviceLogStorage: ServiceLogStorage
 ) {
     fun performInitialSync() = scope.launch {
         supabase.auth.awaitInitialization()
@@ -156,10 +162,10 @@ class SyncManager @Inject constructor(
                 tagDao.insertAll(localTags)
                 albumDao.insertAll(localAlbums)
                 photocardDao.insertAll(localPhotocards)
-                artistDao.insertGroupLinks(localArtistArtistCF)
-                albumDao.insertArtistLinks(localAlbumArtistCF)
-                photocardDao.insertArtistLinks(localPhotocardArtistCF)
-                tagDao.insertTagLinks(localPhotocardTagCF)
+                artistDao.upsertGroupLinks(localArtistArtistCF)
+                albumDao.upsertArtistLinks(localAlbumArtistCF)
+                photocardDao.upsertArtistLinks(localPhotocardArtistCF)
+                tagDao.upsertTagLinks(localPhotocardTagCF)
                 Log.d(TAG, "Download from remote completed")
 
             } finally {
@@ -268,31 +274,45 @@ class SyncManager @Inject constructor(
         }
     }
 
-    suspend fun performScheduledSync(userId: String) {
-        var tablesUpdated = 0
-        // LOADING LOCAL DATA
-        Log.i(TAG, "Starting scheduled sync...")
+    // ================================ HANDSHAKE =================================================
+
+    suspend fun performHandshake(userId: String) {
+        Log.i(TAG, "Starting scheduled handshake...")
+        val startPoint = now()
+        val lastSyncTimestamp = serviceLogStorage.getLastSyncTimestamp().first()
+            ?: Instant.fromEpochMilliseconds(0).toString()
+        Log.d(TAG, "Last sync at $lastSyncTimestamp")
+
+        Log.i(TAG, "Step 1: Local -> Remote")
+        uploadLocalChanges(userId)
+        Log.i(TAG, "Step 2: Local <- Remote")
+        val finishTimestamp = downloadRemoteChanges(lastSyncTimestamp)
+        Log.i(TAG, "Step 3: Clear Deleted")
+        clearDeleted()
+
+        // Updating last sync timestamp
+        // Decreasing it a lil bit just to avoid blind zone
+        val finishPoint = now()
+        val totalSeconds = (finishPoint - startPoint) / 1000f
+        finishTimestamp?.let {
+            serviceLogStorage.updateLastSyncTimestamp(finishTimestamp.toTimestamptz())
+            Log.i(TAG, "Handshake finished at ${finishTimestamp.toTimestamptz()}\nTook $totalSeconds seconds to perform")
+        }
+    }
+
+    private suspend fun uploadLocalChanges(userId: String) {
         val localPackage = try {
             database.withTransaction {
-                val localAlbumArtist = crossRefDao.getAlbumArtist().first().filter { !it.isSynchronized }
-                val localArtistArtist = crossRefDao.getArtistArtist().first().filter { !it.isSynchronized }
-                val localPhotocardArtist = crossRefDao.getPhotocardArtist().first().filter { !it.isSynchronized }
-                val localPhotocardTag = crossRefDao.getPhotocardTag().first().filter { !it.isSynchronized }
-                val localAlbums = albumDao.getAll().first().filter { !it.isSynchronized }
-                val localArtists = artistDao.getAll().first().filter { !it.isSynchronized }
-                val localPhotocards = photocardDao.getAll().first().filter { !it.isSynchronized }
-                val localTags = tagDao.getAll().first().filter { !it.isSynchronized && !it.isSystemTag }
+                val localAlbumArtist = crossRefDao.getAlbumArtistUnSynchronized().first()
+                val localArtistArtist = crossRefDao.getArtistArtistUnSynchronized().first()
+                val localPhotocardArtist = crossRefDao.getPhotocardArtistUnSynchronized().first()
+                val localPhotocardTag = crossRefDao.getPhotocardTagUnSynchronized().first()
+                val localAlbums = albumDao.getUnSynchronized().first()
+                val localArtists = artistDao.getUnSynchronized().first()
+                val localPhotocards = photocardDao.getUnSynchronized().first()
+                val localTags = tagDao.getUnSynchronized().first()
 
-                LocalDataPackage(
-                    localAlbumArtist,
-                    localArtistArtist,
-                    localPhotocardArtist,
-                    localPhotocardTag,
-                    localAlbums,
-                    localArtists,
-                    localPhotocards,
-                    localTags
-                )
+                LocalDataPackage(localAlbumArtist, localArtistArtist, localPhotocardArtist, localPhotocardTag, localAlbums, localArtists, localPhotocards, localTags)
             }
         } catch (e: Exception) {
             Log.d(TAG, "Failed to download local data: ", e)
@@ -318,7 +338,6 @@ class SyncManager @Inject constructor(
                 } else { it }
             }
         )
-
         // MAPPING TO REMOTE
         val backendAlbumArtistCR = modifiedPackage.albumArtistCR.map { it.toBackend(userId) }
         val backendPhotocardArtistCR = modifiedPackage.photocardArtistCR.map { it.toBackend(userId) }
@@ -333,13 +352,18 @@ class SyncManager @Inject constructor(
         // SYNCHRONIZING
         if (backendArtist.isNotEmpty() || backendArtistSettings.isNotEmpty() || backendArtistHierarchy.isNotEmpty()) {
             try {
-                supabase.from(BackendTables.GLOBAL.ARTISTS).upsert(backendArtist)
-                supabase.from(BackendTables.USER.ARTIST_SETTINGS).upsert(backendArtistSettings)
-                supabase.from(BackendTables.GLOBAL.ARTIST_HIERARCHY).upsert(backendArtistHierarchy)
+                val artistsUpd = supabase.from(BackendTables.GLOBAL.ARTISTS).upsert(backendArtist) { select() }
+                    .decodeList<GlobalArtistBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
+                val artistSettingsUpd = supabase.from(BackendTables.USER.ARTIST_SETTINGS).upsert(backendArtistSettings) { select() }
+                    .decodeList<UserArtistSettingsBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
+                val hierarchyUpd = supabase.from(BackendTables.GLOBAL.ARTIST_HIERARCHY).upsert(backendArtistHierarchy) { select() }
+                    .decodeList<GlobalArtistHierarchyBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
                 database.withTransaction {
-                    artistDao.updateAll(localPackage.artists.map { it.copy(isSynchronized = true) })
-                    crossRefDao.updateArtistArtist(localPackage.artistArtistCR.map { it.copy(isSynchronized = true) })
-                    tablesUpdated += 3
+                    artistDao.updateAll(localPackage.artists.map { it.copy(isSynchronized = true, updatedAt = max(artistsUpd, artistSettingsUpd)) })
+                    crossRefDao.updateArtistArtist(localPackage.artistArtistCR.map { it.copy(isSynchronized = true, updatedAt = hierarchyUpd) })
                 }
                 Log.d(TAG, "Artists were synchronized as planned, local flags updated")
             } catch (e: Exception) {
@@ -348,12 +372,15 @@ class SyncManager @Inject constructor(
         }
         if (backendAlbums.isNotEmpty() || backendAlbumArtistCR.isNotEmpty()) {
             try {
-                supabase.from(BackendTables.USER.ALBUMS).upsert(backendAlbums)
-                supabase.from(BackendTables.CROSSREF.ALBUM_ARTIST).upsert(backendAlbumArtistCR)
+                val albumsUpd = supabase.from(BackendTables.USER.ALBUMS).upsert(backendAlbums) { select() }
+                    .decodeList<UserAlbumBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
+                val albumArtistUpd = supabase.from(BackendTables.CROSSREF.ALBUM_ARTIST).upsert(backendAlbumArtistCR) { select() }
+                    .decodeList<AlbumArtistCrossRefBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
                 database.withTransaction {
-                    albumDao.updateAll(modifiedPackage.albums.map { it.copy(isSynchronized = true) })
-                    crossRefDao.updateAlbumArtist(localPackage.albumArtistCR.map { it.copy(isSynchronized = true) })
-                    tablesUpdated += 2
+                    albumDao.updateAll(modifiedPackage.albums.map { it.copy(isSynchronized = true, updatedAt = albumsUpd) })
+                    crossRefDao.updateAlbumArtist(localPackage.albumArtistCR.map { it.copy(isSynchronized = true, updatedAt = albumArtistUpd) })
                 }
                 Log.d(TAG, "Albums were synchronized as planned, local flags updated")
             } catch (e: Exception) {
@@ -362,14 +389,19 @@ class SyncManager @Inject constructor(
         }
         if (backendPhotocards.isNotEmpty() || backendPhotocardArtistCR.isNotEmpty()) {
             try {
-                supabase.from(BackendTables.USER.PHOTOCARDS).upsert(backendPhotocards)
-                supabase.from(BackendTables.CROSSREF.PHOTOCARD_ARTIST).upsert(backendPhotocardArtistCR)
-                supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG).upsert(backendPhotocardTagCR)
+                val photocardsUpd = supabase.from(BackendTables.USER.PHOTOCARDS).upsert(backendPhotocards) { select() }
+                    .decodeList<UserPhotocardBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
+                val photocardArtistUpd = supabase.from(BackendTables.CROSSREF.PHOTOCARD_ARTIST).upsert(backendPhotocardArtistCR) { select() }
+                    .decodeList<PhotocardArtistCrossRefBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
+                val photocardTagUpd = supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG).upsert(backendPhotocardTagCR) { select() }
+                    .decodeList<PhotocardArtistCrossRefBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
                 database.withTransaction {
-                    photocardDao.updateAll(localPackage.photocards.map { it.copy(isSynchronized = true) })
-                    crossRefDao.updatePhotocardArtist(localPackage.photocardArtistCR.map { it.copy(isSynchronized = true) })
-                    crossRefDao.updatePhotocardTag(localPackage.photocardTagCR.map { it.copy(isSynchronized = true) })
-                    tablesUpdated += 3
+                    photocardDao.updateAll(localPackage.photocards.map { it.copy(isSynchronized = true, updatedAt = photocardsUpd) })
+                    crossRefDao.updatePhotocardArtist(localPackage.photocardArtistCR.map { it.copy(isSynchronized = true, updatedAt = photocardArtistUpd) })
+                    crossRefDao.updatePhotocardTag(localPackage.photocardTagCR.map { it.copy(isSynchronized = true, updatedAt = photocardTagUpd) })
                 }
                 Log.d(TAG, "Photocards were synchronized as planned, local flags updated")
             } catch (e: Exception) {
@@ -378,17 +410,128 @@ class SyncManager @Inject constructor(
         }
         if (backendTags.isNotEmpty() || backendPhotocardTagCR.isNotEmpty()) {
             try {
-                supabase.from(BackendTables.TAGS).upsert(backendTags)
+                val tagsUpd = supabase.from(BackendTables.TAGS).upsert(backendTags) { select() }
+                    .decodeList<TagBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
                 database.withTransaction {
-                    tagDao.updateAll(localPackage.tags.map { it.copy(isSynchronized = true) })
-                    tablesUpdated += 1
+                    tagDao.updateAll(localPackage.tags.map { it.copy(isSynchronized = true, updatedAt = tagsUpd) })
                 }
                 Log.d(TAG, "Tags were synchronized as planned, local flags updated")
             } catch (e: Exception) {
                 Log.d(TAG, "Failed to update tags: ", e)
             }
         }
-        Log.i(TAG, "Sync finished, $tablesUpdated remote tables were actualized")
+        Log.i(TAG, "Sync finished, remote tables were actualized")
+    }
+
+    private suspend fun downloadRemoteChanges(lastSyncTimestamp: String): Long? {
+        // DOWNLOADING FROM REMOTE
+        val backPackage = try {
+            coroutineScope {
+                val backendArtistSettings = supabase.from(BackendTables.USER.ARTIST_SETTINGS)
+                    .select { filter { UserArtistSettingsBackend::updatedAt gt lastSyncTimestamp } }
+                    .decodeList<UserArtistSettingsBackend>()
+                val userArtistIds = backendArtistSettings.map { it.artistId }
+                val backendArtists = supabase.from(BackendTables.GLOBAL.ARTISTS)
+                    .select { filter { GlobalArtistBackend::artistId isIn userArtistIds } }
+                    .decodeList<GlobalArtistBackend>()
+                val backendArtistHierarchy = supabase.from(BackendTables.GLOBAL.ARTIST_HIERARCHY)
+                    .select {
+                        filter {
+                            and {
+                                GlobalArtistHierarchyBackend::groupId isIn userArtistIds
+                                GlobalArtistHierarchyBackend::memberId isIn userArtistIds
+                                GlobalArtistHierarchyBackend::updatedAt gt lastSyncTimestamp
+                            }
+                        }
+                    }
+                    .decodeList<GlobalArtistHierarchyBackend>()
+                val backendAlbums = supabase.from(BackendTables.USER.ALBUMS)
+                    .select { filter { UserAlbumBackend::updatedAt gt lastSyncTimestamp } }
+                    .decodeList<UserAlbumBackend>()
+                val backendPhotocards = supabase.from(BackendTables.USER.PHOTOCARDS)
+                    .select { filter { UserPhotocardBackend::updatedAt gt lastSyncTimestamp } }
+                    .decodeList<UserPhotocardBackend>()
+                val backendAACrossRef = supabase.from(BackendTables.CROSSREF.ALBUM_ARTIST)
+                    .select { filter { AlbumArtistCrossRefBackend::updatedAt gt lastSyncTimestamp } }
+                    .decodeList<AlbumArtistCrossRefBackend>()
+                val backendPACrossRef = supabase.from(BackendTables.CROSSREF.PHOTOCARD_ARTIST)
+                    .select { filter { PhotocardArtistCrossRefBackend::updatedAt gt lastSyncTimestamp } }
+                    .decodeList<PhotocardArtistCrossRefBackend>()
+                val backendPTCrossRef = supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG)
+                    .select { filter { PhotocardTagCrossRefBackend::updatedAt gt lastSyncTimestamp } }
+                    .decodeList<PhotocardTagCrossRefBackend>()
+                val backendTags = supabase.from(BackendTables.TAGS)
+                    .select { filter { TagBackend::updatedAt gt lastSyncTimestamp } }
+                    .decodeList<TagBackend>()
+
+                BackendDataPackage(backendArtists, backendArtistHierarchy, backendAlbums, backendArtistSettings, backendPhotocards, backendAACrossRef, backendPACrossRef, backendPTCrossRef, backendTags)
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to download data from remote: ", e)
+            return null
+        }
+
+        // MAPPING TO LOCAL ENTITIES
+        val settingsMap = backPackage.artistSettings.associateBy { it.artistId }
+        val localArtists = backPackage.artists.mapNotNull { artist ->
+            val settings = settingsMap[artist.artistId]
+            settings?.let { artist.toEntity(it) }
+        }
+        val localTags = backPackage.tags.map { it.toEntity() }
+        val localAlbums = backPackage.albums.map { it.toEntity() }
+        val localPhotocards = backPackage.photocards.map { it.toEntity() }
+        val localArtistArtistCF = backPackage.artistHierarchy.map { it.toEntity() }
+        val localAlbumArtistCF = backPackage.albumArtistCR.map { it.toEntity() }
+        val localPhotocardArtistCF = backPackage.photocardArtistCR.map { it.toEntity() }
+        val localPhotocardTagCF = backPackage.photocardTagCR.map { it.toEntity() }
+
+        // UPDATE THE LOCAL DATABASE
+        database.withTransaction {
+            try {
+                artistDao.upsertAll(localArtists)
+                tagDao.upsertAll(localTags)
+                albumDao.upsertAll(localAlbums)
+                photocardDao.upsertAll(localPhotocards)
+                artistDao.upsertGroupLinks(localArtistArtistCF)
+                albumDao.upsertArtistLinks(localAlbumArtistCF)
+                photocardDao.upsertArtistLinks(localPhotocardArtistCF)
+                tagDao.upsertTagLinks(localPhotocardTagCF)
+                Log.d(TAG, "Download from remote completed")
+
+            } catch (e: Exception) {
+                Log.d(TAG, "Failed to save remote data: ", e)
+                return@withTransaction null
+            }
+        }
+
+        val allTimes = mutableListOf<Long>()
+        with(allTimes) {
+            addAll(localArtists.map { it.updatedAt })
+            addAll(localAlbums.map { it.updatedAt })
+            addAll(localTags.map { it.updatedAt })
+            addAll(localPhotocards.map { it.updatedAt })
+            addAll(localArtistArtistCF.map { it.updatedAt })
+            addAll(localAlbumArtistCF.map { it.updatedAt })
+            addAll(localPhotocardArtistCF.map { it.updatedAt })
+            addAll(localPhotocardTagCF.map { it.updatedAt })
+        }
+        val syncTimestamp = allTimes.maxOrNull()
+        return syncTimestamp
+    }
+
+    private suspend fun clearDeleted() {
+        database.withTransaction {
+            try {
+                photocardDao.clearDeleted()
+                albumDao.clearDeleted()
+                tagDao.clearDeleted()
+                artistDao.clearDeleted()
+                Log.d(TAG, "Cleared all entities marked as deleted")
+            } catch (e: Exception) {
+                Log.d(TAG, "Failed to clear deleted data: ", e)
+            }
+        }
     }
 }
 
@@ -417,3 +560,11 @@ class SyncManager @Inject constructor(
         val photocards: List<PhotocardEntity>,
         val tags: List<TagEntity>
     )
+
+private fun now(): Long {
+    return System.currentTimeMillis()
+}
+
+private fun nowStr(): String {
+    return now().toTimestamptz()
+}

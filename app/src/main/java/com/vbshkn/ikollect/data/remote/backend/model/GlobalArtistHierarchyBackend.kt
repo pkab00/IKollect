@@ -8,5 +8,9 @@ data class GlobalArtistHierarchyBackend(
     @SerialName("group_id")
     val groupId: Long,
     @SerialName("member_id")
-    val memberId: Long
+    val memberId: Long,
+    @SerialName("created_at")
+    val createdAt: String? = null,
+    @SerialName("updated_at")
+    val updatedAt: String? = null
 )

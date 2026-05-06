@@ -8,6 +8,7 @@ import com.vbshkn.ikollect.data.mapper.DataMappers.toDomain
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.model.TagItem
 import com.vbshkn.ikollect.util.asLocalResult
+import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -27,7 +28,7 @@ class TagRepository @Inject constructor(
         tagIds: List<Long>,
     ) {
         val tagRelations = tagIds.map { tagId ->
-            PhotocardTagCrossRef(photocardId, tagId, false)
+            PhotocardTagCrossRef(photocardId, tagId, false, updatedAt = now())
         }
         tagLocalDS.insertTagLinks(tagRelations)
     }

@@ -2,6 +2,7 @@ package com.vbshkn.ikollect.data.local.model.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import kotlin.time.Instant
 
 @Entity(
     primaryKeys = ["photocardId", "artistId"],
@@ -23,5 +24,8 @@ import androidx.room.ForeignKey
 data class PhotocardArtistCrossRef(
     val photocardId: Long,
     val artistId: Long,
-    val isSynchronized: Boolean = false
+    val isSynchronized: Boolean = false,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis(),
+    val isDeleted: Boolean = false
 )

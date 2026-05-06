@@ -11,5 +11,9 @@ data class GlobalArtistBackend(
     @SerialName("is_group")
     val isGroup: Boolean = false,
     @SerialName("image_url")
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    @SerialName("created_at")
+    val createdAt: String? = null,
+    @SerialName("updated_at")
+    val updatedAt: String? = null
 )

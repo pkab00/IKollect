@@ -10,5 +10,11 @@ data class AlbumArtistCrossRefBackend(
     @SerialName("artist_id")
     val artistId: Long,
     @SerialName("user_id")
-    val userId: String? = null
+    val userId: String? = null,
+    @SerialName("created_at")
+    val createdAt: String? = null,
+    @SerialName("updated_at")
+    val updatedAt: String? = null,
+    @SerialName("is_deleted")
+    val isDeleted: Boolean = false
 )

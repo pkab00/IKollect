@@ -12,17 +12,29 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CrossRefDao {
-    @Query("SELECT * FROM AlbumArtistCrossRef")
+    @Query("SELECT * FROM AlbumArtistCrossRef WHERE isDeleted = 0")
     fun getAlbumArtist(): Flow<List<AlbumArtistCrossRef>>
 
-    @Query("SELECT * FROM ArtistArtistCrossRef")
+    @Query("SELECT * FROM ArtistArtistCrossRef WHERE isDeleted = 0")
     fun getArtistArtist(): Flow<List<ArtistArtistCrossRef>>
 
-    @Query("SELECT * FROM PhotocardArtistCrossRef")
+    @Query("SELECT * FROM PhotocardArtistCrossRef WHERE isDeleted = 0")
     fun getPhotocardArtist(): Flow<List<PhotocardArtistCrossRef>>
 
-    @Query("SELECT * FROM PhotocardTagCrossRef")
+    @Query("SELECT * FROM PhotocardTagCrossRef WHERE isDeleted = 0")
     fun getPhotocardTag(): Flow<List<PhotocardTagCrossRef>>
+
+    @Query("SELECT * FROM AlbumArtistCrossRef WHERE isSynchronized = 0")
+    fun getAlbumArtistUnSynchronized(): Flow<List<AlbumArtistCrossRef>>
+
+    @Query("SELECT * FROM ArtistArtistCrossRef WHERE isSynchronized = 0")
+    fun getArtistArtistUnSynchronized(): Flow<List<ArtistArtistCrossRef>>
+
+    @Query("SELECT * FROM PhotocardArtistCrossRef WHERE isSynchronized = 0")
+    fun getPhotocardArtistUnSynchronized(): Flow<List<PhotocardArtistCrossRef>>
+
+    @Query("SELECT * FROM PhotocardTagCrossRef WHERE isSynchronized = 0")
+    fun getPhotocardTagUnSynchronized(): Flow<List<PhotocardTagCrossRef>>
 
     @Update
     suspend fun updateAlbumArtist(updated: List<AlbumArtistCrossRef>)

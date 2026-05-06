@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.repository.ImageRepository
+import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -31,10 +32,11 @@ class UpdateAlbumUseCase @Inject constructor(
             .getEntity(id).first()?.copy(
                 name = name,
                 version = version,
-                komcaNumber = komcaNumber,
+                komcaNumber = komcaNumber.ifBlank { null },
                 userNote = userNotes,
                 imageUrl = imagePath ?: oldImage,
-                isSynchronized = false
+                isSynchronized = false,
+                updatedAt = now()
             ) ?: return@withTransaction
         albumRepository.updateAlbum(updatedEntity)
     }

@@ -98,7 +98,7 @@ object DataMappers {
             isFavorite = this.album.isFavorite,
             coverImage = this.album.imageUrl,
             userNote = this.album.userNote ?: "",
-            savingTimestamp = this.album.timestamp
+            savingTimestamp = this.album.createdAt
         )
     }
 
@@ -110,7 +110,7 @@ object DataMappers {
             version = this.version ?: "",
             isFavorite = this.isFavorite,
             imageUrl = this.imageUrl ?: "",
-            timestamp = this.timestamp
+            timestamp = this.createdAt
         )
     }
 
