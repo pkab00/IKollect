@@ -8,11 +8,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.presentation.feature.artists.list.AccountScreen
+import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsScreen
 import com.vbshkn.ikollect.presentation.feature.artists.list.AllArtistsScreen
+import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsContract
 import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsViewModel
 import com.vbshkn.ikollect.presentation.navigation.Route
 import com.vbshkn.ikollect.util.sharedHiltViewModel
+import androidx.compose.runtime.collectAsState
 
 fun NavGraphBuilder.artistsGraph(navController: NavHostController) {
     navigation<Route.Artists>(
@@ -21,7 +23,8 @@ fun NavGraphBuilder.artistsGraph(navController: NavHostController) {
         composable<Route.ArtistsFlow.Main> { backStackEntry ->
             val sharedViewModel =
                 backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.Artists>(navController)
-            AccountScreen(
+
+            ArtistsScreen(
                 viewModel = sharedViewModel,
                 onShowAllGroupsClick = { navController.navigate(Route.ArtistsFlow.AllGroups) },
                 onShowAllSoloistsClick = { navController.navigate(Route.ArtistsFlow.AllSoloists) },
@@ -31,11 +34,12 @@ fun NavGraphBuilder.artistsGraph(navController: NavHostController) {
         composable<Route.ArtistsFlow.AllGroups> { backStackEntry ->
             val sharedViewModel =
                 backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.Artists>(navController)
-            val state by sharedViewModel.uiState.collectAsStateWithLifecycle()
+            val uiState by sharedViewModel.uiState.collectAsStateWithLifecycle()
 
             AllArtistsScreen(
                 title = stringResource(R.string.title_groups),
-                artists = state.groupOverviews,
+                viewModel = sharedViewModel,
+                artists = uiState.groupOverviews,
                 onArtistClick = { id -> navController.navigate(Route.ArtistProfile(id)) },
                 onBackClick = { navController.popBackStack() }
             )
@@ -43,13 +47,14 @@ fun NavGraphBuilder.artistsGraph(navController: NavHostController) {
         composable<Route.ArtistsFlow.AllSoloists> { backStackEntry ->
             val sharedViewModel =
                 backStackEntry.sharedHiltViewModel<ArtistsViewModel, Route.Artists>(navController)
-            val state by sharedViewModel.uiState.collectAsStateWithLifecycle()
+            val uiState by sharedViewModel.uiState.collectAsStateWithLifecycle()
 
             AllArtistsScreen(
                 title = stringResource(R.string.title_soloists),
-                artists = state.soloistsOverviews,
+                viewModel = sharedViewModel,
+                artists = uiState.soloistsOverviews,
                 onArtistClick = { id -> navController.navigate(Route.ArtistProfile(id)) },
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
             )
         }
     }

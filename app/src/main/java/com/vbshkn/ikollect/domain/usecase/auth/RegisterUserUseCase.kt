@@ -1,8 +1,9 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.auth
 
 import com.vbshkn.ikollect.data.repository.AuthRepository
-import com.vbshkn.ikollect.domain.UserAuthError
+import com.vbshkn.ikollect.domain.error.UserAuthError
 import io.github.jan.supabase.auth.exception.AuthRestException
+import java.net.ConnectException
 import javax.inject.Inject
 
 class RegisterUserUseCase @Inject constructor(
@@ -22,7 +23,7 @@ class RegisterUserUseCase @Inject constructor(
                         else -> UserAuthError.Registration.UnknownError(e.description ?: "Registration error.")
                     }
                 }
-                is java.net.ConnectException -> UserAuthError.Registration.UnknownError("Server connection error.")
+                is ConnectException -> UserAuthError.Registration.UnknownError("Server connection error.")
                 else -> UserAuthError.Registration.UnknownError(e.localizedMessage ?: "Unknown error.")
             }
         }

@@ -2,11 +2,11 @@ package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
-import com.vbshkn.ikollect.domain.usecase.GetAllTagsUseCase
-import com.vbshkn.ikollect.domain.usecase.GetArtistAlbumListUseCase
-import com.vbshkn.ikollect.domain.usecase.GetArtistListUseCase
-import com.vbshkn.ikollect.domain.usecase.GetGroupMembersUseCase
-import com.vbshkn.ikollect.domain.usecase.SavePhotocardUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAllTagsUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetArtistAlbumListUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetArtistListUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetGroupMembersUseCase
+import com.vbshkn.ikollect.domain.usecase.save.SavePhotocardUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.presentation.theme.inversePrimaryDark
 import dagger.hilt.android.lifecycle.HiltViewModel

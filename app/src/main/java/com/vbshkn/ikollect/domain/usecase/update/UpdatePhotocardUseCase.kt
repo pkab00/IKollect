@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.update
 
 import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
@@ -24,10 +24,13 @@ class UpdatePhotocardUseCase @Inject constructor(
         oldTagIds: Set<Long>,
         selectedTagIds: Set<Long>
     ) = db.withTransaction {
-        var imagePath: String? = null
+        var imagePath: String?
         if (image != oldImage) {
             imagePath = image?.let { imageRepository.saveToInternalStorage(it) }
             oldImage?.let { imageRepository.deleteFromInternalStorage(it) }
+        }
+        else {
+            imagePath = oldImage
         }
 
         val updatedEntity = photocardRepository

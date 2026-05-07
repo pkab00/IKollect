@@ -1,5 +1,8 @@
 package com.vbshkn.ikollect.presentation.feature.albums.profile
 
+import android.widget.Toast
+import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileContract.Effect
+import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileContract.Event
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
@@ -7,10 +10,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
+import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
 import com.vbshkn.ikollect.presentation.composable.profile.ArtistList
 import com.vbshkn.ikollect.presentation.composable.profile.InfoRowItem
 import com.vbshkn.ikollect.presentation.composable.profile.NotesField
@@ -31,17 +36,21 @@ fun AlbumProfileScreen(
     onNavigateToPhotocard: (Long) -> Unit,
     onNavigateToEdit: () -> Unit
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val profile = uiState.profile
     val topBarState = rememberProfileTopBarState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.effects) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is AlbumProfileContract.Effect.NavigateBack -> onNavigateBack()
-                is AlbumProfileContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
-                is AlbumProfileContract.Effect.NavigateToPhotocard -> onNavigateToPhotocard(effect.id)
-                is AlbumProfileContract.Effect.NavigateToEdit -> onNavigateToEdit()
+                is Effect.NavigateBack -> onNavigateBack()
+                is Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
+                is Effect.NavigateToPhotocard -> onNavigateToPhotocard(effect.id)
+                is Effect.NavigateToEdit -> onNavigateToEdit()
+                is Effect.ShowRefreshingErrorToast -> {
+                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -89,51 +98,56 @@ fun AlbumProfileScreen(
         )
     )
 
-    ProfileScaffold(
-        imageUrl = profile?.album?.coverImage,
-        title = profile?.album?.name ?: "",
-        topBarState = topBarState,
-        onNavigate = { viewModel.onEvent(AlbumProfileContract.Event.OnBackClicked) },
-        actions = { animatedColor ->
-            IconButton(onClick = { viewModel.onEvent(AlbumProfileContract.Event.OnEditClicked) }) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null,
-                    tint = animatedColor
-                )
-            }
-        }
+    PullToRefreshContainer(
+        isRefreshing = uiState.isSyncing,
+        onRefresh = { viewModel.onEvent(Event.OnPulledToRefresh) }
     ) {
-        item {
-            ProfileItemWrapper(
-                title = UiText.StringResource(R.string.artist_profile_title_information)
-            ) { ProfileInfoSection(statItems, infoItems) }
-        }
-
-        item {
-            profile?.album?.artists?.let { items ->
-                if (items.size > 1) {
-                    ArtistList(
-                        title = UiText.StringResource(R.string.profile_title_featuring),
-                        artists = items.drop(1),
-                        onClick = { viewModel.onEvent(AlbumProfileContract.Event.OnArtistCardClicked(it)) }
+        ProfileScaffold(
+            imageUrl = profile?.album?.coverImage,
+            title = profile?.album?.name ?: "",
+            topBarState = topBarState,
+            onNavigate = { viewModel.onEvent(Event.OnBackClicked) },
+            actions = { animatedColor ->
+                IconButton(onClick = { viewModel.onEvent(Event.OnEditClicked) }) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = animatedColor
                     )
                 }
             }
+        ) {
+            item {
+                ProfileItemWrapper(
+                    title = UiText.StringResource(R.string.artist_profile_title_information)
+                ) { ProfileInfoSection(statItems, infoItems) }
+            }
+
+            item {
+                profile?.album?.artists?.let { items ->
+                    if (items.size > 1) {
+                        ArtistList(
+                            title = UiText.StringResource(R.string.profile_title_featuring),
+                            artists = items.drop(1),
+                            onClick = { viewModel.onEvent(Event.OnArtistCardClicked(it)) }
+                        )
+                    }
+                }
+            }
+            item {
+                PhotocardList(
+                    title = UiText.StringResource(R.string.artist_profile_title_photocards),
+                    photocards = profile?.photocards,
+                    onClick = { viewModel.onEvent(Event.OnPhotocardCardClicked(it)) }
+                )
+            }
+            item {
+                NotesField(
+                    title = UiText.StringResource(R.string.profile_title_notes),
+                    text = uiState.profile?.album?.userNote?.let { UiText.DynamicString(it) }
+                )
+            }
         }
-        item {
-            PhotocardList(
-                title = UiText.StringResource(R.string.artist_profile_title_photocards),
-                photocards = profile?.photocards,
-                onClick = { viewModel.onEvent(AlbumProfileContract.Event.OnPhotocardCardClicked(it)) }
-            )
-        }
-        item {
-            NotesField(
-                title = UiText.StringResource(R.string.profile_title_notes),
-                text = uiState.profile?.album?.userNote?.let { UiText.DynamicString(it) }
-            )
-        }
+        if (uiState.isLoading) { LoadingOverlay() }
     }
-    if (uiState.isLoading) { LoadingOverlay() }
 }

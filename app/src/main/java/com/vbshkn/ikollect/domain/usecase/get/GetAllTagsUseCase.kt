@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.get
 
 import com.vbshkn.ikollect.data.repository.TagRepository
 import javax.inject.Inject

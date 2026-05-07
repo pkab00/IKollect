@@ -2,8 +2,8 @@ package com.vbshkn.ikollect.presentation.feature.userprofile
 
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.domain.base.BaseViewModel
-import com.vbshkn.ikollect.domain.usecase.GetUserProfileUseCase
-import com.vbshkn.ikollect.domain.usecase.LogOutUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetUserProfileUseCase
+import com.vbshkn.ikollect.domain.usecase.auth.LogOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

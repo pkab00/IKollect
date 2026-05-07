@@ -1,6 +1,6 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.validate
 
-import com.vbshkn.ikollect.domain.ValidationError
+import com.vbshkn.ikollect.domain.error.ValidationError
 import javax.inject.Inject
 
 class ValidateNicknameUseCase @Inject constructor() {

@@ -1,7 +1,7 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.auth
 
 import com.vbshkn.ikollect.data.repository.AuthRepository
-import com.vbshkn.ikollect.domain.UserAuthError
+import com.vbshkn.ikollect.domain.error.UserAuthError
 import io.github.jan.supabase.auth.exception.AuthRestException
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.save
 
 import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase

@@ -1,39 +1,19 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.profile
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import android.widget.Toast
+import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileContract.Event
+import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileContract.Effect
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.TagItem
-import com.vbshkn.ikollect.presentation.composable.TagLabel
+import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
 import com.vbshkn.ikollect.presentation.composable.TagsField
 import com.vbshkn.ikollect.presentation.composable.profile.ArtistList
 import com.vbshkn.ikollect.presentation.composable.profile.InfoRowItem
@@ -54,6 +34,7 @@ fun PhotocardProfileScreen(
     onNavigateToArtist: (Long) -> Unit,
     onNavigateToAlbum: (Long) -> Unit
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val profile = uiState.profile
     val topBarState = rememberProfileTopBarState()
@@ -61,10 +42,13 @@ fun PhotocardProfileScreen(
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is PhotocardProfileContract.Effect.NavigateBack -> onNavigateBack()
-                is PhotocardProfileContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
-                is PhotocardProfileContract.Effect.NavigateToAlbum -> onNavigateToAlbum(effect.id)
-                is PhotocardProfileContract.Effect.NavigateToEdit -> onNavigateToEdit(effect.id)
+                is Effect.NavigateBack -> onNavigateBack()
+                is Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
+                is Effect.NavigateToAlbum -> onNavigateToAlbum(effect.id)
+                is Effect.NavigateToEdit -> onNavigateToEdit(effect.id)
+                is Effect.ShowRefreshingErrorToast -> {
+                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -73,13 +57,13 @@ fun PhotocardProfileScreen(
         StatCard.ImageStatCardItem(
             imageUrl = profile?.photocard?.owner?.profileImage,
             label = UiText.DynamicString(profile?.photocard?.owner?.name ?: "-:-"),
-            onClick = { viewModel.onEvent(PhotocardProfileContract.Event.OnOwnerCardClicked) }
+            onClick = { viewModel.onEvent(Event.OnOwnerCardClicked) }
         ),
         StatCard.ImageStatCardItem(
             imageUrl = profile?.album?.coverImage,
             label = profile?.album?.name?.let { UiText.DynamicString(it) }
                 ?: UiText.StringResource(R.string.no_album_placeholder),
-            onClick = { viewModel.onEvent(PhotocardProfileContract.Event.OnAlbumCardClicked) }
+            onClick = { viewModel.onEvent(Event.OnAlbumCardClicked) }
         )
     )
 
@@ -95,46 +79,51 @@ fun PhotocardProfileScreen(
         )
     )
 
-    ProfileScaffold(
-        imageUrl = profile?.photocard?.imageUrl,
-        title = profile?.photocard?.displayName ?: "",
-        topBarState = topBarState,
-        onNavigate = { viewModel.onEvent(PhotocardProfileContract.Event.OnBackClicked) },
-        actions = { animatedColor ->
-            IconButton(onClick = { viewModel.onEvent(PhotocardProfileContract.Event.OnEditClicked) }) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null,
-                    tint = animatedColor
-                )
-            }
-        }
+    PullToRefreshContainer(
+        isRefreshing = uiState.isSyncing,
+        onRefresh = { viewModel.onEvent(Event.OnPulledToRefresh) }
     ) {
-        item {
-            ProfileInfoSection(statItems, infoItems)
-        }
-        item {
-            ArtistList(
-                title = UiText.StringResource(R.string.wizard_title_on_the_card),
-                artists = profile?.depictedArtists ?: emptyList(),
-                onClick = { viewModel.onEvent(PhotocardProfileContract.Event.OnArtistCardClicked(it)) }
-            )
-        }
-        item {
-            ProfileItemWrapper(
-                title = UiText.StringResource(R.string.profile_label_tags)
-            ) {
-                TagsField(
-                    tags = uiState.profile?.photocard?.tags ?: emptyList(),
-                    onTagClick = { /* No actions on tag click in profile view */ },
+        ProfileScaffold(
+            imageUrl = profile?.photocard?.imageUrl,
+            title = profile?.photocard?.displayName ?: "",
+            topBarState = topBarState,
+            onNavigate = { viewModel.onEvent(Event.OnBackClicked) },
+            actions = { animatedColor ->
+                IconButton(onClick = { viewModel.onEvent(Event.OnEditClicked) }) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = animatedColor
+                    )
+                }
+            }
+        ) {
+            item {
+                ProfileInfoSection(statItems, infoItems)
+            }
+            item {
+                ArtistList(
+                    title = UiText.StringResource(R.string.wizard_title_on_the_card),
+                    artists = profile?.depictedArtists ?: emptyList(),
+                    onClick = { viewModel.onEvent(Event.OnArtistCardClicked(it)) }
                 )
             }
-        }
-        item {
-            NotesField(
-                title = UiText.StringResource(R.string.artist_profile_title_notes),
-                text = profile?.photocard?.userNotes?.let { UiText.DynamicString(it) }
-            )
+            item {
+                ProfileItemWrapper(
+                    title = UiText.StringResource(R.string.profile_label_tags)
+                ) {
+                    TagsField(
+                        tags = uiState.profile?.photocard?.tags ?: emptyList(),
+                        onTagClick = { },
+                    )
+                }
+            }
+            item {
+                NotesField(
+                    title = UiText.StringResource(R.string.artist_profile_title_notes),
+                    text = profile?.photocard?.userNotes?.let { UiText.DynamicString(it) }
+                )
+            }
         }
     }
 }

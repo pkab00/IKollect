@@ -10,7 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.reflect.typeOf
-import com.vbshkn.ikollect.domain.usecase.SaveAlbumUseCase
+import com.vbshkn.ikollect.domain.usecase.save.SaveAlbumUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 
 @HiltViewModel

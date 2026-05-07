@@ -276,7 +276,7 @@ class SyncManager @Inject constructor(
 
     // ================================ HANDSHAKE =================================================
 
-    suspend fun performHandshake(userId: String) {
+    suspend fun performHandshake(userId: String): HandshakeResult {
         Log.i(TAG, "Starting scheduled handshake...")
         val startPoint = now()
         val lastSyncTimestamp = serviceLogStorage.getLastSyncTimestamp().first()
@@ -284,11 +284,11 @@ class SyncManager @Inject constructor(
         Log.d(TAG, "Last sync at $lastSyncTimestamp")
 
         Log.i(TAG, "Step 1: Local -> Remote")
-        uploadLocalChanges(userId)
+        val firstStepSucceed = uploadLocalChanges(userId)
         Log.i(TAG, "Step 2: Local <- Remote")
-        val finishTimestamp = downloadRemoteChanges(lastSyncTimestamp)
+        val (secondStepSucceed, finishTimestamp) = downloadRemoteChanges(lastSyncTimestamp)
         Log.i(TAG, "Step 3: Clear Deleted")
-        clearDeleted()
+        val thirdStepSucceed = clearDeleted()
 
         // Updating last sync timestamp
         // Decreasing it a lil bit just to avoid blind zone
@@ -298,9 +298,21 @@ class SyncManager @Inject constructor(
             serviceLogStorage.updateLastSyncTimestamp(finishTimestamp.toTimestamptz())
             Log.i(TAG, "Handshake finished at ${finishTimestamp.toTimestamptz()}\nTook $totalSeconds seconds to perform")
         }
+
+        val results = listOf(firstStepSucceed, secondStepSucceed, thirdStepSucceed)
+        val result = if (results.all { it is HandshakeResult.FullSuccess }) {
+            HandshakeResult.FullSuccess
+        } else if (results.all { it is HandshakeResult.Fail }) {
+            HandshakeResult.Fail
+        } else {
+            HandshakeResult.PartialSuccess
+        }
+        Log.i(TAG, "Result: ${result.javaClass.simpleName}")
+        return result
     }
 
-    private suspend fun uploadLocalChanges(userId: String) {
+    private suspend fun uploadLocalChanges(userId: String): HandshakeResult {
+        var result: HandshakeResult = HandshakeResult.FullSuccess
         val localPackage = try {
             database.withTransaction {
                 val localAlbumArtist = crossRefDao.getAlbumArtistUnSynchronized().first()
@@ -316,7 +328,8 @@ class SyncManager @Inject constructor(
             }
         } catch (e: Exception) {
             Log.d(TAG, "Failed to download local data: ", e)
-            return
+            result = HandshakeResult.Fail
+            return result
         }
 
         // COPYING LOCAL IMAGES
@@ -368,6 +381,7 @@ class SyncManager @Inject constructor(
                 Log.d(TAG, "Artists were synchronized as planned, local flags updated")
             } catch (e: Exception) {
                 Log.d(TAG, "Failed to update artists: ", e)
+                result = HandshakeResult.PartialSuccess
             }
         }
         if (backendAlbums.isNotEmpty() || backendAlbumArtistCR.isNotEmpty()) {
@@ -385,6 +399,7 @@ class SyncManager @Inject constructor(
                 Log.d(TAG, "Albums were synchronized as planned, local flags updated")
             } catch (e: Exception) {
                 Log.d(TAG, "Failed to update albums: ", e)
+                result = HandshakeResult.PartialSuccess
             }
         }
         if (backendPhotocards.isNotEmpty() || backendPhotocardArtistCR.isNotEmpty()) {
@@ -396,7 +411,7 @@ class SyncManager @Inject constructor(
                     .decodeList<PhotocardArtistCrossRefBackend>()
                     .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
                 val photocardTagUpd = supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG).upsert(backendPhotocardTagCR) { select() }
-                    .decodeList<PhotocardArtistCrossRefBackend>()
+                    .decodeList<PhotocardTagCrossRefBackend>()
                     .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
                 database.withTransaction {
                     photocardDao.updateAll(localPackage.photocards.map { it.copy(isSynchronized = true, updatedAt = photocardsUpd) })
@@ -406,6 +421,7 @@ class SyncManager @Inject constructor(
                 Log.d(TAG, "Photocards were synchronized as planned, local flags updated")
             } catch (e: Exception) {
                 Log.d(TAG, "Failed to update photocards: ", e)
+                result = HandshakeResult.PartialSuccess
             }
         }
         if (backendTags.isNotEmpty() || backendPhotocardTagCR.isNotEmpty()) {
@@ -419,12 +435,15 @@ class SyncManager @Inject constructor(
                 Log.d(TAG, "Tags were synchronized as planned, local flags updated")
             } catch (e: Exception) {
                 Log.d(TAG, "Failed to update tags: ", e)
+                result = HandshakeResult.PartialSuccess
             }
         }
         Log.i(TAG, "Sync finished, remote tables were actualized")
+        return result
     }
 
-    private suspend fun downloadRemoteChanges(lastSyncTimestamp: String): Long? {
+    private suspend fun downloadRemoteChanges(lastSyncTimestamp: String): Pair<HandshakeResult, Long?> {
+        var result: HandshakeResult = HandshakeResult.FullSuccess
         // DOWNLOADING FROM REMOTE
         val backPackage = try {
             coroutineScope {
@@ -469,7 +488,7 @@ class SyncManager @Inject constructor(
             }
         } catch (e: Exception) {
             Log.d(TAG, "Failed to download data from remote: ", e)
-            return null
+            return HandshakeResult.Fail to null
         }
 
         // MAPPING TO LOCAL ENTITIES
@@ -501,7 +520,7 @@ class SyncManager @Inject constructor(
 
             } catch (e: Exception) {
                 Log.d(TAG, "Failed to save remote data: ", e)
-                return@withTransaction null
+                result = HandshakeResult.Fail
             }
         }
 
@@ -517,10 +536,11 @@ class SyncManager @Inject constructor(
             addAll(localPhotocardTagCF.map { it.updatedAt })
         }
         val syncTimestamp = allTimes.maxOrNull()
-        return syncTimestamp
+        return result to syncTimestamp
     }
 
-    private suspend fun clearDeleted() {
+    private suspend fun clearDeleted(): HandshakeResult {
+        var result: HandshakeResult = HandshakeResult.FullSuccess
         database.withTransaction {
             try {
                 photocardDao.clearDeleted()
@@ -530,8 +550,10 @@ class SyncManager @Inject constructor(
                 Log.d(TAG, "Cleared all entities marked as deleted")
             } catch (e: Exception) {
                 Log.d(TAG, "Failed to clear deleted data: ", e)
+                result = HandshakeResult.Fail
             }
         }
+        return result
     }
 }
 
@@ -560,6 +582,12 @@ class SyncManager @Inject constructor(
         val photocards: List<PhotocardEntity>,
         val tags: List<TagEntity>
     )
+
+sealed interface HandshakeResult {
+    object FullSuccess : HandshakeResult
+    object PartialSuccess : HandshakeResult
+    object Fail : HandshakeResult
+}
 
 private fun now(): Long {
     return System.currentTimeMillis()

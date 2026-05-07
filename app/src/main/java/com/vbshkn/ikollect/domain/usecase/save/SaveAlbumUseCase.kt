@@ -1,9 +1,9 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.save
 
 import androidx.room.withTransaction
-import com.vbshkn.ikollect.data.mapper.DataMappers.toEntity
 import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
+import com.vbshkn.ikollect.data.mapper.DataMappers.toEntity
 import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.repository.ArtistRepository
 import com.vbshkn.ikollect.data.repository.ImageRepository

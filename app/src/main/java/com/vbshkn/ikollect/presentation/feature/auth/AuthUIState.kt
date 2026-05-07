@@ -1,8 +1,8 @@
 package com.vbshkn.ikollect.presentation.feature.auth
 
-import com.vbshkn.ikollect.domain.AppError
-import com.vbshkn.ikollect.domain.ValidationError
-import com.vbshkn.ikollect.domain.UserAuthError
+import com.vbshkn.ikollect.domain.error.AppError
+import com.vbshkn.ikollect.domain.error.ValidationError
+import com.vbshkn.ikollect.domain.error.UserAuthError
 
 data class AuthUIState(
     val email: String = "",

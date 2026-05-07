@@ -4,8 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.domain.base.BaseViewModel
-import com.vbshkn.ikollect.domain.usecase.GetAlbumProfileDataUseCase
-import com.vbshkn.ikollect.domain.usecase.UpdateAlbumUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAlbumProfileDataUseCase
+import com.vbshkn.ikollect.domain.usecase.update.UpdateAlbumUseCase
 import com.vbshkn.ikollect.presentation.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

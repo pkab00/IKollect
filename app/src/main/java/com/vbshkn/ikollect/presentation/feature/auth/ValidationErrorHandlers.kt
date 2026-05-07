@@ -2,7 +2,7 @@ package com.vbshkn.ikollect.presentation.feature.auth
 
 import androidx.compose.runtime.Composable
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.ValidationError
+import com.vbshkn.ikollect.domain.error.ValidationError
 import com.vbshkn.ikollect.util.UiText
 
 @Composable

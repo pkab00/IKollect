@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.data.remote
 
-import com.vbshkn.ikollect.domain.AppError
+import com.vbshkn.ikollect.domain.error.AppError
 
 sealed class NetworkResult<out T> {
     data class Success<out T>(val data: T) : NetworkResult<T>()

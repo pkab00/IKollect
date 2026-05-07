@@ -26,7 +26,7 @@
     <string name="dialog_title_exit">Are you sure?</string>
     <string name="dialog_body_unsaved_data">The current data will not be saved.</string>
     <string name="see_info_name">Name:</string>
-    <string name="see_info_artist">Atrist:</string>
+    <string name="see_info_artist">Artist:</string>
     <string name="see_info_release_year">Release year:</string>
     <string name="see_info_barcode">Barcode:</string>
     <string name="see_info_discogs_id" translatable="false">Discogs ID:</string>
@@ -150,4 +150,5 @@
     <string name="label_nickname">Nickname</string>
     <string name="nickname_validation_error_empty">Enter a nickname.</string>
     <string name="nickname_validation_error_format">Nickname should contain 3-25 letters, dights or special symbols (-, _,).</string>
+    <string name="message_unable_to_refresh">Unable to refresh the data. Please check your network connection.</string>
 </resources>

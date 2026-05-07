@@ -1,9 +1,7 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.validate
 
-import com.vbshkn.ikollect.domain.AppError
-import com.vbshkn.ikollect.domain.ValidationError
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import android.util.Patterns
+import com.vbshkn.ikollect.domain.error.ValidationError
 import javax.inject.Inject
 
 class ValidateEmailUseCase @Inject constructor() {
@@ -11,7 +9,7 @@ class ValidateEmailUseCase @Inject constructor() {
         if (email.isBlank()) {
             return ValidationError.EmailError.EmptyEmail
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             return ValidationError.EmailError.InvalidEmailFormat
         }
         return null

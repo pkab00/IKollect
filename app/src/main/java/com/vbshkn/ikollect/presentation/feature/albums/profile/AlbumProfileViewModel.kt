@@ -1,22 +1,24 @@
 package com.vbshkn.ikollect.presentation.feature.albums.profile
 
+import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileContract.Effect
+import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileContract.Event
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.domain.base.BaseViewModel
-import com.vbshkn.ikollect.domain.usecase.GetAlbumProfileDataUseCase
+import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAlbumProfileDataUseCase
 import com.vbshkn.ikollect.presentation.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AlbumProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getAlbumProfileDataUseCase: GetAlbumProfileDataUseCase
-) : BaseViewModel<
-        AlbumProfileUIState,
-        AlbumProfileContract.Event,
-        AlbumProfileContract.Effect
-        >(initialState = AlbumProfileUIState()) {
+    private val getAlbumProfileDataUseCase: GetAlbumProfileDataUseCase,
+    private val refreshDataUseCase: RefreshDataUseCase
+) : BaseViewModel<AlbumProfileUIState, Event, Effect>(initialState = AlbumProfileUIState()) {
     private val args = savedStateHandle.toRoute<Route.AlbumFlow.Profile>()
     private val albumId = args.id
 
@@ -24,23 +26,29 @@ class AlbumProfileViewModel @Inject constructor(
         observeProfileData()
     }
 
-    override fun onEvent(event: AlbumProfileContract.Event) {
+    override fun onEvent(event: Event) {
         when (event) {
-            is AlbumProfileContract.Event.OnBackClicked -> {
-                sendEffect(AlbumProfileContract.Effect.NavigateBack)
+            is Event.OnBackClicked -> {
+                sendEffect(Effect.NavigateBack)
             }
-            is AlbumProfileContract.Event.OnOwnerClicked -> {
+            is Event.OnOwnerClicked -> {
                 val ownerId = uiState.value.profile?.album?.artists[0]?.artistId
-                ownerId?.let { sendEffect(AlbumProfileContract.Effect.NavigateToArtist(it)) }
+                ownerId?.let { sendEffect(Effect.NavigateToArtist(it)) }
             }
-            is AlbumProfileContract.Event.OnArtistCardClicked -> {
-                sendEffect(AlbumProfileContract.Effect.NavigateToArtist(event.id))
+            is Event.OnArtistCardClicked -> {
+                sendEffect(Effect.NavigateToArtist(event.id))
             }
-            is AlbumProfileContract.Event.OnPhotocardCardClicked -> {
-                sendEffect(AlbumProfileContract.Effect.NavigateToPhotocard(event.id))
+            is Event.OnPhotocardCardClicked -> {
+                sendEffect(Effect.NavigateToPhotocard(event.id))
             }
-            is AlbumProfileContract.Event.OnEditClicked -> {
-                sendEffect(AlbumProfileContract.Effect.NavigateToEdit)
+            is Event.OnEditClicked -> {
+                sendEffect(Effect.NavigateToEdit)
+            }
+            is Event.OnPulledToRefresh -> viewModelScope.launch {
+                updateState { it.copy(isSyncing = true) }
+                val succeed = refreshDataUseCase()
+                if (!succeed) sendEffect(Effect.ShowRefreshingErrorToast)
+                updateState { it.copy(isSyncing = false) }
             }
         }
     }

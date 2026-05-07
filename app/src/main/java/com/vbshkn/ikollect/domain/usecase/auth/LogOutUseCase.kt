@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.auth
 
 import com.vbshkn.ikollect.data.repository.AuthRepository
 import javax.inject.Inject

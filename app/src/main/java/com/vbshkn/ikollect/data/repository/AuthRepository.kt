@@ -113,6 +113,11 @@ class AuthRepository @Inject constructor(
             // Для полного удаления аккаунта (Auth) потребуется админский доступ или Edge Function
         }
     }
+
+    suspend fun awaitAndGetUid(): String? {
+        auth.awaitInitialization()
+        return auth.currentSessionOrNull()?.user?.id
+    }
 }
 
 @Serializable

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.domain
+package com.vbshkn.ikollect.domain.error
 
 sealed interface ValidationError {
     sealed interface NicknameError : ValidationError {

@@ -4,11 +4,14 @@ sealed interface PhotocardsContract {
     sealed interface Effect {
         object GoToWizard : Effect
         data class GoToPhotocard(val id: Long) : Effect
+        object ShowRefreshingErrorToast : Effect
+
     }
     sealed interface Event {
         object OnWizardClicked : Event
         data class OnPhotocardClicked(val id: Long) : Event
         data class OnPhotocardPreviewPressed(val imageUrl: String?) : Event
         object OnPhotocardPreviewReleased : Event
+        object OnPulledToRefresh : Event
     }
 }

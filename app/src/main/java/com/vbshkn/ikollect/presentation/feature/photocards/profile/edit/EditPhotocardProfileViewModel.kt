@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.domain.base.BaseViewModel
-import com.vbshkn.ikollect.domain.usecase.GetAllTagsUseCase
-import com.vbshkn.ikollect.domain.usecase.GetPhotocardProfileDataUseCase
-import com.vbshkn.ikollect.domain.usecase.UpdatePhotocardUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAllTagsUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetPhotocardProfileDataUseCase
+import com.vbshkn.ikollect.domain.usecase.update.UpdatePhotocardUseCase
 import com.vbshkn.ikollect.presentation.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

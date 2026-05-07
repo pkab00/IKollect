@@ -1,5 +1,8 @@
 package com.vbshkn.ikollect.presentation.feature.albums.list
 
+import android.widget.Toast
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Event
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Effect
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +47,7 @@ import com.vbshkn.ikollect.domain.model.details.AlbumDetails
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.presentation.composable.CommonTopBar
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
+import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
 import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
 import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
@@ -54,14 +59,18 @@ fun AlbumsScreen(
     onGoToWizard: (AlbumCandidate) -> Unit,
     onAlbumClick: (Long) -> Unit
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val onEvent: (AlbumsContract.Event) -> Unit = viewModel::onEvent
+    val onEvent: (Event) -> Unit = viewModel::onEvent
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is AlbumsContract.Effect.NavigateToAlbum -> onAlbumClick(effect.id)
-                is AlbumsContract.Effect.NavigateToSaveFlow -> onGoToWizard(effect.candidate)
+                is Effect.NavigateToAlbum -> onAlbumClick(effect.id)
+                is Effect.NavigateToSaveFlow -> onGoToWizard(effect.candidate)
+                is Effect.ShowRefreshingErrorToast -> {
+                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -71,42 +80,47 @@ fun AlbumsScreen(
         onEvent = onEvent
     )
 
-    Scaffold(
-        topBar = {
-            CommonTopBar(
-                title = UiText.StringResource(R.string.screen_title_albums),
-                actions = {
-                    IconButton({ onEvent(AlbumsContract.Event.OnStartScanningClicked) }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_scanner),
-                            contentDescription = ""
-                        )
+    PullToRefreshContainer(
+        isRefreshing = uiState.isSyncing,
+        onRefresh = { onEvent(Event.OnPulledToSync) }
+    ) {
+        Scaffold(
+            topBar = {
+                CommonTopBar(
+                    title = UiText.StringResource(R.string.screen_title_albums),
+                    actions = {
+                        IconButton({ onEvent(Event.OnStartScanningClicked) }) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_scanner),
+                                contentDescription = ""
+                            )
+                        }
                     }
-                }
-            )
-        },
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
-    ) { paddingValues ->
-        Box(
-            contentAlignment = Alignment.Center,
+                )
+            },
             modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(10.dp)
-        ) {
-            if ( uiState.albums.isEmpty() && uiState.error != null) {
-                ErrorScreen()
-            } else if (uiState.albums.isEmpty()) {
-                NoAlbumsScreen()
-            } else {
-                AlbumsGrid(uiState.albums, viewModel::onEvent)
+        ) { paddingValues ->
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(10.dp)
+            ) {
+                if (uiState.albums.isEmpty() && uiState.error != null) {
+                    ErrorScreen()
+                } else if (uiState.albums.isEmpty()) {
+                    NoAlbumsScreen()
+                } else {
+                    AlbumsGrid(uiState.albums, viewModel::onEvent)
+                }
             }
-        }
 
-        if (uiState.isLoading) {
-            LoadingOverlay()
+            if (uiState.isLoading) {
+                LoadingOverlay()
+            }
         }
     }
 }
@@ -128,7 +142,7 @@ fun AlbumsGrid(
         ) { album ->
             AlbumCard(
                 album = album,
-                onClick = { onEvent(AlbumsContract.Event.OnAlbumClicked(album.albumId)) }
+                onClick = { onEvent(Event.OnAlbumClicked(album.albumId)) }
             )
         }
     }
@@ -222,14 +236,14 @@ fun AlbumCard(
 @Composable
 private fun DialogHost(
     dialogState: AlbumsDialogState,
-    onEvent: (AlbumsContract.Event) -> Unit
+    onEvent: (Event) -> Unit
 ) {
     when (dialogState) {
         is AlbumsDialogState.ScanningErrorDialog -> {
             ErrorDialog(
                 title = stringResource(R.string.error_title_scanning),
                 errorMessage = dialogState.errorMessage.asString(),
-                onDismiss = { onEvent(AlbumsContract.Event.OnDismissDialogClicked) },
+                onDismiss = { onEvent(Event.OnDismissDialogClicked) },
             )
         }
 
@@ -238,8 +252,8 @@ private fun DialogHost(
                 title = stringResource(R.string.dialog_title_album_detected),
                 action = stringResource(R.string.dialog_action_next),
                 text = dialogState.message,
-                onConfirm = { onEvent(AlbumsContract.Event.OnAlbumSavingConfirmed) },
-                onDismiss = { onEvent(AlbumsContract.Event.OnDismissDialogClicked) },
+                onConfirm = { onEvent(Event.OnAlbumSavingConfirmed) },
+                onDismiss = { onEvent(Event.OnDismissDialogClicked) },
             )
         }
 

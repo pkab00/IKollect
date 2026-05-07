@@ -1,19 +1,19 @@
 package com.vbshkn.ikollect.presentation.feature.albums.list
 
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewModelScope
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Event
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Effect
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.AppError
-import com.vbshkn.ikollect.data.remote.NetworkResult
-import com.vbshkn.ikollect.domain.usecase.GetAllAlbumsUseCase
+import com.vbshkn.ikollect.domain.error.AppError
+import com.vbshkn.ikollect.domain.usecase.get.GetAllAlbumsUseCase
 import com.vbshkn.ikollect.domain.usecase.ScanAlbumBarcodeUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
+import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Effect.*
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsDialogState.*
 import com.vbshkn.ikollect.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,23 +21,20 @@ import javax.inject.Inject
 class AlbumsViewModel @Inject constructor(
     private val getAllAlbumsUseCase: GetAllAlbumsUseCase,
     private val scanAlbumBarcodeUseCase: ScanAlbumBarcodeUseCase,
-) : BaseViewModel<
-        AlbumsUIState,
-        AlbumsContract.Event,
-        AlbumsContract.Effect
-        >(initialState = AlbumsUIState()) {
+    private val refreshDataUseCase: RefreshDataUseCase
+) : BaseViewModel<AlbumsUIState, Event, Effect>(initialState = AlbumsUIState()) {
 
     init {
         collectAlbums()
     }
 
-    override fun onEvent(event: AlbumsContract.Event) {
+    override fun onEvent(event: Event) {
         when (event) {
-            is AlbumsContract.Event.OnAlbumClicked -> {
-                sendEffect(AlbumsContract.Effect.NavigateToAlbum(event.id))
+            is Event.OnAlbumClicked -> {
+                sendEffect(NavigateToAlbum(event.id))
             }
 
-            is AlbumsContract.Event.OnStartScanningClicked -> {
+            is Event.OnStartScanningClicked -> {
                 collectFlowIntoState(
                     flow = scanAlbumBarcodeUseCase()
                         .onCompletion { updateState { it.copy(isLoading = false) } },
@@ -48,25 +45,32 @@ class AlbumsViewModel @Inject constructor(
                     if (uiState.value.scannedCandidate != null) {
                         val artists = uiState.value.scannedCandidate?.artistCandidates?.joinToString { it.name }
                         val release = uiState.value.scannedCandidate?.name
-                        showDialog(AlbumsDialogState.ScanningResultDialog("$artists - $release"))
+                        showDialog(ScanningResultDialog("$artists - $release"))
                     }
                     else {
                         val e = uiState.value.error ?: return@invokeOnCompletion
-                        showDialog(AlbumsDialogState.ScanningErrorDialog(handleErrors(e)))
+                        showDialog(ScanningErrorDialog(handleErrors(e)))
                     }
                 }
             }
 
-            AlbumsContract.Event.OnAlbumSavingConfirmed -> {
+            is Event.OnAlbumSavingConfirmed -> {
                 val candidate = uiState.value.scannedCandidate
                 if (candidate != null) {
                     dismissDialog()
-                    sendEffect(AlbumsContract.Effect.NavigateToSaveFlow(candidate))
+                    sendEffect(NavigateToSaveFlow(candidate))
                 }
             }
 
-            AlbumsContract.Event.OnDismissDialogClicked -> {
+            is Event.OnDismissDialogClicked -> {
                 dismissDialog()
+            }
+
+            is Event.OnPulledToSync -> viewModelScope.launch {
+                updateState { it.copy(isSyncing = true) }
+                val succeed = refreshDataUseCase()
+                if (!succeed) sendEffect(ShowRefreshingErrorToast)
+                updateState { it.copy(isSyncing = false) }
             }
         }
     }
@@ -83,7 +87,7 @@ class AlbumsViewModel @Inject constructor(
     }
 
     private fun dismissDialog() {
-        updateState { it.copy(dialogState = AlbumsDialogState.None, scannedCandidate = null) }
+        updateState { it.copy(dialogState = None, scannedCandidate = null) }
     }
 
     private fun handleErrors(error: AppError): UiText {

@@ -1,31 +1,34 @@
 package com.vbshkn.ikollect.presentation.feature.artists.list
 
-import androidx.lifecycle.ViewModel
+import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsContract.Event
+import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsContract.Effect
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.base.BaseViewModel
-import com.vbshkn.ikollect.domain.usecase.GetArtistListUseCase
+import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetArtistListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ArtistsViewModel @Inject constructor(
-    private val getArtistListUseCase: GetArtistListUseCase
-) : BaseViewModel<
-        ArtistsUIState,
-        ArtistsContract.Event,
-        ArtistsContract.Effect
-        >(initialState = ArtistsUIState()) {
+    private val getArtistListUseCase: GetArtistListUseCase,
+    private val refreshDataUseCase: RefreshDataUseCase
+) : BaseViewModel<ArtistsUIState, Event, Effect>(initialState = ArtistsUIState()) {
     init {
         collectArtistOverviews()
     }
 
-    override fun onEvent(event: ArtistsContract.Event) {
-        // TODO
+    override fun onEvent(event: Event) {
+        when (event) {
+            is Event.OnPulledToRefresh -> viewModelScope.launch {
+                updateState { it.copy(isSyncing = true) }
+                val succeed = refreshDataUseCase()
+                if (!succeed) sendEffect(Effect.ShowRefreshingErrorToast)
+                updateState { it.copy(isSyncing = false) }
+            }
+        }
     }
 
     private fun collectArtistOverviews() = viewModelScope.launch {

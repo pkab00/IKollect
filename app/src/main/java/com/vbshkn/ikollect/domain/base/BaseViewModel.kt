@@ -2,7 +2,7 @@ package com.vbshkn.ikollect.domain.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vbshkn.ikollect.domain.AppError
+import com.vbshkn.ikollect.domain.error.AppError
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel

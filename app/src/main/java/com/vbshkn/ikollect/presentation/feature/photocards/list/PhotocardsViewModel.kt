@@ -1,34 +1,44 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.list
 
-import com.vbshkn.ikollect.domain.usecase.GetAllPhotocardsUseCase
+import androidx.lifecycle.viewModelScope
+import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsContract.Event
+import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsContract.Effect
+import com.vbshkn.ikollect.domain.usecase.get.GetAllPhotocardsUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
+import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
+import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsContract.Effect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PhotocardsViewModel @Inject constructor(
-    private val getAllPhotocardsUseCase: GetAllPhotocardsUseCase
-) : BaseViewModel<
-        PhotocardsUIState,
-        PhotocardsContract.Event,
-        PhotocardsContract.Effect
-        >(initialState = PhotocardsUIState()) {
+    private val getAllPhotocardsUseCase: GetAllPhotocardsUseCase,
+    private val refreshDataUseCase: RefreshDataUseCase
+) : BaseViewModel<PhotocardsUIState, Event, Effect>(initialState = PhotocardsUIState()) {
 
     init { observePhotocards() }
 
-    override fun onEvent(event: PhotocardsContract.Event) {
+    override fun onEvent(event: Event) {
         when (event) {
-            is PhotocardsContract.Event.OnWizardClicked -> {
-                sendEffect(PhotocardsContract.Effect.GoToWizard)
+            is Event.OnWizardClicked -> {
+                sendEffect(Effect.GoToWizard)
             }
-            is PhotocardsContract.Event.OnPhotocardClicked -> {
-                sendEffect(PhotocardsContract.Effect.GoToPhotocard(event.id))
+            is Event.OnPhotocardClicked -> {
+                sendEffect(GoToPhotocard(event.id))
             }
-            is PhotocardsContract.Event.OnPhotocardPreviewPressed -> updateState {
+            is Event.OnPhotocardPreviewPressed -> updateState {
                 it.copy(fullScreenPreview = event.imageUrl)
             }
-            is PhotocardsContract.Event.OnPhotocardPreviewReleased -> updateState {
+            is Event.OnPhotocardPreviewReleased -> updateState {
                 it.copy(fullScreenPreview = null)
+            }
+            is Event.OnPulledToRefresh -> viewModelScope.launch {
+                updateState { it.copy(isSyncing = true) }
+                val succeed = refreshDataUseCase()
+                if (!succeed) sendEffect(ShowRefreshingErrorToast)
+                updateState { it.copy(isSyncing = false) }
+
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.domain
+package com.vbshkn.ikollect.domain.error
 
 sealed interface UserAuthError {
     sealed interface Login : UserAuthError {

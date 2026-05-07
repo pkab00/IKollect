@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.data.repository
 
-import com.vbshkn.ikollect.domain.AppError
+import com.vbshkn.ikollect.domain.error.AppError
 import com.vbshkn.ikollect.data.mapper.DataMappers.toListItem
 import com.vbshkn.ikollect.data.mapper.DataMappers.toDetails
 import com.vbshkn.ikollect.data.mapper.DataMappers.toCandidate

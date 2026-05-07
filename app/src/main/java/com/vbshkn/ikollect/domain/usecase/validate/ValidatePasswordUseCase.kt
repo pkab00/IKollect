@@ -1,8 +1,6 @@
-package com.vbshkn.ikollect.domain.usecase
+package com.vbshkn.ikollect.domain.usecase.validate
 
-import com.vbshkn.ikollect.domain.ValidationError
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import com.vbshkn.ikollect.domain.error.ValidationError
 import javax.inject.Inject
 
 class ValidatePasswordUseCase @Inject constructor() {

@@ -1,6 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.albums.profile.edit
 
-import com.vbshkn.ikollect.domain.AppError
+import com.vbshkn.ikollect.domain.error.AppError
 
 data class EditAlbumProfileUIState(
     val isLoading: Boolean = false,
