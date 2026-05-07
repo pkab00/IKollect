@@ -48,10 +48,10 @@ interface ArtistDao {
             """)
     fun getArtistOverviews(): Flow<List<ArtistMinimalDetail>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(artistEntity: ArtistEntity)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(entities: List<ArtistEntity>)
 
     @Update
@@ -60,8 +60,8 @@ interface ArtistDao {
     @Upsert
     suspend fun upsertAll(entities: List<ArtistEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertGroupLinks(links: List<ArtistArtistCrossRef>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertGroupLinks(links: List<ArtistArtistCrossRef>)
 
     @Transaction
     suspend fun insertAndLinkToGroup(
@@ -69,7 +69,7 @@ interface ArtistDao {
         groupId: Long
     ) {
         insert(member)
-        upsertGroupLinks(listOf(ArtistArtistCrossRef(groupId, member.artistId, false)))
+        insertGroupLinks(listOf(ArtistArtistCrossRef(groupId, member.artistId, false)))
     }
 
     @Query("DELETE FROM ArtistEntity")
