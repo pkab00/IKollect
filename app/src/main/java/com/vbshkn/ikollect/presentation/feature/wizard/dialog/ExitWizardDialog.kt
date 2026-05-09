@@ -3,7 +3,7 @@ package com.vbshkn.ikollect.presentation.feature.wizard.dialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
+import com.vbshkn.ikollect.presentation.composable.dialog.ConfirmDialog
 
 @Composable
 fun ExitWizardDialog(

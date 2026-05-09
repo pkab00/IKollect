@@ -22,8 +22,8 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.presentation.dialog.ErrorDialog
-import com.vbshkn.ikollect.presentation.dialog.InfoDialog
+import com.vbshkn.ikollect.presentation.composable.dialog.ErrorDialog
+import com.vbshkn.ikollect.presentation.composable.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.steps.AlbumWizardSteps
 import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 import com.vbshkn.ikollect.presentation.feature.wizard.GenericWizard

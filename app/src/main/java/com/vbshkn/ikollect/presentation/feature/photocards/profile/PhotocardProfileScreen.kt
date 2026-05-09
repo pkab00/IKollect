@@ -4,6 +4,7 @@ import android.widget.Toast
 import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileContract.Event
 import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileContract.Effect
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
 import com.vbshkn.ikollect.presentation.composable.TagsField
+import com.vbshkn.ikollect.presentation.composable.dialog.ConfirmDeleteDialog
 import com.vbshkn.ikollect.presentation.composable.profile.ArtistList
 import com.vbshkn.ikollect.presentation.composable.profile.InfoRowItem
 import com.vbshkn.ikollect.presentation.composable.profile.NotesField
@@ -23,6 +25,7 @@ import com.vbshkn.ikollect.presentation.composable.profile.ProfileItemWrapper
 import com.vbshkn.ikollect.presentation.composable.profile.ProfileScaffold
 import com.vbshkn.ikollect.presentation.composable.profile.StatCard
 import com.vbshkn.ikollect.presentation.composable.profile.rememberProfileTopBarState
+import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.util.TimeUtil.toDateString
 import com.vbshkn.ikollect.util.UiText
 
@@ -47,11 +50,14 @@ fun PhotocardProfileScreen(
                 is Effect.NavigateToAlbum -> onNavigateToAlbum(effect.id)
                 is Effect.NavigateToEdit -> onNavigateToEdit(effect.id)
                 is Effect.ShowRefreshingErrorToast -> {
-                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
     }
+
+    DialogHost(uiState.dialogState, viewModel::onEvent)
 
     val statItems = listOf(
         StatCard.ImageStatCardItem(
@@ -75,7 +81,9 @@ fun PhotocardProfileScreen(
         ),
         InfoRowItem(
             label = UiText.StringResource(R.string.album_profile_label_added_on),
-            value = UiText.DynamicString(profile?.photocard?.savingTimestamp?.toDateString() ?: "-:-")
+            value = UiText.DynamicString(
+                profile?.photocard?.savingTimestamp?.toDateString() ?: "-:-"
+            )
         )
     )
 
@@ -86,12 +94,25 @@ fun PhotocardProfileScreen(
         ProfileScaffold(
             imageUrl = profile?.photocard?.imageUrl,
             title = profile?.photocard?.displayName ?: "",
+            like = profile?.photocard?.isFavorite ?: false,
             topBarState = topBarState,
             onNavigate = { viewModel.onEvent(Event.OnBackClicked) },
+            onLikeToggled = {
+                profile?.photocard?.let {
+                    viewModel.onEvent(Event.OnLikeClicked(it.photocardId, it.isFavorite))
+                }
+            },
             actions = { animatedColor ->
                 IconButton(onClick = { viewModel.onEvent(Event.OnEditClicked) }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = animatedColor
+                    )
+                }
+                IconButton(onClick = { viewModel.onEvent(Event.OnDeleteClicked) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
                         contentDescription = null,
                         tint = animatedColor
                     )
@@ -125,5 +146,19 @@ fun PhotocardProfileScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun DialogHost(
+    dialog: PhotocardProfileDialogState,
+    onEvent: (Event) -> Unit
+) {
+    when (dialog) {
+        PhotocardProfileDialogState.ConfirmDeletion -> ConfirmDeleteDialog(
+            onConfirm = { onEvent(Event.OnDeletionConfirmed) },
+            onDismiss = { onEvent(Event.OnDismissDialogClicked) }
+        )
+        PhotocardProfileDialogState.None -> {}
     }
 }

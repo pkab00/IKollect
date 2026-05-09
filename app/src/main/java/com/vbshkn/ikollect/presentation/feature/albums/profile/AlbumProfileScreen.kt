@@ -4,6 +4,7 @@ import android.widget.Toast
 import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileContract.Effect
 import com.vbshkn.ikollect.presentation.feature.albums.profile.AlbumProfileContract.Event
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
+import com.vbshkn.ikollect.presentation.composable.dialog.ConfirmDeleteDialog
 import com.vbshkn.ikollect.presentation.composable.profile.ArtistList
 import com.vbshkn.ikollect.presentation.composable.profile.InfoRowItem
 import com.vbshkn.ikollect.presentation.composable.profile.NotesField
@@ -55,12 +57,14 @@ fun AlbumProfileScreen(
         }
     }
 
+    DialogHost(uiState.dialogState, viewModel::onEvent)
+
     val totalPhotocards = (profile?.photocards?.size ?: 0).toString()
     val statItems = listOf(
         StatCard.ImageStatCardItem(
             imageUrl = profile?.album?.artists[0]?.profileImage,
             label = UiText.DynamicString(profile?.album?.artists[0]?.name ?: ""),
-            onClick = { viewModel.onEvent(AlbumProfileContract.Event.OnOwnerClicked) }
+            onClick = { viewModel.onEvent(Event.OnOwnerClicked) }
         ),
         StatCard.TextStatCardItem(
             label = UiText.StringResource(R.string.artist_profile_title_photocards),
@@ -105,12 +109,23 @@ fun AlbumProfileScreen(
         ProfileScaffold(
             imageUrl = profile?.album?.coverImage,
             title = profile?.album?.name ?: "",
+            like = profile?.album?.isFavorite ?: false,
             topBarState = topBarState,
             onNavigate = { viewModel.onEvent(Event.OnBackClicked) },
+            onLikeToggled = {
+                profile?.album?.let { viewModel.onEvent(Event.OnLikeClicked(it.albumId, it.isFavorite)) }
+            },
             actions = { animatedColor ->
                 IconButton(onClick = { viewModel.onEvent(Event.OnEditClicked) }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = animatedColor
+                    )
+                }
+                IconButton(onClick = { viewModel.onEvent(Event.OnDeleteClicked) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
                         contentDescription = null,
                         tint = animatedColor
                     )
@@ -149,5 +164,19 @@ fun AlbumProfileScreen(
             }
         }
         if (uiState.isLoading) { LoadingOverlay() }
+    }
+}
+
+@Composable
+fun DialogHost(
+    dialog: AlbumProfileDialogState,
+    onEvent: (Event) -> Unit
+) {
+    when (dialog) {
+        AlbumProfileDialogState.ConfirmDeletion -> ConfirmDeleteDialog(
+            onConfirm = { onEvent(Event.OnDeletionConfirmed) },
+            onDismiss = { onEvent(Event.OnDismissDialogClicked) }
+        )
+        AlbumProfileDialogState.None -> {}
     }
 }

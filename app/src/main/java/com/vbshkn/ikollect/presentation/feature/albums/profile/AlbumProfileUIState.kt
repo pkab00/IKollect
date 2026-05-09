@@ -7,5 +7,6 @@ data class AlbumProfileUIState(
     val profile: AlbumProfileData? = null,
     val isLoading: Boolean = false,
     val isSyncing: Boolean = false,
-    val error: AppError? = null
+    val error: AppError? = null,
+    val dialogState: AlbumProfileDialogState = AlbumProfileDialogState.None
 )

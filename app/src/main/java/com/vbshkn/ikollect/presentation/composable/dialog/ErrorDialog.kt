@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.dialog
+package com.vbshkn.ikollect.presentation.composable.dialog
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning

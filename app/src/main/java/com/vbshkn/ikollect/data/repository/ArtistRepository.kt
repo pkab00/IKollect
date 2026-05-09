@@ -70,4 +70,8 @@ class ArtistRepository @Inject constructor(
             }
         }.awaitAll()
     }
+
+    suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
+        artistLocalDS.setFavorite(id, !oldValue)
+    }
 }

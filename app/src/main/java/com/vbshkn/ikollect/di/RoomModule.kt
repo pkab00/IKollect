@@ -67,6 +67,9 @@ object RoomModule {
                         val tagDao = database.tagDao()
                         systemTags.forEach { tagDao.insert(it) }
                     }
+                    db.execSQL(AppDatabase.TRIGGER_ALBUMS_SOFT_DELETE_CASCADE)
+                    db.execSQL(AppDatabase.TRIGGER_PHOTOCARDS_SOFT_DELETE_CASCADE)
+                    db.execSQL(AppDatabase.TRIGGER_ARTISTS_SOFT_DELETE_CASCADE)
                 }
             })
             .build()

@@ -142,4 +142,6 @@
     <string name="nickname_validation_error_empty">Введите никнейм.</string>
     <string name="nickname_validation_error_format">Никнейм должен включать 3-25 букв, цифр или специальных символов (-, _).</string>
     <string name="message_unable_to_refresh">Не удалось обновить данные. Проверьте подключение к сети.</string>
+    <string name="confirm_delete_dialog_title">Подтвердить удаление?</string>
+    <string name="confirm_delete_dialog_body">Это действие невозможно отменить.</string>
 </resources>

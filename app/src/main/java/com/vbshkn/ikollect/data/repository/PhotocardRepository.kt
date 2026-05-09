@@ -37,7 +37,15 @@ class PhotocardRepository @Inject constructor(
     suspend fun insertWithArtists(
         entity: PhotocardEntity,
         artistIds: List<Long>
-    ) : Long {
+    ): Long {
         return photocardLocalDS.insertPhotocardWithArtists(entity, artistIds)
+    }
+
+    suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
+        photocardLocalDS.setFavorite(id, !oldValue)
+    }
+
+    suspend fun softDelete(id: Long) {
+        photocardLocalDS.setDeleted(id)
     }
 }

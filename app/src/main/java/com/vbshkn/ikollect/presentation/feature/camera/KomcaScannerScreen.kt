@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -29,7 +28,7 @@ import androidx.core.content.ContextCompat
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.business.KomcaAnalyzer
 import com.vbshkn.ikollect.presentation.composable.CameraPreview
-import com.vbshkn.ikollect.presentation.dialog.ConfirmDialog
+import com.vbshkn.ikollect.presentation.composable.dialog.ConfirmDialog
 import kotlinx.coroutines.delay
 
 @Composable

@@ -6,6 +6,7 @@ import com.vbshkn.ikollect.data.mapper.DataMappers.toDetails
 import com.vbshkn.ikollect.data.mapper.DataMappers.toCandidate
 import com.vbshkn.ikollect.data.local.datasource.AlbumLocalDataSource
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
+import com.vbshkn.ikollect.data.mapper.DataMappers.toEntity
 import com.vbshkn.ikollect.data.mapper.DataMappers.toProfile
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.dao.FullReleaseData
@@ -15,6 +16,7 @@ import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.domain.model.list.AlbumListItem
 import com.vbshkn.ikollect.domain.model.profile.AlbumProfileData
 import com.vbshkn.ikollect.util.asLocalResult
+import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -82,5 +84,13 @@ class AlbumRepository @Inject constructor(
 
     suspend fun updateAlbum(updated: AlbumEntity) {
         albumLocalDS.updateAlbum(updated)
+    }
+
+    suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
+        albumLocalDS.setFavorite(id, !oldValue)
+    }
+
+    suspend fun softDelete(id: Long) {
+        albumLocalDS.setDeleted(id)
     }
 }

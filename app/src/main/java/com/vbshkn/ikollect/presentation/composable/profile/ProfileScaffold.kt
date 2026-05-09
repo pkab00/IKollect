@@ -8,18 +8,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.IconToggleButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -40,8 +49,10 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 fun ProfileScaffold(
     imageUrl: String?,
     title: String,
+    like: Boolean,
     topBarState: ProfileTopBarState,
     onNavigate: () -> Unit,
+    onLikeToggled: (Boolean) -> Unit,
     actions: @Composable (Color) -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
@@ -58,8 +69,10 @@ fun ProfileScaffold(
             CollapsingToolbar(
                 imageUrl = imageUrl,
                 title = title,
+                like = like,
                 toolbarState = state.toolbarState,
                 onBackClick = onNavigate,
+                onLikeToggled = onLikeToggled,
                 actions = actions,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -69,6 +82,16 @@ fun ProfileScaffold(
                     .road(
                         whenCollapsed = Alignment.CenterStart,
                         whenExpanded = Alignment.BottomStart
+                    )
+                    .padding(horizontal = titleHorizontalPadding)
+                    .padding(
+                        top = topBarState.collapsedHeight,
+                        bottom = 16.dp
+                    ),
+                likeModifier = Modifier
+                    .road(
+                        whenCollapsed = Alignment.CenterEnd,
+                        whenExpanded = Alignment.BottomEnd
                     )
                     .padding(horizontal = titleHorizontalPadding)
                     .padding(top = topBarState.collapsedHeight, bottom = 16.dp),
@@ -91,19 +114,50 @@ fun ProfileScaffold(
     }
 }
 
+@Composable
+private fun LikeButton(
+    isToggled: Boolean,
+    onToggled: (Boolean) -> Unit,
+    modifier: Modifier
+) {
+    IconToggleButton(
+        checked = isToggled,
+        onCheckedChange = onToggled,
+        colors = IconButtonDefaults.iconToggleButtonVibrantColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
+        shape = CircleShape,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = if (isToggled) Icons.Default.Favorite else Icons.Rounded.FavoriteBorder,
+            contentDescription = null
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CollapsingToolbar(
     toolbarState: CollapsingToolbarState,
     imageUrl: String?,
     title: String,
+    like: Boolean,
     onBackClick: () -> Unit,
+    onLikeToggled: (Boolean) -> Unit,
     actions: @Composable (Color) -> Unit,
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
+    likeModifier: Modifier = Modifier,
     backModifier: Modifier = Modifier,
 ) {
     val textSize = (20f + (12f * toolbarState.progress)).sp
+    val textEndPadding = (50 * toolbarState.progress).dp
+    val likeButtonSize = (20f + (25f * toolbarState.progress)).dp
+    val likeButtonAlpha = toolbarState.progress
     val animatedColor = if (toolbarState.progress < 0.3f) MaterialTheme.colorScheme.onSurfaceVariant else Color.White
 
 
@@ -150,7 +204,15 @@ private fun CollapsingToolbar(
         fontWeight = FontWeight.Bold,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = textModifier
+        modifier = textModifier.padding(end = textEndPadding)
+    )
+
+    LikeButton(
+        isToggled = like,
+        onToggled = onLikeToggled,
+        modifier = likeModifier
+            .size(likeButtonSize)
+            .alpha(likeButtonAlpha)
     )
 
     // 4. Кнопка "Назад" (закреплена всегда сверху)

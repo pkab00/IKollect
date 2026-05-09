@@ -26,6 +26,7 @@ import com.vbshkn.ikollect.domain.model.profile.AlbumProfileData
 import com.vbshkn.ikollect.domain.model.profile.PhotocardProfileData
 import com.vbshkn.ikollect.util.ArtistNameHelper
 import com.vbshkn.ikollect.util.UiText
+import com.vbshkn.ikollect.util.now
 
 object DataMappers {
     fun ArtistDetailsResponse.toCandidate(): ArtistCandidate {
@@ -142,7 +143,8 @@ object DataMappers {
             tags = this.tags.map { it.toDomain() },
             imageUrl = this.photocard.imageUrl,
             savingTimestamp = this.photocard.savingTimestamp,
-            userNotes = this.photocard.userNote ?: ""
+            userNotes = this.photocard.userNote ?: "",
+            isFavorite = this.photocard.isFavorite
         )
     }
 

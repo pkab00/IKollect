@@ -47,7 +47,8 @@ fun ArtistProfileScreen(
                 is Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
                 is Effect.NavigateToPhotocard -> onNavigateToPhotocard(effect.id)
                 is Effect.ShowRefreshingErrorToast -> {
-                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -55,7 +56,11 @@ fun ArtistProfileScreen(
 
     val totalAlbums = (profile?.albums?.size ?: 0).toString()
     val totalPhotocards = (profile?.photocards?.size ?: 0).toString()
-    val status = UiText.DynamicString(if (profile?.artist?.isGroup == true) stringResource(R.string.status_group) else stringResource(R.string.status_soloist))
+    val status = UiText.DynamicString(
+        if (profile?.artist?.isGroup == true) stringResource(R.string.status_group) else stringResource(
+            R.string.status_soloist
+        )
+    )
     val firstAlbum = profile?.albums?.minByOrNull { it.savingTimestamp }
     val lastAlbum = profile?.albums?.maxByOrNull { it.savingTimestamp }
 
@@ -64,8 +69,14 @@ fun ArtistProfileScreen(
         onRefresh = { viewModel.onEvent(Event.OnPulledToRefresh) }
     ) {
         ProfileScaffold(
+            like = profile?.artist?.isFavorite ?: false,
             topBarState = topBarState,
             onNavigate = { viewModel.onEvent(Event.OnBackClicked) },
+            onLikeToggled = {
+                profile?.artist?.let {
+                    viewModel.onEvent(Event.OnLikeClicked(it.artistId, it.isFavorite))
+                }
+            },
             imageUrl = profile?.artist?.profileImage,
             title = profile?.artist?.name ?: ""
         ) {
@@ -124,6 +135,7 @@ fun ArtistProfileScreen(
                             onClick = { viewModel.onEvent(Event.OnArtistCardClicked(it)) }
                         )
                     }
+
                     is ArtistProfileData.SoloistProfile -> {
                         ArtistList(
                             title = UiText.StringResource(R.string.artist_profile_title_in_groups),
@@ -131,6 +143,7 @@ fun ArtistProfileScreen(
                             onClick = { viewModel.onEvent(Event.OnArtistCardClicked(it)) }
                         )
                     }
+
                     null -> {}
                 }
             }

@@ -41,4 +41,12 @@ class PhotocardLocalDataSource @Inject constructor(
     ) : Long {
         return dao.insertPhotocardWithArtists(photocardEntity, artistIds)
     }
+
+    suspend fun setDeleted(id: Long) {
+        dao.setDeleted(id)
+    }
+
+    suspend fun setFavorite(id: Long, isFavorite: Boolean) {
+        dao.setFavorite(id, isFavorite)
+    }
 }

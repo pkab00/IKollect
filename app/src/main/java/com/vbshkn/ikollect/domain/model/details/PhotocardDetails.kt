@@ -10,5 +10,6 @@ data class PhotocardDetails(
     val tags: List<TagItem>,
     val imageUrl: String?,
     val savingTimestamp: Long,
+    val isFavorite: Boolean,
     val userNotes: String
 )

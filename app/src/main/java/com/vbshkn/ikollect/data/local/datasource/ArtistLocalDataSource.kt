@@ -42,4 +42,12 @@ class ArtistLocalDataSource @Inject constructor(
     ) {
         dao.insertAndLinkToGroup(member, groupId)
     }
+
+    suspend fun setDeleted(id: Long) {
+        dao.setDeleted(id)
+    }
+
+    suspend fun setFavorite(id: Long, isFavorite: Boolean) {
+        dao.setFavorite(id, isFavorite)
+    }
 }

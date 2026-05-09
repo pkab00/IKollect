@@ -15,6 +15,10 @@ sealed interface PhotocardProfileContract {
         object OnOwnerCardClicked : Event
         object OnAlbumCardClicked : Event
         data class OnArtistCardClicked(val id: Long) : Event
+        data class OnLikeClicked(val id: Long, val isLiked: Boolean) : Event
         object OnPulledToRefresh : Event
+        object OnDeletionConfirmed : Event
+        object OnDeleteClicked : Event
+        object OnDismissDialogClicked : Event
     }
 }

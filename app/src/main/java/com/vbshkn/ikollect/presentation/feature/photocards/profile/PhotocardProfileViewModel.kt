@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
+import com.vbshkn.ikollect.domain.usecase.delete.DeletePhotocardUseCase
+import com.vbshkn.ikollect.domain.usecase.favorite.ToggleFavoritePhotocardUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetPhotocardProfileDataUseCase
 import com.vbshkn.ikollect.presentation.feature.photocards.profile.PhotocardProfileContract.Effect.*
 import com.vbshkn.ikollect.presentation.navigation.Route
@@ -18,7 +20,9 @@ import javax.inject.Inject
 class PhotocardProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getPhotocardProfileDataUseCase: GetPhotocardProfileDataUseCase,
-    private val refreshDataUseCase: RefreshDataUseCase
+    private val refreshDataUseCase: RefreshDataUseCase,
+    private val toggleFavoritePhotocardUseCase: ToggleFavoritePhotocardUseCase,
+    private val deletePhotocardUseCase: DeletePhotocardUseCase
 ) : BaseViewModel<PhotocardProfileUIState, Event, Effect>(initialState = PhotocardProfileUIState()) {
     private val args = savedStateHandle.toRoute<Route.PhotocardFlow.Profile>()
     private val photocardId = args.id
@@ -55,6 +59,23 @@ class PhotocardProfileViewModel @Inject constructor(
                 if (!succeed) sendEffect(ShowRefreshingErrorToast)
                 updateState { it.copy(isSyncing = false) }
 
+            }
+
+            is Event.OnLikeClicked -> viewModelScope.launch {
+                toggleFavoritePhotocardUseCase(event.id, event.isLiked)
+            }
+
+            is Event.OnDeleteClicked -> {
+                updateState { it.copy(dialogState = PhotocardProfileDialogState.ConfirmDeletion) }
+            }
+
+            is Event.OnDeletionConfirmed -> viewModelScope.launch {
+                deletePhotocardUseCase(photocardId)
+                sendEffect(NavigateBack)
+            }
+
+            is Event.OnDismissDialogClicked -> {
+                updateState { it.copy(dialogState = PhotocardProfileDialogState.None) }
             }
         }
     }

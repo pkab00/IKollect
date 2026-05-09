@@ -13,6 +13,7 @@ import com.vbshkn.ikollect.data.local.model.pojo.AlbumFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithArtists
 import com.vbshkn.ikollect.data.local.model.pojo.AlbumWithPhotocards
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistWithAlbums
+import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -82,6 +83,28 @@ interface AlbumDao {
 
     @Update
     suspend fun updateAlbum(albumEntity: AlbumEntity)
+
+    @Query(
+        """
+            UPDATE AlbumEntity SET
+            isDeleted = 1,
+            isSynchronized = 0,
+            updatedAt = :time
+            WHERE albumId = :id
+        """
+    )
+    suspend fun setDeleted(id: Long, time: Long = now())
+
+    @Query(
+        """
+            UPDATE AlbumEntity SET
+            isFavorite = :isFavorite,
+            isSynchronized = 0,
+            updatedAt = :time
+            WHERE albumId = :id
+        """
+    )
+    suspend fun setFavorite(id: Long, isFavorite: Boolean, time: Long = now())
 
     @Query("DELETE FROM AlbumEntity")
     suspend fun clearAll()

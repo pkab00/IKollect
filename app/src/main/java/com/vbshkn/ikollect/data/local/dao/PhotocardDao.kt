@@ -12,6 +12,7 @@ import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
 import com.vbshkn.ikollect.data.local.model.pojo.ArtistWithPhotocards
 import com.vbshkn.ikollect.data.local.model.pojo.PhotocardFullDetail
 import com.vbshkn.ikollect.data.local.model.pojo.PhotocardMinimalDetail
+import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -67,6 +68,28 @@ interface PhotocardDao {
         upsertArtistLinks(links)
         return photocardId
     }
+
+    @Query(
+        """
+            UPDATE PhotocardEntity SET
+            isDeleted = 1,
+            isSynchronized = 0,
+            updatedAt = :time
+            WHERE photocardId = :id
+        """
+    )
+    suspend fun setDeleted(id: Long, time: Long = now())
+
+    @Query(
+        """
+            UPDATE PhotocardEntity SET
+            isFavorite = :isFavorite,
+            isSynchronized = 0,
+            updatedAt = :time
+            WHERE photocardId = :id
+        """
+    )
+    suspend fun setFavorite(id: Long, isFavorite: Boolean, time: Long = now())
 
     @Query("DELETE FROM PhotocardEntity")
     suspend fun clearAll()

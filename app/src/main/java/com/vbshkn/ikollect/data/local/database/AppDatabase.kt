@@ -38,4 +38,41 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun photocardDao(): PhotocardDao
     abstract fun tagDao(): TagDao
     abstract fun crossRefDao(): CrossRefDao
+
+    companion object {
+        val TRIGGER_ALBUMS_SOFT_DELETE_CASCADE: String = """
+                            CREATE TRIGGER IF NOT EXISTS albums_soft_delete_cascade
+                            AFTER UPDATE OF isDeleted ON AlbumEntity
+                            FOR EACH ROW WHEN NEW.isDeleted = 1
+                            BEGIN
+                                UPDATE AlbumArtistCrossRef
+                                SET isDeleted = 1 WHERE albumId = OLD.albumId;
+                            END;
+                        """.trimIndent()
+        val TRIGGER_PHOTOCARDS_SOFT_DELETE_CASCADE = """
+                            CREATE TRIGGER IF NOT EXISTS photocard_soft_delete_cascade
+                            AFTER UPDATE OF isDeleted ON PhotocardEntity
+                            FOR EACH ROW WHEN NEW.isDeleted = 1
+                            BEGIN
+                                UPDATE PhotocardArtistCrossRef
+                                SET isDeleted = 1 WHERE photocardId = OLD.albumId;
+                                UPDATE PhotocardTagCrossRef
+                                SET isDeleted = 1 WHERE photocardId = OLD.albumId;
+                            END;
+                        """.trimIndent()
+
+        val TRIGGER_ARTISTS_SOFT_DELETE_CASCADE = """
+                            CREATE TRIGGER IF NOT EXISTS artists_soft_delete_cascade
+                            AFTER UPDATE OF isDeleted ON ArtistEntity
+                            FOR EACH ROW WHEN NEW.isDeleted = 1
+                            BEGIN
+                                UPDATE ArtistArtistCrossRef
+                                SET isDeleted = 1 WHERE groupId = OLD.artistId OR memberId = OLD.artistId;
+                                UPDATE AlbumArtistCrossRef
+                                SET isDeleted = 1 WHERE artistId = OLD.artistId;
+                                UPDATE PhotocardArtistCrossRef
+                                SET isDeleted = 1 WHERE artistId = OLD.artistId;
+                            END;
+                        """.trimIndent()
+    }
 }

@@ -189,7 +189,7 @@ object BackendMappers {
             isGroup = this.isGroup,
             imageUrl = this.imageUrl,
             createdAt = this.createdAt.toTimestamptz(),
-            updatedAt = this.updatedAt.toTimestamptz()
+            updatedAt = this.updatedAt.toTimestamptz(),
         )
     }
 

@@ -7,5 +7,6 @@ data class PhotocardProfileUIState(
     val isLoading: Boolean = false,
     val isSyncing: Boolean = false,
     val error: AppError? = null,
+    val dialogState: PhotocardProfileDialogState = PhotocardProfileDialogState.None,
     val profile: PhotocardProfileData? = null
 )

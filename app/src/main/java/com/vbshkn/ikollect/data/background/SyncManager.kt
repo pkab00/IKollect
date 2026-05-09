@@ -283,6 +283,8 @@ class SyncManager @Inject constructor(
             ?: Instant.fromEpochMilliseconds(0).toString()
         Log.d(TAG, "Last sync at $lastSyncTimestamp")
 
+        Log.i(TAG, "Step 0: Looking for unused artists to delete...")
+        val zeroStepSucceed = softDeleteUnusedArtists()
         Log.i(TAG, "Step 1: Local -> Remote")
         val firstStepSucceed = uploadLocalChanges(userId)
         Log.i(TAG, "Step 2: Local <- Remote")
@@ -299,7 +301,7 @@ class SyncManager @Inject constructor(
             Log.i(TAG, "Handshake finished at ${finishTimestamp.toTimestamptz()}\nTook $totalSeconds seconds to perform")
         }
 
-        val results = listOf(firstStepSucceed, secondStepSucceed, thirdStepSucceed)
+        val results = listOf(zeroStepSucceed, firstStepSucceed, secondStepSucceed, thirdStepSucceed)
         val result = if (results.all { it is HandshakeResult.FullSuccess }) {
             HandshakeResult.FullSuccess
         } else if (results.all { it is HandshakeResult.Fail }) {
@@ -308,6 +310,32 @@ class SyncManager @Inject constructor(
             HandshakeResult.PartialSuccess
         }
         Log.i(TAG, "Result: ${result.javaClass.simpleName}")
+        return result
+    }
+
+    private suspend fun softDeleteUnusedArtists(): HandshakeResult {
+        var result: HandshakeResult = HandshakeResult.FullSuccess
+
+        try {
+            database.withTransaction {
+                val localGroups = artistDao.getGroups().first()
+                localGroups.forEach {
+                    if (artistDao.countAllOwnedItems(it.artistId) == 0L) {
+                        artistDao.update(it.copy(isDeleted = true, isSynchronized = false, updatedAt = now()))
+                    }
+                }
+
+                val localSoloists = artistDao.getSoloists().first()
+                localSoloists.forEach {
+                    if (artistDao.countAllOwnedItems(it.artistId) == 0L && artistDao.countArtistArtistCrossRefs(it.artistId) == 0L) {
+                        artistDao.update(it.copy(isDeleted = true, isSynchronized = false, updatedAt = now()))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to soft delete unused local artists: ", e)
+            result = HandshakeResult.Fail
+        }
         return result
     }
 
@@ -448,11 +476,22 @@ class SyncManager @Inject constructor(
         val backPackage = try {
             coroutineScope {
                 val backendArtistSettings = supabase.from(BackendTables.USER.ARTIST_SETTINGS)
-                    .select { filter { UserArtistSettingsBackend::updatedAt gt lastSyncTimestamp } }
+                    .select {
+                        filter {
+                            and {
+                                UserArtistSettingsBackend::isDeleted isExact false
+                                UserArtistSettingsBackend::updatedAt gt lastSyncTimestamp
+                            }
+                        }
+                    }
                     .decodeList<UserArtistSettingsBackend>()
                 val userArtistIds = backendArtistSettings.map { it.artistId }
                 val backendArtists = supabase.from(BackendTables.GLOBAL.ARTISTS)
-                    .select { filter { GlobalArtistBackend::artistId isIn userArtistIds } }
+                    .select {
+                        filter {
+                            GlobalArtistBackend::artistId isIn userArtistIds
+                        }
+                    }
                     .decodeList<GlobalArtistBackend>()
                 val backendArtistHierarchy = supabase.from(BackendTables.GLOBAL.ARTIST_HIERARCHY)
                     .select {
@@ -466,22 +505,64 @@ class SyncManager @Inject constructor(
                     }
                     .decodeList<GlobalArtistHierarchyBackend>()
                 val backendAlbums = supabase.from(BackendTables.USER.ALBUMS)
-                    .select { filter { UserAlbumBackend::updatedAt gt lastSyncTimestamp } }
+                    .select {
+                        filter {
+                            and {
+                                UserAlbumBackend::isDeleted isExact false
+                                UserAlbumBackend::updatedAt gt lastSyncTimestamp
+                            }
+                        }
+                    }
                     .decodeList<UserAlbumBackend>()
                 val backendPhotocards = supabase.from(BackendTables.USER.PHOTOCARDS)
-                    .select { filter { UserPhotocardBackend::updatedAt gt lastSyncTimestamp } }
+                    .select {
+                        filter {
+                            and {
+                                UserPhotocardBackend::isDeleted isExact false
+                                UserPhotocardBackend::updatedAt gt lastSyncTimestamp
+                            }
+                        }
+                    }
                     .decodeList<UserPhotocardBackend>()
                 val backendAACrossRef = supabase.from(BackendTables.CROSSREF.ALBUM_ARTIST)
-                    .select { filter { AlbumArtistCrossRefBackend::updatedAt gt lastSyncTimestamp } }
+                    .select {
+                        filter {
+                            and {
+                                AlbumArtistCrossRefBackend::isDeleted isExact false
+                                AlbumArtistCrossRefBackend::updatedAt gt lastSyncTimestamp
+                            }
+                        }
+                    }
                     .decodeList<AlbumArtistCrossRefBackend>()
                 val backendPACrossRef = supabase.from(BackendTables.CROSSREF.PHOTOCARD_ARTIST)
-                    .select { filter { PhotocardArtistCrossRefBackend::updatedAt gt lastSyncTimestamp } }
+                    .select {
+                        filter {
+                            and {
+                                PhotocardArtistCrossRefBackend::isDeleted isExact false
+                                PhotocardArtistCrossRefBackend::updatedAt gt lastSyncTimestamp
+                            }
+                        }
+                    }
                     .decodeList<PhotocardArtistCrossRefBackend>()
                 val backendPTCrossRef = supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG)
-                    .select { filter { PhotocardTagCrossRefBackend::updatedAt gt lastSyncTimestamp } }
+                    .select {
+                        filter {
+                            and {
+                                PhotocardTagCrossRefBackend::isDeleted isExact false
+                                PhotocardTagCrossRefBackend::updatedAt gt lastSyncTimestamp
+                            }
+                        }
+                    }
                     .decodeList<PhotocardTagCrossRefBackend>()
                 val backendTags = supabase.from(BackendTables.TAGS)
-                    .select { filter { TagBackend::updatedAt gt lastSyncTimestamp } }
+                    .select {
+                        filter {
+                            and {
+                                TagBackend::isDeleted isExact false
+                                TagBackend::updatedAt gt lastSyncTimestamp
+                            }
+                        }
+                    }
                     .decodeList<TagBackend>()
 
                 BackendDataPackage(backendArtists, backendArtistHierarchy, backendAlbums, backendArtistSettings, backendPhotocards, backendAACrossRef, backendPACrossRef, backendPTCrossRef, backendTags)

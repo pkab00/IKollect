@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
+import com.vbshkn.ikollect.domain.usecase.favorite.ToggleFavoriteArtistUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetArtistProfileDataUseCase
 import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileContract.Effect.*
 import com.vbshkn.ikollect.presentation.navigation.Route
@@ -18,7 +19,8 @@ import javax.inject.Inject
 class ArtistProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getArtistProfileDataUseCase: GetArtistProfileDataUseCase,
-    private val refreshDataUseCase: RefreshDataUseCase
+    private val refreshDataUseCase: RefreshDataUseCase,
+    private val toggleFavoriteArtistUseCase: ToggleFavoriteArtistUseCase
 ) : BaseViewModel<ArtistProfileUIState, Event, Effect>(initialState = ArtistProfileUIState()) {
     private val args = savedStateHandle.toRoute<Route.ArtistProfile>()
     private val artistId = args.id
@@ -46,6 +48,9 @@ class ArtistProfileViewModel @Inject constructor(
                 val succeed = refreshDataUseCase()
                 if (!succeed) sendEffect(ShowRefreshingErrorToast)
                 updateState { it.copy(isSyncing = false) }
+            }
+            is Event.OnLikeClicked -> viewModelScope.launch {
+                toggleFavoriteArtistUseCase(event.id, event.isLiked)
             }
         }
     }

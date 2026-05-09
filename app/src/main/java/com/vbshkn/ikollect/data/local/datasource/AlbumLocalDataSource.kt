@@ -54,4 +54,12 @@ class AlbumLocalDataSource @Inject constructor(
     suspend fun updateAlbum(albumEntity: AlbumEntity) {
         dao.updateAlbum(albumEntity)
     }
+
+    suspend fun setDeleted(id: Long) {
+        dao.setDeleted(id)
+    }
+
+    suspend fun setFavorite(id: Long, isFavorite: Boolean) {
+        dao.setFavorite(id, isFavorite)
+    }
 }
