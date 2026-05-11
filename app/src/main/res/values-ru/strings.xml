@@ -138,7 +138,7 @@
     <string name="action_logout">Выйти</string>
     <string name="error_user_not_found">Неверный email или пароль.</string>
     <string name="action_google_sign_in">Войти с помощью Google</string>
-    <string name="label_nickname">Никнейм.</string>
+    <string name="label_nickname">Никнейм</string>
     <string name="nickname_validation_error_empty">Введите никнейм.</string>
     <string name="nickname_validation_error_format">Никнейм должен включать 3-25 букв, цифр или специальных символов (-, _).</string>
     <string name="message_unable_to_refresh">Не удалось обновить данные. Проверьте подключение к сети.</string>
