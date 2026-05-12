@@ -45,6 +45,7 @@ import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.details.AlbumDetails
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
+import com.vbshkn.ikollect.presentation.composable.AlbumCard
 import com.vbshkn.ikollect.presentation.composable.CommonTopBar
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
@@ -128,7 +129,7 @@ fun AlbumsScreen(
 @Composable
 fun AlbumsGrid(
     albums: List<AlbumDetails>,
-    onEvent: (AlbumsContract.Event) -> Unit
+    onEvent: (Event) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -180,71 +181,6 @@ fun ErrorScreen() {
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center
             )
-        }
-    }
-}
-
-@Composable
-fun AlbumCard(
-    album: AlbumDetails,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        ),
-    ) {
-        Column {
-            // 1. ОБЛОЖКА АЛЬБОМА
-            Box {
-                AsyncImage(
-                    model = album.coverImage,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(16.dp)),
-                    contentScale = ContentScale.Crop
-                )
-
-            }
-            // 2. ИНФОРМАЦИЯ
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // Название альбома
-                Text(
-                    text = album.name,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                // Исполнитель
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-
-                    Text(
-                        text = album.artists.joinToString { it.name },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                // Тег с версией
-                SmallTextLabel(
-                    text = UiText.DynamicString(album.version),
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                )
-            }
         }
     }
 }

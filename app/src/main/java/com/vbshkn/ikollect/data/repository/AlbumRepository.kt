@@ -62,6 +62,13 @@ class AlbumRepository @Inject constructor(
             }
     }
 
+    fun getFavoriteAlbums(): Flow<NetworkResult<List<AlbumDetails>>> {
+        return albumLocalDS.getFavoriteWithArtists()
+            .asLocalResult { albums ->
+                albums.map { it.toDetails() }
+            }
+    }
+
     fun getAllByArtist(artistId: Long): Flow<NetworkResult<List<AlbumListItem>>> {
         return albumLocalDS.getAllByArtist(artistId)
             .asLocalResult { artistsWithAlbums ->

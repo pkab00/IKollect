@@ -15,6 +15,11 @@ class ArtistLocalDataSource @Inject constructor(
         return dao.getAll()
     }
 
+    fun getFavorite(): Flow<List<ArtistEntity>> {
+        return dao.getFavorite()
+    }
+
+
     fun getById(id: Long): Flow<ArtistEntity?> {
         return dao.getById(id)
     }

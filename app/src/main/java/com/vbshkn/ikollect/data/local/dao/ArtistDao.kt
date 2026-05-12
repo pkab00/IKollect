@@ -20,6 +20,9 @@ interface ArtistDao {
     @Query("SELECT * FROM ArtistEntity WHERE isDeleted = 0 ORDER BY name ASC")
     fun getAll(): Flow<List<ArtistEntity>>
 
+    @Query("SELECT * FROM ArtistEntity WHERE isDeleted = 0 AND isFavorite = 1 ORDER BY name ASC")
+    fun getFavorite(): Flow<List<ArtistEntity>>
+
     @Query("SELECT * FROM ArtistEntity WHERE isGroup = 1 AND isDeleted = 0 ORDER BY name ASC")
     fun getGroups(): Flow<List<ArtistEntity>>
 

@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.list.ArtistListItem
+import com.vbshkn.ikollect.presentation.composable.ArtistCircleItem
 import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
 
 @Composable
@@ -90,40 +91,6 @@ fun AllArtistsScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ArtistCircleItem(
-    artist: ArtistListItem,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick,)
-    ) {
-        AsyncImage(
-            model = artist.profileImage,
-            contentDescription = artist.name,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(size = 80.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-        )
-
-        Text(
-            text = artist.name,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
     }
 }
 

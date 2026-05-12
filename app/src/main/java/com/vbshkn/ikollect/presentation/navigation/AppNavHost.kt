@@ -55,7 +55,10 @@ fun AppNavHost(navController: NavHostController) {
             val viewModel = hiltViewModel<UserProfileViewModel>()
             UserProfileScreen(
                 viewModel = viewModel,
-                onNavigateToAuth = { navController.navigate(Route.AuthFlow.Login) }
+                onNavigateToAuth = { navController.navigate(Route.AuthFlow.Login) },
+                onNavigateToAlbum = { navController.navigate(Route.AlbumFlow.Profile(it)) },
+                onNavigateToPhotocard = { navController.navigate(Route.PhotocardFlow.Profile(it)) },
+                onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) }
             )
         }
 

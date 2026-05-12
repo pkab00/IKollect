@@ -43,6 +43,12 @@ class ArtistRepository @Inject constructor(
             .asLocalResult { list -> list.map { it.toListItem() } }
     }
 
+    fun getFavorite(): Flow<NetworkResult<List<ArtistListItem>>> {
+        return artistLocalDS
+            .getFavorite()
+            .asLocalResult { list -> list.map { it.toListItem() } }
+    }
+
     fun getArtistProfile(id: Long): Flow<NetworkResult<ArtistProfileData?>> {
         return artistLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
     }

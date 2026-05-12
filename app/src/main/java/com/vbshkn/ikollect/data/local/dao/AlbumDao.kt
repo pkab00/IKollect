@@ -35,6 +35,10 @@ interface AlbumDao {
     fun getAllWithArtists(): Flow<List<AlbumWithArtists>>
 
     @Transaction
+    @Query("SELECT * FROM AlbumEntity WHERE isDeleted = 0 AND isFavorite = 1")
+    fun getFavoriteWithArtists(): Flow<List<AlbumWithArtists>>
+
+    @Transaction
     @Query("SELECT * FROM AlbumEntity WHERE barcodeNumber = :barcode AND isDeleted = 0")
     fun getWithArtistsByBarcode(barcode: String): Flow<AlbumWithArtists>?
 

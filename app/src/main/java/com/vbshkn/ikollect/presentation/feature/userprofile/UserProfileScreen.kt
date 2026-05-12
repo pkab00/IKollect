@@ -4,6 +4,7 @@ import com.vbshkn.ikollect.presentation.feature.userprofile.UserProfileContract.
 import com.vbshkn.ikollect.presentation.feature.userprofile.UserProfileContract.Event
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -18,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +52,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.AppUser
+import com.vbshkn.ikollect.domain.model.details.AlbumDetails
+import com.vbshkn.ikollect.domain.model.list.ArtistListItem
+import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
+import com.vbshkn.ikollect.presentation.composable.AlbumCard
+import com.vbshkn.ikollect.presentation.composable.ArtistBox
+import com.vbshkn.ikollect.presentation.composable.ArtistCircleItem
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
+import com.vbshkn.ikollect.presentation.composable.PhotocardItem
+import com.vbshkn.ikollect.presentation.composable.profile.ArtistCard
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract
 import com.vbshkn.ikollect.util.UiText
 import kotlinx.coroutines.launch
 
@@ -54,7 +69,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun UserProfileScreen(
     viewModel: UserProfileViewModel,
-    onNavigateToAuth: () -> Unit
+    onNavigateToAuth: () -> Unit,
+    onNavigateToAlbum: (Long) -> Unit,
+    onNavigateToPhotocard: (Long) -> Unit,
+    onNavigateToArtist: (Long) -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoggedIn = state.user?.email != null
@@ -62,7 +80,10 @@ fun UserProfileScreen(
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                Effect.GoToAuthScreen -> onNavigateToAuth()
+                is Effect.GoToAuthScreen -> onNavigateToAuth()
+                is Effect.GoToAlbum -> onNavigateToAlbum(effect.id)
+                is Effect.GoToArtist -> onNavigateToArtist(effect.id)
+                is Effect.GoToPhotocard -> onNavigateToPhotocard(effect.id)
             }
         }
     }
@@ -97,7 +118,15 @@ fun UserProfileScreen(
                 .padding(paddingValues)
         ) {
             if (isLoggedIn) {
-                state.user?.let { LoggedInContent(it) }
+                state.user?.let { user ->
+                    LoggedInContent(
+                        user = user,
+                        albums = state.favoriteAlbums,
+                        photocards = state.favoritePhotocards,
+                        artists = state.favoriteArtists,
+                        onEvent = viewModel::onEvent
+                    )
+                }
             } else {
                 LoggedOutContent(
                     onLoginClick = { viewModel.onEvent(Event.OnLogInClick) }
@@ -130,7 +159,11 @@ fun LoggedOutContent(
 
 @Composable
 fun LoggedInContent(
-    user: AppUser
+    user: AppUser,
+    albums: List<AlbumDetails>,
+    photocards: List<PhotocardListItem>,
+    artists: List<ArtistListItem>,
+    onEvent: (Event) -> Unit
 ) {
     val tabs = Tabs.entries.toList()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -151,8 +184,29 @@ fun LoggedInContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
+                .padding(10.dp)
         ) {
+            when (Tabs.entries[pagerState.currentPage]) {
+                Tabs.ALBUMS -> {
+                    AlbumTabContent(
+                        albums = albums,
+                        onClick = { onEvent(Event.OnAlbumClick(it)) }                 )
+                }
 
+                Tabs.PHOTOCARDS -> {
+                    PhotocardTabContent(
+                        photocards = photocards,
+                        onClick = { onEvent(Event.OnPhotocardClick(it)) }
+                    )
+                }
+
+                Tabs.ARTISTS -> {
+                    ArtistTabContent(
+                        artists = artists,
+                        onClick = { onEvent(Event.OnArtistClick(it)) }
+                    )
+                }
+            }
         }
     }
 }
@@ -216,6 +270,105 @@ private fun ProfileHeader(
                     )
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun AlbumTabContent(
+    albums: List<AlbumDetails>,
+    onClick: (Long) -> Unit
+
+) {
+    if (albums.isEmpty()) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(stringResource(R.string.filler_nothing_to_show))
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                items = albums,
+                key = { it.albumId }
+            ) { album ->
+                AlbumCard(
+                    album = album,
+                    onClick = { onClick(album.albumId) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PhotocardTabContent(
+    photocards: List<PhotocardListItem>,
+    onClick: (Long) -> Unit
+) {
+    if (photocards.isEmpty()) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(stringResource(R.string.filler_nothing_to_show))
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                items = photocards,
+                key = { it.photocardId }
+            ) { photocard ->
+                PhotocardItem(
+                    item = photocard,
+                    height = 150.dp,
+                    onClick = { onClick(photocard.photocardId) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ArtistTabContent(
+    artists: List<ArtistListItem>,
+    onClick: (Long) -> Unit
+) {
+    if (artists.isEmpty()) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(stringResource(R.string.filler_nothing_to_show))
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                items = artists,
+                key = { it.artistId }
+            ) { artist ->
+                ArtistCircleItem(
+                    artist = artist,
+                    imageSize = 90.dp,
+                    onClick = { onClick(artist.artistId) },
+                )
+            }
         }
     }
 }

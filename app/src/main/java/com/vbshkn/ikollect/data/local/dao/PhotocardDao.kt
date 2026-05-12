@@ -20,6 +20,9 @@ interface PhotocardDao {
     @Query("SELECT * FROM PhotocardEntity WHERE isDeleted = 0")
     fun getAll(): Flow<List<PhotocardEntity>>
 
+    @Query("SELECT * FROM PhotocardEntity WHERE isDeleted = 0 AND isFavorite = 1")
+    fun getFavorite(): Flow<List<PhotocardEntity>>
+
     @Query("SELECT * FROM PhotocardEntity WHERE isSynchronized = 0")
     fun getUnSynchronized(): Flow<List<PhotocardEntity>>
 

@@ -15,6 +15,10 @@ class PhotocardLocalDataSource @Inject constructor(
         return dao.getAll()
     }
 
+    fun getFavorite(): Flow<List<PhotocardEntity>> {
+        return dao.getFavorite()
+    }
+
     fun getById(id: Long): Flow<PhotocardEntity?> {
         return dao.getById(id)
     }

@@ -22,6 +22,13 @@ class PhotocardRepository @Inject constructor(
             }
     }
 
+    fun getFavorite(): Flow<NetworkResult<List<PhotocardListItem>>> {
+        return photocardLocalDS.getFavorite()
+            .asLocalResult { photocards ->
+                photocards.map { it.toListItem() }
+            }
+    }
+
     fun getPhotocardProfile(id: Long): Flow<NetworkResult<PhotocardProfileData?>> {
         return photocardLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
     }

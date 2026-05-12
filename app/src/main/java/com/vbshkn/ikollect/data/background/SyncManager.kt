@@ -93,7 +93,9 @@ class SyncManager @Inject constructor(
         // DOWNLOADING FROM REMOTE
         val backPackage = try {
             coroutineScope {
-                val backendArtistSettings = supabase.from(BackendTables.USER.ARTIST_SETTINGS).select().decodeList<UserArtistSettingsBackend>()
+                val backendArtistSettings = supabase.from(BackendTables.USER.ARTIST_SETTINGS).select {
+                    filter { UserArtistSettingsBackend::isDeleted isExact false }
+                }.decodeList<UserArtistSettingsBackend>()
                 val userArtistIds = backendArtistSettings.map { it.artistId }
                 val backendArtists = supabase.from(BackendTables.GLOBAL.ARTISTS)
                     .select {
@@ -110,12 +112,24 @@ class SyncManager @Inject constructor(
                         }
                     }
                     .decodeList<GlobalArtistHierarchyBackend>()
-                val backendAlbums = supabase.from(BackendTables.USER.ALBUMS).select().decodeList<UserAlbumBackend>()
-                val backendPhotocards = supabase.from(BackendTables.USER.PHOTOCARDS).select().decodeList<UserPhotocardBackend>()
-                val backendAACrossRef = supabase.from(BackendTables.CROSSREF.ALBUM_ARTIST).select().decodeList<AlbumArtistCrossRefBackend>()
-                val backendPACrossRef = supabase.from(BackendTables.CROSSREF.PHOTOCARD_ARTIST).select().decodeList<PhotocardArtistCrossRefBackend>()
-                val backendPTCrossRef = supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG).select().decodeList<PhotocardTagCrossRefBackend>()
-                val backendTags = supabase.from(BackendTables.TAGS).select().decodeList<TagBackend>()
+                val backendAlbums = supabase.from(BackendTables.USER.ALBUMS).select {
+                    filter { UserAlbumBackend::isDeleted isExact false }
+                }.decodeList<UserAlbumBackend>()
+                val backendPhotocards = supabase.from(BackendTables.USER.PHOTOCARDS).select {
+                    filter { UserPhotocardBackend::isDeleted isExact false }
+                }.decodeList<UserPhotocardBackend>()
+                val backendAACrossRef = supabase.from(BackendTables.CROSSREF.ALBUM_ARTIST).select {
+                    filter { AlbumArtistCrossRefBackend::isDeleted isExact false }
+                }.decodeList<AlbumArtistCrossRefBackend>()
+                val backendPACrossRef = supabase.from(BackendTables.CROSSREF.PHOTOCARD_ARTIST).select {
+                    filter { PhotocardArtistCrossRefBackend::isDeleted isExact false }
+                }.decodeList<PhotocardArtistCrossRefBackend>()
+                val backendPTCrossRef = supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG).select {
+                    filter { PhotocardTagCrossRefBackend::isDeleted isExact false }
+                }.decodeList<PhotocardTagCrossRefBackend>()
+                val backendTags = supabase.from(BackendTables.TAGS).select {
+                    filter { TagBackend::isDeleted isExact false }
+                }.decodeList<TagBackend>()
 
                 BackendDataPackage(
                     backendArtists,

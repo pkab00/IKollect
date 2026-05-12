@@ -24,6 +24,10 @@ class AlbumLocalDataSource @Inject constructor(
         return dao.getAllWithArtists()
     }
 
+    fun getFavoriteWithArtists(): Flow<List<AlbumWithArtists>> {
+        return dao.getFavoriteWithArtists()
+    }
+
     fun getAllByArtist(artistId: Long): Flow<List<ArtistWithAlbums>> {
         return dao.getAllByArtist(artistId)
     }
