@@ -7,9 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,13 +46,23 @@ fun AlbumCard(
                 AsyncImage(
                     model = album.coverImage,
                     contentDescription = null,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .clip(RoundedCornerShape(16.dp)),
-                    contentScale = ContentScale.Crop
+                        .clip(RoundedCornerShape(16.dp))
                 )
-
+                if (album.isFavorite) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(6.dp)
+                            .align(Alignment.BottomEnd)
+                    )
+                }
             }
             // 2. ИНФОРМАЦИЯ
             Column(

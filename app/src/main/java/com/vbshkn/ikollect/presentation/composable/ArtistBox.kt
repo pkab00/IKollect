@@ -3,12 +3,16 @@ package com.vbshkn.ikollect.presentation.composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -35,17 +40,19 @@ import com.vbshkn.ikollect.util.PaletteUtil
 @Composable
 fun ArtistBox(
     overview: ArtistListItem,
-    onClick: (Long) -> Unit
+    onClick: (Long) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val initialColors = listOf(
-        MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f),
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-    )
+        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+        )
     var imageGradient by remember { mutableStateOf(Brush.verticalGradient(initialColors)) }
 
     Surface(
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.size(120.dp),
+        modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     ) {
         Column(
@@ -55,25 +62,41 @@ fun ArtistBox(
                 .fillMaxSize()
                 .clickable { onClick(overview.artistId) }
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(overview.profileImage)
-                    .allowHardware(false)
-                    .build(),
-                onSuccess = { result ->
-                    val bitmap = result.result.image.toBitmap()
-                    imageGradient = PaletteUtil.getVibrantGradient(
-                        bitmap = bitmap,
-                        defaultColors = initialColors
-                    )
-                },
-                contentDescription = null,
-                contentScale = ContentScale.FillHeight,
+            Box(
                 modifier = Modifier
                     .weight(0.6f)
                     .fillMaxWidth()
-                    .background(imageGradient)
-            )
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(overview.profileImage)
+                        .allowHardware(false)
+                        .build(),
+                    onSuccess = { result ->
+                        val bitmap = result.result.image.toBitmap()
+                        imageGradient = PaletteUtil.getVibrantGradient(
+                            bitmap = bitmap,
+                            defaultColors = initialColors
+                        )
+                    },
+                    contentDescription = null,
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(imageGradient)
+                )
+                if (overview.isFavorite) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(6.dp)
+                            .align(Alignment.BottomEnd)
+                    )
+                }
+            }
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(6.dp),

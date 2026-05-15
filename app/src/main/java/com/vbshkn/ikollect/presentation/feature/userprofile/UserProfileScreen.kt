@@ -354,7 +354,7 @@ private fun ArtistTabContent(
         }
     } else {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
+            columns = GridCells.Adaptive(150.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxSize()
@@ -363,10 +363,10 @@ private fun ArtistTabContent(
                 items = artists,
                 key = { it.artistId }
             ) { artist ->
-                ArtistCircleItem(
-                    artist = artist,
-                    imageSize = 90.dp,
+                ArtistBox(
+                    overview = artist,
                     onClick = { onClick(artist.artistId) },
+                    modifier = Modifier.size(150.dp)
                 )
             }
         }
