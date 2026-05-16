@@ -14,6 +14,7 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.storage.Storage
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
@@ -26,7 +27,7 @@ object SupabaseModule {
     fun provideSupabaseClient(): SupabaseClient {
         return createSupabaseClient(
             supabaseUrl = BuildConfig.SUPABASE_URL,
-            supabaseKey = BuildConfig.SUPABASE_KEY
+            supabaseKey = BuildConfig.SUPABASE_KEY,
         ) {
             install(Auth) {
                 sessionManager = SettingsSessionManager()
@@ -42,6 +43,7 @@ object SupabaseModule {
             install(Storage)
             install(Realtime)
 
+            httpEngine = OkHttp.create()
             httpConfig {
                 install(HttpTimeout) {
                     requestTimeoutMillis = 15_000

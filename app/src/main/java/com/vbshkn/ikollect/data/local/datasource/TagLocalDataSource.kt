@@ -24,4 +24,8 @@ class TagLocalDataSource @Inject constructor(
     suspend fun deleteLink(link: PhotocardTagCrossRef) {
         dao.deleteLink(link)
     }
+
+    suspend fun clearAllButSystem() {
+        dao.clearUserTags()
+    }
 }

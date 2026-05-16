@@ -47,8 +47,7 @@ fun ArtistProfileScreen(
                 is Effect.NavigateToArtist -> onNavigateToArtist(effect.id)
                 is Effect.NavigateToPhotocard -> onNavigateToPhotocard(effect.id)
                 is Effect.ShowRefreshingErrorToast -> {
-                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
                 }
             }
         }

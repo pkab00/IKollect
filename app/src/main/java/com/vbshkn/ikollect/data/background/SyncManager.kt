@@ -33,6 +33,7 @@ import com.vbshkn.ikollect.data.remote.backend.model.UserAlbumBackend
 import com.vbshkn.ikollect.data.remote.backend.model.UserArtistSettingsBackend
 import com.vbshkn.ikollect.data.remote.backend.model.UserPhotocardBackend
 import com.vbshkn.ikollect.di.ApplicationScope
+import com.vbshkn.ikollect.util.now
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
@@ -682,12 +683,4 @@ sealed interface HandshakeResult {
     object FullSuccess : HandshakeResult
     object PartialSuccess : HandshakeResult
     object Fail : HandshakeResult
-}
-
-private fun now(): Long {
-    return System.currentTimeMillis()
-}
-
-private fun nowStr(): String {
-    return now().toTimestamptz()
 }

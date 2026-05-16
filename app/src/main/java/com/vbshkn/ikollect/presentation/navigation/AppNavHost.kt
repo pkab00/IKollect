@@ -26,6 +26,7 @@ import com.vbshkn.ikollect.presentation.navigation.graphs.albumProfileGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.artistsGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.authGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.photocardProfileGraph
+import com.vbshkn.ikollect.presentation.navigation.graphs.settingsGraph
 import kotlin.reflect.typeOf
 
 @Composable
@@ -56,6 +57,7 @@ fun AppNavHost(navController: NavHostController) {
             UserProfileScreen(
                 viewModel = viewModel,
                 onNavigateToAuth = { navController.navigate(Route.AuthFlow.Login) },
+                onNavigateToSettings = { navController.navigate(Route.Settings) },
                 onNavigateToAlbum = { navController.navigate(Route.AlbumFlow.Profile(it)) },
                 onNavigateToPhotocard = { navController.navigate(Route.PhotocardFlow.Profile(it)) },
                 onNavigateToArtist = { navController.navigate(Route.ArtistProfile(it)) }
@@ -124,9 +126,12 @@ fun AppNavHost(navController: NavHostController) {
             )
         }
 
-        artistsGraph(navController)
-        albumProfileGraph(navController)
-        photocardProfileGraph(navController)
-        authGraph(navController)
+        with(navController) {
+            artistsGraph(this)
+            albumProfileGraph(this)
+            photocardProfileGraph(this)
+            authGraph(this)
+            settingsGraph(this)
+        }
     }
 }

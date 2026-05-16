@@ -36,6 +36,12 @@ sealed interface Route {
         @Serializable data object Login : AuthFlow()
         @Serializable data object Register : AuthFlow()
     }
+
+    @Serializable data object Settings : Route
+    @Serializable sealed class SettingsFlow : Route {
+        @Serializable data object Main : SettingsFlow()
+    }
+
     @Serializable data class AlbumWizard(val candidate: AlbumCandidate) : Route
     @Serializable data object PhotocardWizard : Route
 }

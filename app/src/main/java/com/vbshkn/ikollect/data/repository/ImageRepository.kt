@@ -46,4 +46,11 @@ class ImageRepository @Inject constructor(
             android.util.Log.d("ImageRepository", "Failed to delete: ${e.message}")
         }
     }
+
+    fun clearLocalStorage() {
+        val localDir = context.filesDir
+        localDir.listFiles()?.forEach { file ->
+            file.delete()
+        }
+    }
 }

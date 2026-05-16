@@ -113,6 +113,7 @@ dependencies {
     implementation(libs.supabase.realtime.kt)
     implementation(libs.ktor.client.android)
     implementation(libs.play.services.auth)
+    implementation(libs.ktor.client.okhttp)
 
     // --- WORKMANAGER ---
     implementation(libs.androidx.work.runtime.ktx)

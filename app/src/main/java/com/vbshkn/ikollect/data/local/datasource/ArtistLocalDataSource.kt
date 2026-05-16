@@ -55,4 +55,8 @@ class ArtistLocalDataSource @Inject constructor(
     suspend fun setFavorite(id: Long, isFavorite: Boolean) {
         dao.setFavorite(id, isFavorite)
     }
+
+    suspend fun clearAll() {
+        dao.clearAll()
+    }
 }

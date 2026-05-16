@@ -16,11 +16,10 @@ import javax.inject.Inject
 @HiltViewModel
 class UserProfileViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
-    private val logOutUseCase: LogOutUseCase,
     private val getFavoriteAlbumsUseCase: GetFavoriteAlbumsUseCase,
     private val getFavoritePhotocardsUseCase: GetFavoritePhotocardsUseCase,
     private val getFavoriteArtistsUseCase: GetFavoriteArtistsUseCase
-) : BaseViewModel<UserProfileUIState, UserProfileContract.Event, UserProfileContract.Effect>(initialState = UserProfileUIState()) {
+) : BaseViewModel<UserProfileUIState, Event, Effect>(initialState = UserProfileUIState()) {
 
     init {
         loadUserProfile()
@@ -41,8 +40,8 @@ class UserProfileViewModel @Inject constructor(
             is Event.OnLogInClick -> {
                 sendEffect(Effect.GoToAuthScreen)
             }
-            is Event.OnLogOutClick -> viewModelScope.launch {
-                logOutUseCase()
+            is Event.OnSettingsClick -> {
+                sendEffect(Effect.GoToSettings)
             }
 
             is Event.OnAlbumClick -> {

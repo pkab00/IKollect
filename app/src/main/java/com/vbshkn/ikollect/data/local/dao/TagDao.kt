@@ -40,6 +40,9 @@ interface TagDao {
     @Query("DELETE FROM tagentity")
     suspend fun clearAll()
 
+    @Query("DELETE FROM tagentity WHERE isSystemTag = 0")
+    suspend fun clearUserTags()
+
     @Query("DELETE FROM tagentity WHERE isDeleted = 1")
     suspend fun clearDeleted()
 }
