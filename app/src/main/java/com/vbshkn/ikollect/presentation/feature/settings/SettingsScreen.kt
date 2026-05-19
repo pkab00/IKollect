@@ -4,27 +4,18 @@ import com.vbshkn.ikollect.presentation.feature.settings.SettingsContract.Event
 import com.vbshkn.ikollect.presentation.feature.settings.SettingsContract.Effect
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,7 +34,10 @@ import com.vbshkn.ikollect.presentation.feature.auth.nicknameErrorHandler
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToThemeSettings: () -> Unit,
+    onNavigateToLanguageSettings: () -> Unit,
+    onNavigateToTabsSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -51,6 +45,9 @@ fun SettingsScreen(
         viewModel.effects.collect { effect ->
             when (effect) {
                 Effect.GoBack -> onNavigateBack()
+                Effect.GoToThemeSettings -> onNavigateToThemeSettings()
+                Effect.GoToLanguageSettings -> onNavigateToLanguageSettings()
+                Effect.GoToTabsSettings -> onNavigateToTabsSettings()
             }
         }
     }
@@ -67,69 +64,39 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            item {
+                SettingsCategoryHeader(title = stringResource(R.string.settings_section_appearence))
+                ClickableSettingItem(
+                    title = stringResource(R.string.settings_item_theme),
+                    onClick = { viewModel.onEvent(Event.OnChangeThemeClicked) }
+                )
+                ClickableSettingItem(
+                    title = stringResource(R.string.settings_item_language),
+                    onClick = { viewModel.onEvent(Event.OnChangeLanguageClicked) }
+                )
+                ClickableSettingItem(
+                    title = stringResource(R.string.settings_item_tabs_order),
+                    onClick = { viewModel.onEvent(Event.OnConfigureTabsClicked) }
+                )
+            }
             if (uiState.user != null) {
                 item {
-                    SettingsContainer {
-                        SettingsCategoryHeader(title = stringResource(R.string.settings_section_account))
-                        ClickableSettingItem(
-                            title = stringResource(R.string.settings_item_change_username),
-                            onClick = { viewModel.onEvent(Event.OnChangeNicknameClicked) }
-                        )
-                        ClickableSettingItem(
-                            title = stringResource(R.string.settings_item_log_out),
-                            trailingIcon = Icons.AutoMirrored.Filled.Logout,
-                            onClick = { viewModel.onEvent(Event.OnLogOutClicked) }
-                        )
-                    }
+                    SettingsCategoryHeader(title = stringResource(R.string.settings_section_account))
+                    ClickableSettingItem(
+                        title = stringResource(R.string.settings_item_change_username),
+                        onClick = { viewModel.onEvent(Event.OnChangeNicknameClicked) }
+                    )
+                    ClickableSettingItem(
+                        title = stringResource(R.string.settings_item_log_out),
+                        trailingIcon = Icons.AutoMirrored.Filled.Logout,
+                        onClick = { viewModel.onEvent(Event.OnLogOutClicked) }
+                    )
                 }
             }
         }
     }
     if (uiState.isLoading) {
         LoadingOverlay()
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SettingsTopBar(
-    onEvent: (Event) -> Unit
-) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.title_settings),
-                style = MaterialTheme.typography.titleLarge
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = { onEvent(Event.OnBackClicked) }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    )
-}
-
-@Composable
-fun SettingsContainer(
-    content: @Composable () -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.padding(6.dp)
-    ) {
-        Column {
-            content()
-        }
     }
 }
 

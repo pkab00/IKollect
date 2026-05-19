@@ -1,6 +1,7 @@
 package com.vbshkn.ikollect.presentation.feature.settings
 
 import com.vbshkn.ikollect.domain.error.ValidationError
+import com.vbshkn.ikollect.domain.model.AppSettings
 import com.vbshkn.ikollect.domain.model.AppUser
 
 data class SettingsUIState(
@@ -9,6 +10,7 @@ data class SettingsUIState(
     val isRefreshing: Boolean = false,
     val dialogState: SettingsDialogState = SettingsDialogState.None,
 
+    val settings: AppSettings? = null,
     val newNickname: String? = null,
     val nicknameValidationError: ValidationError.NicknameError? = null
 )

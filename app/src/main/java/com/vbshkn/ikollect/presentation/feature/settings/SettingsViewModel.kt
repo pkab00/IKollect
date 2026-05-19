@@ -6,7 +6,11 @@ import com.vbshkn.ikollect.presentation.feature.settings.SettingsContract.Effect
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.ClearLocalDataUseCase
 import com.vbshkn.ikollect.domain.usecase.auth.LogOutUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAppSettingsUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetUserProfileUseCase
+import com.vbshkn.ikollect.domain.usecase.update.UpdateAppLanguageUseCase
+import com.vbshkn.ikollect.domain.usecase.update.UpdateAppThemeUseCase
+import com.vbshkn.ikollect.domain.usecase.update.UpdateNavBarTabsUseCase
 import com.vbshkn.ikollect.domain.usecase.update.UpdateUserNicknameUseCase
 import com.vbshkn.ikollect.domain.usecase.validate.ValidateNicknameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,9 +24,14 @@ class SettingsViewModel @Inject constructor(
     private val clearLocalDataUseCase: ClearLocalDataUseCase,
     private val validateNicknameUseCase: ValidateNicknameUseCase,
     private val updateUserNicknameUseCase: UpdateUserNicknameUseCase,
+    private val getAppSettingsUseCase: GetAppSettingsUseCase,
+    private val updateAppThemeUseCase: UpdateAppThemeUseCase,
+    private val updateAppLanguageUseCase: UpdateAppLanguageUseCase,
+    private val updateNavBarTabsUseCase: UpdateNavBarTabsUseCase
 ) : BaseViewModel<SettingsUIState, Event, Effect>(initialState = SettingsUIState()) {
     init {
         observeUser()
+        observeSettings()
     }
 
     override fun onEvent(event: Event) {
@@ -53,6 +62,25 @@ class SettingsViewModel @Inject constructor(
             is Event.OnNewNicknameSelected -> viewModelScope.launch {
                 updateUserNicknameUseCase(event.newNickname)
             }
+            is Event.OnChangeThemeClicked -> {
+                sendEffect(Effect.GoToThemeSettings)
+            }
+            is Event.OnNewThemeSelected -> viewModelScope.launch {
+                updateAppThemeUseCase(event.newTheme)
+            }
+
+            is Event.OnChangeLanguageClicked -> {
+                sendEffect(Effect.GoToLanguageSettings)
+            }
+            is Event.OnNewLanguageSelected -> viewModelScope.launch {
+                updateAppLanguageUseCase(event.newLanguage)
+            }
+            is Event.OnConfigureTabsClicked -> {
+                sendEffect(Effect.GoToTabsSettings)
+            }
+            is Event.OnTabsReordered -> viewModelScope.launch {
+                updateNavBarTabsUseCase(event.newOrder)
+            }
         }
     }
 
@@ -62,4 +90,10 @@ class SettingsViewModel @Inject constructor(
         onError = { state, error -> state.copy(isLoading = false) },
         onSuccess = { state, data -> state.copy(user = data, isLoading = false) }
     )
+
+    private fun observeSettings() = viewModelScope.launch {
+        getAppSettingsUseCase().collect { settings ->
+            updateState { it.copy(settings = settings) }
+        }
+    }
 }

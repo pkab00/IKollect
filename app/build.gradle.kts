@@ -119,8 +119,14 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
 
-    // ---DATASTORE ---
+    // --- DATASTORE ---
     implementation(libs.androidx.datastore.preferences)
+
+    // --- APPCOMPAT ---
+    implementation(libs.androidx.appcompat)
+
+    // --- REORDERABLE (by Calvin-LL on github) ---
+    implementation(libs.reorderable)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

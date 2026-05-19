@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -13,15 +14,19 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.navigation.NavBarDestinations
 import com.vbshkn.ikollect.presentation.navigation.AppNavHost
 import com.vbshkn.ikollect.presentation.navigation.Route
@@ -29,7 +34,7 @@ import com.vbshkn.ikollect.presentation.theme.IKollectTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,15 +43,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             IKollectTheme(dynamicColor = false) {
-                IKollectApp()
+                IKollectApp(viewModel)
             }
         }
     }
 }
 
-@PreviewScreenSizes
 @Composable
-fun IKollectApp() {
+fun IKollectApp(viewModel: MainViewModel) {
+    val settings by viewModel.settings.collectAsStateWithLifecycle()
     val navController = rememberNavController()
     val bachStackEntity by navController.currentBackStackEntryAsState()
     val currentDestination = bachStackEntity?.destination
@@ -67,7 +72,7 @@ fun IKollectApp() {
     NavigationSuiteScaffold(
         layoutType = navSuiteType,
         navigationSuiteItems = {
-            NavBarDestinations.entries.forEach { destination ->
+            settings?.navBarDestinations?.forEach { destination ->
                 item(
                     icon = {
                         Icon(
@@ -89,6 +94,15 @@ fun IKollectApp() {
             }
         }
     ) {
-        AppNavHost(navController)
+        val startRoute = settings?.navBarDestinations?.first()?.route
+        if (startRoute == null) {
+            LoadingOverlay()
+        }
+        else {
+            AppNavHost(
+                navController = navController,
+                startRoute = remember { startRoute }
+            )
+        }
     }
 }

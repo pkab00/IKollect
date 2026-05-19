@@ -1,6 +1,7 @@
 package com.vbshkn.ikollect.data.mapper
 
 import androidx.compose.ui.graphics.Color
+import com.vbshkn.ikollect.data.local.datastore.LocalSettings
 import com.vbshkn.ikollect.data.local.model.entity.AlbumArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.entity.ArtistArtistCrossRef
@@ -18,6 +19,8 @@ import com.vbshkn.ikollect.data.remote.backend.model.TagBackend
 import com.vbshkn.ikollect.data.remote.backend.model.UserAlbumBackend
 import com.vbshkn.ikollect.data.remote.backend.model.UserArtistSettingsBackend
 import com.vbshkn.ikollect.data.remote.backend.model.UserPhotocardBackend
+import com.vbshkn.ikollect.data.remote.backend.model.UserSettingsBackend
+import com.vbshkn.ikollect.util.nowTimestamp
 import kotlin.time.Instant
 
 object BackendMappers {
@@ -230,6 +233,14 @@ object BackendMappers {
             createdAt = this.createdAt.toTimestamptz(),
             updatedAt = this.updatedAt.toTimestamptz(),
             isDeleted = this.isDeleted
+        )
+    }
+
+    fun LocalSettings.toBackend(userId: String): UserSettingsBackend {
+        return UserSettingsBackend(
+            id = userId,
+            settings = this,
+            updatedAt = nowTimestamp()
         )
     }
 }

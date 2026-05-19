@@ -30,10 +30,13 @@ import com.vbshkn.ikollect.presentation.navigation.graphs.settingsGraph
 import kotlin.reflect.typeOf
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(
+    navController: NavHostController,
+    startRoute: Route
+) {
     NavHost(
         navController = navController,
-        startDestination = Route.Albums
+        startDestination = startRoute
     ) {
         composable<Route.Albums> {
             val viewModel = hiltViewModel<AlbumsViewModel>()

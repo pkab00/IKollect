@@ -10,6 +10,7 @@ interface BackendTables {
         val ALBUMS = "user_albums"
         val ARTIST_SETTINGS = "user_artist_settings"
         val PHOTOCARDS = "user_photocards"
+        val SETTINGS = "user_settings"
     }
 
     object CROSSREF {
