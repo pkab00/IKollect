@@ -14,9 +14,13 @@ class BackgroundSyncWorker @AssistedInject constructor(
     private val syncManager: SyncManager
 ) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
-        val userId = inputData.getString("USER_ID") ?: return Result.failure()
+        val userId = inputData.getString("USER_ID")
 
         return try {
+            if (userId == null) {
+                syncManager.offlineCheckup()
+                return Result.success()
+            }
             syncManager.performHandshake(userId)
             Result.success()
         } catch (e: Exception) {

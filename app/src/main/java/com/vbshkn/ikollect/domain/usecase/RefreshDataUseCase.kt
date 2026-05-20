@@ -17,6 +17,9 @@ class RefreshDataUseCase @Inject constructor(
             val handshakeResult = syncManager.performHandshake(userId)
             return handshakeResult is HandshakeResult.FullSuccess
         }
-        return false
+        else {
+            syncManager.offlineCheckup()
+            return true
+        }
     }
 }

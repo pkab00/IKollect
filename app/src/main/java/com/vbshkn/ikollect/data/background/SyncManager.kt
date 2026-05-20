@@ -308,6 +308,20 @@ class SyncManager @Inject constructor(
         }
     }
 
+    suspend fun offlineCheckup() {
+        Log.i(TAG, "Starting offline checkup...")
+        val startPoint = now()
+
+        Log.i(TAG, "Step 1: Looking for unused artists to delete...")
+        softDeleteUnusedArtists()
+        Log.i(TAG, "Step 2: Clear Deleted")
+        clearDeleted()
+
+        val finishPoint = now()
+        val totalSeconds = (finishPoint - startPoint) / 1000f
+        Log.i(TAG, "Offline checkup finished in $totalSeconds seconds.")
+    }
+
     // ================================ HANDSHAKE =================================================
 
     suspend fun performHandshake(userId: String): HandshakeResult {
