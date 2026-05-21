@@ -79,13 +79,13 @@ class PhotocardWizardViewModel @Inject constructor(
 
             is PhotocardWizardContract.Event.OnPhotoSelected -> updateState {
                 it.copy(
-                    photocardImagePreviews = it.photocardImagePreviews + event.uri,
-                    photocardCandidate = it.photocardCandidate.copy(imageUrl = event.uri)
+                    photocardImagePreviews = it.photocardImagePreviews + event.photo,
+                    photocardCandidate = it.photocardCandidate.copy(image = event.photo)
                 )
             }
 
             is PhotocardWizardContract.Event.OnPhotocardPreviewSelected -> updateState {
-                it.copy(photocardCandidate = it.photocardCandidate.copy(imageUrl = event.url))
+                it.copy(photocardCandidate = it.photocardCandidate.copy(image = event.preview))
             }
 
             is PhotocardWizardContract.Event.OnShowSelectArtistTip -> updateState {

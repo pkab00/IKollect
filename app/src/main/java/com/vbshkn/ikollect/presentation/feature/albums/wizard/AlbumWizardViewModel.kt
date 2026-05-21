@@ -12,6 +12,7 @@ import javax.inject.Inject
 import kotlin.reflect.typeOf
 import com.vbshkn.ikollect.domain.usecase.save.SaveAlbumUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
+import com.vbshkn.ikollect.domain.model.UserItemImage
 
 @HiltViewModel
 class AlbumWizardViewModel @Inject constructor(
@@ -50,20 +51,22 @@ class AlbumWizardViewModel @Inject constructor(
             is AlbumWizardContract.Event.OnStepChanged -> updateState {
                 it.copy(stepIndex = event.newStep)
             }
-            is AlbumWizardContract.Event.OnNewAlbumPrevirew -> updateState {
+            is AlbumWizardContract.Event.OnNewAlbumPreview -> updateState {
                 it.copy(
-                    albumCoverPreviews = it.albumCoverPreviews + event.uri,
-                    coverImage = event.uri
+                    albumCoverPreviews = it.albumCoverPreviews + event.preview,
+                    coverImage = event.preview
                 )
             }
             is AlbumWizardContract.Event.OnVersionSelected -> updateState {
                 it.copy(
                     versionCandidate = event.candidate,
-                    coverImage = event.candidate.coverImage
+                    coverImage = event.candidate.coverImage?.let { uri ->
+                        UserItemImage(uri = uri, isCached = false)
+                    }
                 )
             }
             is AlbumWizardContract.Event.OnAlbumPreviewSelected -> updateState { state ->
-                state.copy(coverImage = event.path)
+                state.copy(coverImage = event.preview)
             }
             is AlbumWizardContract.Event.OnVersionNameChanged -> updateState { state ->
                 state.versionCandidate?.let { candidate ->

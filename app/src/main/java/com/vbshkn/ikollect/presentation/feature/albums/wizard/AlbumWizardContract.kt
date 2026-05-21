@@ -1,5 +1,7 @@
 package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
 
 sealed interface AlbumWizardContract {
@@ -23,9 +25,9 @@ sealed interface AlbumWizardContract {
         object OnShowCameraRationale : Event
         object OnShowKomcaHint : Event
         data class OnStepChanged(val newStep: Int) : Event
-        data class OnNewAlbumPrevirew(val uri: String) : Event
+        data class OnNewAlbumPreview(val preview: UserItemImage) : Event
         data class OnVersionSelected(val candidate: VersionCandidate) : Event
-        data class OnAlbumPreviewSelected(val path: String) : Event
+        data class OnAlbumPreviewSelected(val preview: UserItemImage) : Event
         data class OnVersionNameChanged(val newName: String) : Event
         data class OnKomcaCodeChanged(val newCode: String) : Event
         data class OnUserNotesChanged(val newValue: String) : Event

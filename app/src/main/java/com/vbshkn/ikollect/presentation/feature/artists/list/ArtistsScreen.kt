@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.HorizontalDivider
@@ -89,7 +90,8 @@ fun ArtistsScreen(
                                 ) { overview ->
                                     ArtistBox(
                                         overview = overview,
-                                        onClick = onArtistClick
+                                        onClick = onArtistClick,
+                                        modifier = Modifier.width(120.dp)
                                     )
                                 }
                             }

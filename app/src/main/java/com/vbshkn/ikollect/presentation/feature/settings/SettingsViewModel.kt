@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.presentation.feature.settings.SettingsContract.Event
 import com.vbshkn.ikollect.presentation.feature.settings.SettingsContract.Effect
 import com.vbshkn.ikollect.domain.base.BaseViewModel
-import com.vbshkn.ikollect.domain.usecase.ClearLocalDataUseCase
 import com.vbshkn.ikollect.domain.usecase.auth.LogOutUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetAppSettingsUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetUserProfileUseCase
@@ -21,7 +20,6 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase,
     private val logOutUseCase: LogOutUseCase,
-    private val clearLocalDataUseCase: ClearLocalDataUseCase,
     private val validateNicknameUseCase: ValidateNicknameUseCase,
     private val updateUserNicknameUseCase: UpdateUserNicknameUseCase,
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
@@ -51,7 +49,6 @@ class SettingsViewModel @Inject constructor(
             is Event.OnLogOutConfirmed -> viewModelScope.launch {
                 updateState { it.copy(isLoading = true) }
                 logOutUseCase()
-                clearLocalDataUseCase()
                 updateState { it.copy(isLoading = false) }
                 sendEffect(Effect.GoBack)
             }

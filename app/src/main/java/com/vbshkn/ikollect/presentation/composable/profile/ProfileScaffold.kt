@@ -155,7 +155,7 @@ private fun CollapsingToolbar(
     backModifier: Modifier = Modifier,
 ) {
     val textSize = (20f + (12f * toolbarState.progress)).sp
-    val textEndPadding = (50 * toolbarState.progress).dp
+    val textEndPadding = if (toolbarState.progress == 0f) 40.dp else (50f * toolbarState.progress).dp
     val likeButtonSize = (20f + (25f * toolbarState.progress)).dp
     val likeButtonAlpha = toolbarState.progress
     val animatedColor = if (toolbarState.progress < 0.3f) MaterialTheme.colorScheme.onSurfaceVariant else Color.White

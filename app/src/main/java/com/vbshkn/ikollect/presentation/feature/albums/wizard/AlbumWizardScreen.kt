@@ -22,6 +22,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.presentation.composable.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.composable.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.steps.AlbumWizardSteps
@@ -73,7 +74,12 @@ fun AlbumWizardScreen(
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPrevirew(uri.toString()))
+                viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPreview(
+                    UserItemImage(
+                        uri = uri.toString(),
+                        isCached = false
+                    )
+                ))
             }
         }
     )
@@ -168,7 +174,12 @@ private fun CameraResultObserver(
 
     LaunchedEffect(cameraResult, scannerResult) {
         if (cameraResult != null) {
-            viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPrevirew(cameraResult!!))
+            viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPreview(
+                UserItemImage(
+                    uri = cameraResult!!,
+                    isCached = true
+                )
+            ))
             savedStateHandle[CameraResultContract.CAMERA_RESULT] = null
         }
         if (scannerResult != null) {

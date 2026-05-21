@@ -146,7 +146,7 @@ private fun ImageStatCard(
             AsyncImage(
                 model = item.imageUrl,
                 contentDescription = null,
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(120.dp)
                     .background(

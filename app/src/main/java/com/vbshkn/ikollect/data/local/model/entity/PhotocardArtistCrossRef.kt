@@ -11,7 +11,7 @@ import kotlin.time.Instant
             entity = PhotocardEntity::class,
             parentColumns = ["photocardId"],
             childColumns = ["photocardId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = ArtistEntity::class,

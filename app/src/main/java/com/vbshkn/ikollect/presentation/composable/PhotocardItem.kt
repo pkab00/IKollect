@@ -31,14 +31,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.request.crossfade
+import coil3.toBitmap
 import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
+import com.vbshkn.ikollect.util.PaletteUtil
 import kotlinx.coroutines.delay
 
 @Composable
@@ -48,6 +55,9 @@ fun PhotocardItem(
     onClick: () -> Unit,
     onHold: () -> Unit = {}
 ) {
+    var innerGradient: Brush by remember {
+        mutableStateOf(Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent)))
+    }
     val width = remember { height / 1.59f }
     val shape = remember { RoundedCornerShape(16.dp) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -75,9 +85,22 @@ fun PhotocardItem(
             interactionSource = interactionSource,
             modifier = Modifier.size(width, height)
         ) {
-            Box(Modifier.fillMaxSize()) {
+            Box(
+                Modifier.fillMaxSize().background(innerGradient)
+            ) {
                 AsyncImage(
-                    model = item.imageUrl,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(item.imageUrl)
+                        .allowHardware(false)
+                        .crossfade(true)
+                        .build(),
+                    onSuccess = { result ->
+                        val bitmap = result.result.image.toBitmap()
+                        innerGradient = PaletteUtil.getSoftGradient(
+                            bitmap = bitmap,
+                            defaultColors = listOf(Color.Transparent, Color.Transparent)
+                        )
+                    },
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize()

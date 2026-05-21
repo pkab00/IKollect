@@ -1,7 +1,9 @@
 package com.vbshkn.ikollect.domain.model.candidate
 
+import com.vbshkn.ikollect.domain.model.UserItemImage
+
 data class PhotocardCandidate(
-    val imageUrl: String? = null,
+    val image: UserItemImage? = null,
     val ownerId: Long? = null,
     val isOwnerAGroup: Boolean = true,
     val albumId: Long? = null,

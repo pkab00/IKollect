@@ -49,6 +49,7 @@ import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.time.Instant
+import androidx.core.net.toUri
 
 private const val TAG = "SyncManager"
 
@@ -173,8 +174,8 @@ class SyncManager @Inject constructor(
         val localPhotocardTagCF = backPackage.photocardTagCR.map { it.toEntity() }
         val localSettings = backPackage.settings.settings
 
+        database.openHelper.writableDatabase.execSQL("PRAGMA foreign_keys = OFF")
         database.withTransaction {
-            database.openHelper.writableDatabase.execSQL("PRAGMA foreign_keys = OFF")
             try {
                 // CLEANING THE LOCAL DB
                 crossRefDao.clearAll()
@@ -190,11 +191,10 @@ class SyncManager @Inject constructor(
                 photocardDao.insertAll(localPhotocards)
                 artistDao.insertGroupLinks(localArtistArtistCF)
                 albumDao.upsertArtistLinks(localAlbumArtistCF)
-                photocardDao.upsertArtistLinks(localPhotocardArtistCF)
+                photocardDao.insertArtistLinks(localPhotocardArtistCF)
                 tagDao.upsertTagLinks(localPhotocardTagCF)
                 localSettings?.let { settingsStorage.update(it) }
                 Log.d(TAG, "Download from remote completed")
-
             } finally {
                 database.openHelper.writableDatabase.execSQL("PRAGMA foreign_keys = ON")
             }
@@ -235,8 +235,9 @@ class SyncManager @Inject constructor(
         // COPYING LOCAL IMAGES
         val modifiedPackage = localPackage.copy(
             albums = localPackage.albums.map {
-                if (it.imageUrl?.startsWith("file:///") == true) {
-                    val newPath = backendStorageDao.upsertAlbumImage(it.imageUrl, it.albumId)
+                val uri = it.imageUrl?.toUri()
+                if (uri?.scheme == "file://") {
+                    val newPath = backendStorageDao.upsertAlbumImage(uri, it.albumId)
                     val copy = it.copy(imageUrl = newPath ?: it.imageUrl)
                     albumDao.updateAlbum(copy)
                     copy
@@ -245,9 +246,9 @@ class SyncManager @Inject constructor(
                 }
             },
             photocards = localPackage.photocards.map {
-                if (it.imageUrl?.startsWith("file:///") == true) {
-                    val newPath =
-                        backendStorageDao.upsertPhotocardImage(it.imageUrl, it.photocardId)
+                val uri = it.imageUrl?.toUri()
+                if (uri?.scheme == "file://") {
+                    val newPath = backendStorageDao.upsertPhotocardImage(uri, it.photocardId)
                     val copy = it.copy(imageUrl = newPath ?: it.imageUrl)
                     photocardDao.updatePhotocard(copy)
                     copy
@@ -440,8 +441,9 @@ class SyncManager @Inject constructor(
         // COPYING LOCAL IMAGES
         val modifiedPackage = localPackage.copy(
             albums = localPackage.albums.map {
-                if (it.imageUrl?.startsWith("file:///") == true) {
-                    val newPath = backendStorageDao.upsertAlbumImage(it.imageUrl, it.albumId)
+                val uri = it.imageUrl?.toUri()
+                if (uri?.scheme == "file") {
+                    val newPath = backendStorageDao.upsertAlbumImage(uri, it.albumId)
                     val copy = it.copy(imageUrl = newPath ?: it.imageUrl)
                     albumDao.updateAlbum(copy)
                     copy
@@ -450,9 +452,9 @@ class SyncManager @Inject constructor(
                 }
             },
             photocards = localPackage.photocards.map {
-                if (it.imageUrl?.startsWith("file:///") == true) {
-                    val newPath =
-                        backendStorageDao.upsertPhotocardImage(it.imageUrl, it.photocardId)
+                val uri = it.imageUrl?.toUri()
+                if (uri?.scheme == "file") {
+                    val newPath = backendStorageDao.upsertPhotocardImage(uri, it.photocardId)
                     val copy = it.copy(imageUrl = newPath ?: it.imageUrl)
                     photocardDao.updatePhotocard(copy)
                     copy
@@ -703,7 +705,7 @@ class SyncManager @Inject constructor(
                         }
                     }
                     .decodeList<TagBackend>()
-                val backendSettings = supabase.from(BackendTables.USER.ARTIST_SETTINGS)
+                val backendSettings = supabase.from(BackendTables.USER.SETTINGS)
                     .select {
                         filter {
                             and {
@@ -756,7 +758,7 @@ class SyncManager @Inject constructor(
                 photocardDao.upsertAll(localPhotocards)
                 artistDao.insertGroupLinks(localArtistArtistCF)
                 albumDao.upsertArtistLinks(localAlbumArtistCF)
-                photocardDao.upsertArtistLinks(localPhotocardArtistCF)
+                photocardDao.insertArtistLinks(localPhotocardArtistCF)
                 tagDao.upsertTagLinks(localPhotocardTagCF)
                 localSettings?.let { settingsStorage.update(it) }
                 Log.d(TAG, "Download from remote completed")

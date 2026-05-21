@@ -25,9 +25,9 @@ class SaveAlbumUseCase @Inject constructor(
         val versionCandidate = state.versionCandidate!!
         val komcaNumber = state.komcaNumber
 
-        val coverUri = if (state.isCoverCached) {
-            imageRepository.saveToInternalStorage(state.coverImage!!)
-        } else state.coverImage!!
+        val coverUri = if (state.coverImage?.isCached == true) {
+            imageRepository.saveToInternalStorage(state.coverImage.uri)
+        } else state.coverImage!!.uri
 
         db.withTransaction {
             albumCandidate.artistCandidates.forEach { artist ->

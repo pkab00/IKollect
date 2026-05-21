@@ -40,15 +40,16 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.util.PaletteUtil
 
 @Composable
 fun WizardImageSelector(
-    displayedImage: String?,
-    imageOptions: List<String>,
+    displayedImage: UserItemImage?,
+    imageOptions: List<UserItemImage>,
     onSelectPicture: () -> Unit,
     onTakePicture: () -> Unit,
-    onImageClicked: (String) -> Unit,
+    onImageClicked: (UserItemImage) -> Unit,
     imagePreview: @Composable (String?) -> Unit
 ) {
     OutlinedCard(
@@ -84,7 +85,7 @@ fun WizardImageSelector(
                     Text(text = stringResource(R.string.add_details_take_picture))
                 }
             }
-            imagePreview(displayedImage)
+            imagePreview(displayedImage?.uri)
             if (imageOptions.isNotEmpty()) {
                 PreviewsRow(
                     previews = imageOptions,
@@ -129,9 +130,9 @@ fun ImageSelectorPreview(
 
 @Composable
 private fun PreviewsRow(
-    previews: List<String>,
-    selectedPreview: String?,
-    onPreviewSelected: (String) -> Unit
+    previews: List<UserItemImage>,
+    selectedPreview: UserItemImage?,
+    onPreviewSelected: (UserItemImage) -> Unit
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -141,7 +142,7 @@ private fun PreviewsRow(
     ) {
         items(previews) { preview ->
             AsyncImage(
-                model = preview,
+                model = preview.uri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -149,7 +150,7 @@ private fun PreviewsRow(
                     .fillMaxHeight()
                     .border(
                         BorderStroke(
-                            width = if (selectedPreview == preview) 1f.dp else 0f.dp,
+                            width = if (selectedPreview == preview) 2.5f.dp else 0f.dp,
                             color = if (selectedPreview == preview) MaterialTheme.colorScheme.primary else Color.Transparent
                         )
                     )

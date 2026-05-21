@@ -21,6 +21,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.presentation.composable.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.steps.PhotocardWizardSteps
@@ -76,7 +77,12 @@ fun PhotocardWizardScreen(
                 context.contentResolver.takePersistableUriPermission(
                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                viewModel.onEvent(PhotocardWizardContract.Event.OnPhotoSelected(uri.toString()))
+                viewModel.onEvent(PhotocardWizardContract.Event.OnPhotoSelected(
+                    UserItemImage(
+                        uri = uri.toString(),
+                        isCached = true
+                    )
+                ))
             }
         }
     )
@@ -146,7 +152,12 @@ private fun CameraResultObserver(
 
     LaunchedEffect(cameraResult) {
         if (cameraResult != null) {
-            viewModel.onEvent(PhotocardWizardContract.Event.OnPhotoSelected(cameraResult!!))
+            viewModel.onEvent(PhotocardWizardContract.Event.OnPhotoSelected(
+                UserItemImage(
+                    uri = cameraResult!!,
+                    isCached = true
+                )
+            ))
             savedStateHandle[CameraResultContract.CAMERA_RESULT] = null
         }
     }

@@ -11,13 +11,15 @@ import kotlin.time.Instant
             entity = ArtistEntity::class,
             parentColumns = ["artistId"],
             childColumns = ["groupId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
+            deferred = true
         ),
         ForeignKey(
             entity = ArtistEntity::class,
             parentColumns = ["artistId"],
             childColumns = ["memberId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
+            deferred = true
         )
     ]
 )

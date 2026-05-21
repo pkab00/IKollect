@@ -56,8 +56,8 @@ interface PhotocardDao {
     @Upsert
     suspend fun upsertAll(entities: List<PhotocardEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertArtistLinks(links: List<PhotocardArtistCrossRef>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertArtistLinks(links: List<PhotocardArtistCrossRef>)
 
     @Transaction
     suspend fun insertPhotocardWithArtists(
@@ -68,7 +68,7 @@ interface PhotocardDao {
         val links = artistIds.map { artistId ->
             PhotocardArtistCrossRef(photocardId = photocardId, artistId = artistId, isSynchronized = false)
         }
-        upsertArtistLinks(links)
+        insertArtistLinks(links)
         return photocardId
     }
 

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardContract
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
@@ -59,13 +60,22 @@ fun AddDetailsScreen(viewModel: AlbumWizardViewModel) {
 
         item {
             WizardItemWrapper(UiText.StringResource(R.string.add_details_title_image)) {
-                val defaultCover = uiState.versionCandidate?.coverImage
+                val defaultCover = uiState.versionCandidate?.coverImage?.let {
+                    UserItemImage(
+                        uri = it,
+                        isCached = false
+                    )
+                }
                 WizardImageSelector(
                     displayedImage = uiState.coverImage,
                     imageOptions = (defaultCover?.let { listOf(it) } ?: emptyList()) + uiState.albumCoverPreviews,
                     onSelectPicture = { viewModel.onEvent(AlbumWizardContract.Event.OnSelectPicture) },
                     onTakePicture = { viewModel.onEvent(AlbumWizardContract.Event.OnTakePicture) },
-                    onImageClicked = { viewModel.onEvent(AlbumWizardContract.Event.OnAlbumPreviewSelected(it)) }
+                    onImageClicked = {
+                        viewModel.onEvent(
+                            AlbumWizardContract.Event.OnAlbumPreviewSelected(preview = it)
+                        )
+                    }
                 ) { url ->
                     ImageSelectorPreview(
                         imageUrl = url,

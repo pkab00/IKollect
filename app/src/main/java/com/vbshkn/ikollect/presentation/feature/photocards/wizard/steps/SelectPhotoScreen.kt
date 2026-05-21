@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.wizard.ImageSelectorPreview
@@ -31,7 +32,7 @@ fun SelectPhotoScreen(viewModel: PhotocardWizardViewModel) {
         item {
             WizardItemWrapper(UiText.StringResource(R.string.add_details_title_image)) {
                 WizardImageSelector(
-                    displayedImage = uiState.photocardCandidate.imageUrl,
+                    displayedImage = uiState.photocardCandidate.image,
                     imageOptions = uiState.photocardImagePreviews,
                     onSelectPicture = { viewModel.onEvent(PhotocardWizardContract.Event.OnOpenGallerySelector) },
                     onTakePicture = { viewModel.onEvent(PhotocardWizardContract.Event.OnOpenCamera) },

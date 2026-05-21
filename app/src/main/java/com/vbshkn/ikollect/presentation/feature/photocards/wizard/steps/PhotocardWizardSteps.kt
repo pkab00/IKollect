@@ -14,7 +14,7 @@ sealed interface PhotocardWizardSteps {
         @Composable
         override fun isNextEnabled(): Boolean {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            return uiState.photocardCandidate.imageUrl != null
+            return uiState.photocardCandidate.image != null
         }
         @Composable
         override fun Content() {
