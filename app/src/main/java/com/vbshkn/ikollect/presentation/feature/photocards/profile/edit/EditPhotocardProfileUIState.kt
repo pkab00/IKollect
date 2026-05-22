@@ -2,7 +2,7 @@ package com.vbshkn.ikollect.presentation.feature.photocards.profile.edit
 
 import com.vbshkn.ikollect.domain.error.AppError
 import com.vbshkn.ikollect.domain.model.TagItem
-import com.vbshkn.ikollect.domain.model.profile.PhotocardProfileData
+import com.vbshkn.ikollect.domain.model.UserItemImage
 
 data class EditPhotocardProfileUIState(
     val isLoading: Boolean = false,
@@ -10,8 +10,8 @@ data class EditPhotocardProfileUIState(
     val enableTagSelector: Boolean = false,
     val dialogState: EditPhotocardProfileDialogState = EditPhotocardProfileDialogState.None,
 
-    val image: String? = null,
-    val oldImage: String? = null,
+    val image: UserItemImage? = null,
+    val oldImageUrl: String? = null,
     val photocardName: String = "",
     val userNotes: String = "",
     val oldTagIds: Set<Long> = emptySet(),

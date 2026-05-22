@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.repository.AlbumRepository
 import com.vbshkn.ikollect.data.repository.ImageRepository
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -19,13 +20,18 @@ class UpdateAlbumUseCase @Inject constructor(
         version: String,
         komcaNumber: String,
         userNotes: String,
-        image: String?,
+        image: UserItemImage?,
         oldImage: String?
     ) = db.withTransaction {
         var imagePath: String? = null
-        if (image != oldImage) {
-            imagePath = image?.let { imageRepository.saveToInternalStorage(it) }
-            oldImage?.let { imageRepository.deleteFromInternalStorage(it) }
+        if (image?.uri != oldImage) {
+            imagePath = image?.let {
+                if (it.isCached) imageRepository.saveToInternalStorage(it.uri)
+                else it.uri
+            }
+            oldImage?.let {
+                imageRepository.deleteFromInternalStorage(it)
+            }
         }
 
         val updatedEntity = albumRepository

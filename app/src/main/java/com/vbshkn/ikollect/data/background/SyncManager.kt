@@ -454,6 +454,7 @@ class SyncManager @Inject constructor(
             photocards = localPackage.photocards.map {
                 val uri = it.imageUrl?.toUri()
                 if (uri?.scheme == "file") {
+                    Log.d("TTT", "Need to update photocard $uri with id ${it.photocardId}")
                     val newPath = backendStorageDao.upsertPhotocardImage(uri, it.photocardId)
                     val copy = it.copy(imageUrl = newPath ?: it.imageUrl)
                     photocardDao.updatePhotocard(copy)

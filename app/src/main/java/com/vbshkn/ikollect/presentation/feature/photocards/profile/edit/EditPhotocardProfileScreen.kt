@@ -9,7 +9,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +29,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -37,10 +39,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.model.UserItemImage
+import com.vbshkn.ikollect.presentation.composable.CameraResultObserver
 import com.vbshkn.ikollect.presentation.composable.ImageChangerItem
 import com.vbshkn.ikollect.presentation.composable.PlainTextField
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
@@ -48,15 +55,20 @@ import com.vbshkn.ikollect.presentation.feature.wizard.dialog.CameraRationaleDia
 import com.vbshkn.ikollect.util.UiText
 import com.vbshkn.ikollect.presentation.composable.TagSelectionSheet
 import com.vbshkn.ikollect.presentation.composable.TagsField
+import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
+import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun EditPhotocardProfileScreen(
     viewModel: EditPhotocardProfileViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToCamera: () -> Unit,
+    stateHandle: SavedStateHandle
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    var cameraPending by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -69,22 +81,62 @@ fun EditPhotocardProfileScreen(
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
                 } catch (_: SecurityException) {
-                    // Some content providers don't support persistable URI permissions
-                    // App will still work with temporary URI permissions
                 }
-                viewModel.onEvent(EditPhotocardProfileContract.Event.OnImageChanged(uri.toString()))
+                viewModel.onEvent(
+                    Event.OnImageChanged(
+                        UserItemImage(
+                            uri = uri.toString(),
+                            isCached = true
+                        )
+                    )
+                )
             }
         }
     )
+
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
                 is Effect.NavigateBack -> onNavigateBack()
-                is Effect.OpenGallery -> galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                is Effect.OpenGallery -> galleryLauncher.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
+
+                is Effect.TryOpenCamera -> when {
+                    cameraPermissionState.status.isGranted -> {
+                        onNavigateToCamera()
+                    }
+
+                    cameraPermissionState.status.shouldShowRationale -> {
+                        cameraPending = true
+                        viewModel.onEvent(Event.OnShowCameraRationale)
+                    }
+
+                    else -> {
+                        cameraPending = true
+                        cameraPermissionState.launchPermissionRequest()
+                    }
+                }
             }
         }
     }
+
+    LaunchedEffect(cameraPermissionState.status) {
+        if (cameraPermissionState.status.isGranted && cameraPending) {
+            cameraPending = false
+            onNavigateToCamera()
+        }
+    }
+
+    CameraResultObserver(
+        savedStateHandle = stateHandle,
+        onResult = { image ->
+            viewModel.onEvent(Event.OnImageChanged(image))
+        }
+    )
 
     DialogHost(
         dialogState = uiState.dialogState,
@@ -110,17 +162,17 @@ fun EditPhotocardProfileScreen(
                 .padding(top = 8.dp)
         ) {
             item {
-                ImageChangerItem(
-                    title = stringResource(R.string.title_change_image),
-                    imageUrl = uiState.image,
-                    blurRadius = 60.dp,
-                    onClick = { viewModel.onEvent(Event.OnOpenGalleryClicked) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(horizontal = 16.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                )
+                WizardItemWrapper(UiText.StringResource(R.string.profile_label_image)) {
+                    ImageChangerItem(
+                        imageUrl = uiState.image?.uri,
+                        onOpenGallery = { viewModel.onEvent(Event.OnOpenGalleryClicked) },
+                        onOpenCamera = { viewModel.onEvent(Event.OnOpenCameraClicked) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                }
             }
 
             item {
@@ -209,7 +261,11 @@ fun UserNotesField(
 
     OutlinedTextField(
         value = value,
-        onValueChange = { if (it.length <= maxChar) { onEvent(Event.OnUserNotesChanged(it)) } },
+        onValueChange = {
+            if (it.length <= maxChar) {
+                onEvent(Event.OnUserNotesChanged(it))
+            }
+        },
         placeholder = { Text(stringResource(R.string.album_notes_placeholder)) },
         modifier = Modifier
             .fillMaxWidth()
@@ -241,6 +297,7 @@ private fun DialogHost(
                 onRequestPermission()
             }
         }
+
         is EditPhotocardProfileDialogState.None -> {}
     }
 }

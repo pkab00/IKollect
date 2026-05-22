@@ -5,6 +5,7 @@ import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.repository.ImageRepository
 import com.vbshkn.ikollect.data.repository.PhotocardRepository
 import com.vbshkn.ikollect.data.repository.TagRepository
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -17,7 +18,7 @@ class UpdatePhotocardUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         id: Long,
-        image: String?,
+        image: UserItemImage?,
         oldImage: String?,
         photocardName: String,
         userNotes: String,
@@ -25,9 +26,14 @@ class UpdatePhotocardUseCase @Inject constructor(
         selectedTagIds: Set<Long>
     ) = db.withTransaction {
         var imagePath: String?
-        if (image != oldImage) {
-            imagePath = image?.let { imageRepository.saveToInternalStorage(it) }
-            oldImage?.let { imageRepository.deleteFromInternalStorage(it) }
+        if (image?.uri != oldImage) {
+            imagePath = image?.let {
+                if (it.isCached) imageRepository.saveToInternalStorage(it.uri)
+                else it.uri
+            }
+            oldImage?.let {
+                imageRepository.deleteFromInternalStorage(it)
+            }
         }
         else {
             imagePath = oldImage

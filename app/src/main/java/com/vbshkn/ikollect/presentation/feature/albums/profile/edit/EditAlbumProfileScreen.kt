@@ -29,6 +29,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +53,9 @@ import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
 import com.vbshkn.ikollect.presentation.feature.wizard.dialog.CameraRationaleDialog
 import com.vbshkn.ikollect.util.UiText
 import androidx.lifecycle.SavedStateHandle
+import com.vbshkn.ikollect.domain.model.UserItemImage
+import com.vbshkn.ikollect.presentation.composable.CameraResultObserver
+import com.vbshkn.ikollect.presentation.composable.ScannerResultObserver
 import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -57,13 +63,15 @@ import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 fun EditAlbumProfileScreen(
     viewModel: EditAlbumProfileViewModel,
     onNavigateBack: () -> Unit,
+    onOpenCamera: () -> Unit,
     onOpenScanner: () -> Unit = {},
     savedStateHandle: SavedStateHandle
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
-
     val context = LocalContext.current
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    var pending by rememberSaveable { mutableStateOf(Pending.NONE) }
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
@@ -73,11 +81,15 @@ fun EditAlbumProfileScreen(
                         uri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
-                } catch (e: SecurityException) {
-                    // Some content providers don't support persistable URI permissions
-                    // App will still work with temporary URI permissions
-                }
-                viewModel.onEvent(EditAlbumProfileContract.Event.OnImageChanged(uri.toString()))
+                } catch (e: SecurityException) { }
+                viewModel.onEvent(
+                    EditAlbumProfileContract.Event.OnImageChanged(
+                        UserItemImage(
+                            uri = uri.toString(),
+                            isCached = false
+                        )
+                    )
+                )
             }
         }
     )
@@ -89,23 +101,65 @@ fun EditAlbumProfileScreen(
                 is EditAlbumProfileContract.Effect.OpenGallery -> galleryLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
+
                 is EditAlbumProfileContract.Effect.TryOpenScanner -> {
                     val status = cameraPermissionState.status
                     when {
                         status.isGranted -> {
                             onOpenScanner()
                         }
+
                         status.shouldShowRationale -> {
                             viewModel.onEvent(EditAlbumProfileContract.Event.OnShowCameraRationale)
+                            pending = Pending.SCANNER
                         }
+
                         else -> {
                             cameraPermissionState.launchPermissionRequest()
+                            pending = Pending.SCANNER
+                        }
+                    }
+                }
+
+                is EditAlbumProfileContract.Effect.TryOpenCamera -> {
+                    val status = cameraPermissionState.status
+                    when {
+                        status.isGranted -> {
+                            onOpenCamera()
+                        }
+
+                        status.shouldShowRationale -> {
+                            viewModel.onEvent(EditAlbumProfileContract.Event.OnShowCameraRationale)
+                            pending = Pending.CAMERA
+                        }
+
+                        else -> {
+                            cameraPermissionState.launchPermissionRequest()
+                            pending = Pending.CAMERA
                         }
                     }
                 }
             }
         }
     }
+
+    LaunchedEffect(cameraPermissionState.status) {
+        if (cameraPermissionState.status.isGranted) {
+            when (pending) {
+                Pending.CAMERA -> onOpenCamera()
+                Pending.SCANNER -> onOpenScanner()
+                Pending.NONE -> {}
+            }
+            pending = Pending.NONE
+        }
+    }
+
+    CameraResultObserver(
+        savedStateHandle = savedStateHandle,
+        onResult = { result ->
+            viewModel.onEvent(EditAlbumProfileContract.Event.OnImageChanged(result))
+        }
+    )
 
     DialogHost(
         dialogState = uiState.dialogState,
@@ -115,7 +169,9 @@ fun EditAlbumProfileScreen(
 
     ScannerResultObserver(
         savedStateHandle = savedStateHandle,
-        viewModel = viewModel
+        onResult = { result ->
+            viewModel.onEvent(EditAlbumProfileContract.Event.OnKomcaNumberChanged(result))
+        }
     )
 
     Scaffold(
@@ -129,15 +185,13 @@ fun EditAlbumProfileScreen(
         ) {
             item {
                 ImageChangerItem(
-                    title = stringResource(R.string.title_change_image),
-                    imageUrl = uiState.image,
-                    blurRadius = 60.dp,
-                    onClick = { viewModel.onEvent(EditAlbumProfileContract.Event.OnOpenGalleryClicked) },
+                    imageUrl = uiState.image?.uri,
+                    onOpenCamera = { viewModel.onEvent(EditAlbumProfileContract.Event.OnOpenCameraClicked) },
+                    onOpenGallery = { viewModel.onEvent(EditAlbumProfileContract.Event.OnOpenGalleryClicked) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(horizontal = 16.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(12.dp))
                 )
             }
 
@@ -311,23 +365,11 @@ private fun DialogHost(
                 onRequestPermission()
             }
         }
+
         is EditAlbumProfileDialogState.None -> {}
     }
 }
 
-@Composable
-private fun ScannerResultObserver(
-    savedStateHandle: SavedStateHandle,
-    viewModel: EditAlbumProfileViewModel
-) {
-    val scannerResult by savedStateHandle
-        .getStateFlow<String?>(CameraResultContract.SCANNER_RESULT, null)
-        .collectAsStateWithLifecycle()
-
-    LaunchedEffect(scannerResult) {
-        if (scannerResult != null) {
-            viewModel.onEvent(EditAlbumProfileContract.Event.OnKomcaNumberChanged(scannerResult!!))
-            savedStateHandle[CameraResultContract.SCANNER_RESULT] = null
-        }
-    }
+private enum class Pending {
+    CAMERA, SCANNER, NONE
 }

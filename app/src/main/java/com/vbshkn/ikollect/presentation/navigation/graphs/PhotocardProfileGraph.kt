@@ -25,10 +25,13 @@ fun NavGraphBuilder.photocardProfileGraph(navController: NavHostController) {
                 onNavigateToEdit = { navController.navigate(Route.PhotocardFlow.Edit(it)) }
             )
         }
-        composable<Route.PhotocardFlow.Edit> {
+        composable<Route.PhotocardFlow.Edit> { backStackEntry ->
             val viewModel = hiltViewModel<EditPhotocardProfileViewModel>()
+            val savedStateHandle = backStackEntry.savedStateHandle
             EditPhotocardProfileScreen(
                 viewModel = viewModel,
+                stateHandle = savedStateHandle,
+                onNavigateToCamera = { navController.navigate(Route.PhotocardCameraScreen) },
                 onNavigateBack = { navController.popBackStack() }
             )
         }

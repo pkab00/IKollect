@@ -22,6 +22,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.UserItemImage
+import com.vbshkn.ikollect.presentation.composable.CameraResultObserver
 import com.vbshkn.ikollect.presentation.composable.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.steps.PhotocardWizardSteps
@@ -131,7 +132,7 @@ fun PhotocardWizardScreen(
 
     CameraResultObserver(
         savedStateHandle = savedStateHandle,
-        viewModel = viewModel
+        onResult = { image -> viewModel.onEvent(PhotocardWizardContract.Event.OnPhotoSelected(image)) }
     )
     DialogHost(
         dialogState = uiState.dialogState,
@@ -139,28 +140,6 @@ fun PhotocardWizardScreen(
         onRequestPermission = { cameraPermissionState.launchPermissionRequest() }
     )
     GenericWizard(wizardState)
-}
-
-@Composable
-private fun CameraResultObserver(
-    savedStateHandle: SavedStateHandle,
-    viewModel: PhotocardWizardViewModel
-) {
-    val cameraResult by savedStateHandle
-        .getStateFlow<String?>(CameraResultContract.CAMERA_RESULT, null)
-        .collectAsStateWithLifecycle()
-
-    LaunchedEffect(cameraResult) {
-        if (cameraResult != null) {
-            viewModel.onEvent(PhotocardWizardContract.Event.OnPhotoSelected(
-                UserItemImage(
-                    uri = cameraResult!!,
-                    isCached = true
-                )
-            ))
-            savedStateHandle[CameraResultContract.CAMERA_RESULT] = null
-        }
-    }
 }
 
 @Composable

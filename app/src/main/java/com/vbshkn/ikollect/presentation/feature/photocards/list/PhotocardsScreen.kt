@@ -68,6 +68,7 @@ fun PhotocardsScreen(
             topBar = {
                 CommonTopBar(
                     title = UiText.StringResource(R.string.screen_title_photocards),
+                    counter = uiState.photocards.size,
                     actions = {
                         IconButton({ viewModel.onEvent(Event.OnWizardClicked) }) {
                             Icon(

@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.domain.base.BaseViewModel
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.domain.usecase.get.GetAlbumProfileDataUseCase
 import com.vbshkn.ikollect.domain.usecase.update.UpdateAlbumUseCase
 import com.vbshkn.ikollect.presentation.navigation.Route
@@ -46,7 +47,7 @@ class EditAlbumProfileViewModel @Inject constructor(
                     komcaNumber = uiState.value.komcaNumber,
                     userNotes = uiState.value.userNotes,
                     image = uiState.value.image,
-                    oldImage = uiState.value.oldImage
+                    oldImage = uiState.value.oldImageUrl
                 )
                 sendEffect(EditAlbumProfileContract.Effect.NavigateBack)
             }
@@ -82,6 +83,10 @@ class EditAlbumProfileViewModel @Inject constructor(
             is EditAlbumProfileContract.Event.OnImageChanged -> {
                 updateState { it.copy(image = event.image) }
             }
+
+            EditAlbumProfileContract.Event.OnOpenCameraClicked -> {
+                sendEffect(EditAlbumProfileContract.Effect.TryOpenCamera)
+            }
         }
     }
 
@@ -91,8 +96,8 @@ class EditAlbumProfileViewModel @Inject constructor(
         onSuccess = { state, data ->
             state.copy(
                 isLoading = false,
-                image = data?.album?.coverImage ?: "",
-                oldImage = data?.album?.coverImage ?: "",
+                image = UserItemImage(uri = data?.album?.coverImage ?: "", isCached = false),
+                oldImageUrl = data?.album?.coverImage ?: "",
                 albumName = data?.album?.name ?: "",
                 albumVersion = data?.album?.version ?: "",
                 komcaNumber = data?.album?.komcaNumber ?: "",

@@ -34,6 +34,7 @@ fun NavGraphBuilder.albumProfileGraph(navController: NavHostController) {
                 viewModel = viewModel,
                 savedStateHandle = backStackEntry.savedStateHandle,
                 onNavigateBack = { navController.popBackStack() },
+                onOpenCamera = { navController.navigate(Route.AlbumCameraScreen) },
                 onOpenScanner = { navController.navigate(Route.KomcaScanner) }
             )
         }

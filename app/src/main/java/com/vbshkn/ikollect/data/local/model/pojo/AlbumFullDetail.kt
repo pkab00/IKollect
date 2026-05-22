@@ -10,7 +10,7 @@ data class AlbumFullDetail(
     @Relation(
         entity = PhotocardEntity::class,
         parentColumn = "albumId",
-        entityColumn = "photocardId",
+        entityColumn = "albumId"
     )
     val photocards: List<PhotocardEntity>
 )

@@ -23,6 +23,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.domain.model.UserItemImage
+import com.vbshkn.ikollect.presentation.composable.CameraResultObserver
+import com.vbshkn.ikollect.presentation.composable.ScannerResultObserver
 import com.vbshkn.ikollect.presentation.composable.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.composable.dialog.InfoDialog
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.steps.AlbumWizardSteps
@@ -149,8 +151,12 @@ fun AlbumWizardScreen(
     }
 
     CameraResultObserver(
-        viewModel = viewModel,
-        savedStateHandle = savedStateHandle
+        savedStateHandle = savedStateHandle,
+        onResult = { image -> viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPreview(image)) }
+    )
+    ScannerResultObserver(
+        savedStateHandle = savedStateHandle,
+        onResult = { result -> viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPreview(UserItemImage(uri = result, isCached = false))) }
     )
     DialogHost(
         dialogState = uiState.dialogState,
@@ -158,35 +164,6 @@ fun AlbumWizardScreen(
         onRequestPermission = { cameraPermissionState.launchPermissionRequest() },
     )
     GenericWizard(wizardState)
-}
-
-@Composable
-private fun CameraResultObserver(
-    viewModel: AlbumWizardViewModel,
-    savedStateHandle: SavedStateHandle
-) {
-    val cameraResult by savedStateHandle
-        .getStateFlow<String?>(CameraResultContract.CAMERA_RESULT, null)
-        .collectAsStateWithLifecycle()
-    val scannerResult by savedStateHandle
-        .getStateFlow<String?>(CameraResultContract.SCANNER_RESULT, null)
-        .collectAsStateWithLifecycle()
-
-    LaunchedEffect(cameraResult, scannerResult) {
-        if (cameraResult != null) {
-            viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPreview(
-                UserItemImage(
-                    uri = cameraResult!!,
-                    isCached = true
-                )
-            ))
-            savedStateHandle[CameraResultContract.CAMERA_RESULT] = null
-        }
-        if (scannerResult != null) {
-            viewModel.onEvent(AlbumWizardContract.Event.OnKomcaCodeChanged(scannerResult!!))
-            savedStateHandle[CameraResultContract.SCANNER_RESULT] = null
-        }
-    }
 }
 
 @Composable

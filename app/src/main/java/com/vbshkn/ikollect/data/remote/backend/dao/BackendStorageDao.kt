@@ -3,6 +3,7 @@ package com.vbshkn.ikollect.data.remote.backend.dao
 import android.content.Context
 import android.net.Uri
 import com.vbshkn.ikollect.data.remote.backend.BackendStorage
+import com.vbshkn.ikollect.util.now
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
@@ -45,8 +46,9 @@ class BackendStorageDao @Inject constructor(
         }
         val pathInStorage = "$uid/pc_$photocardId.jpg"
         try {
-            storage.from(BackendStorage.PHOTOCARDS).upload(pathInStorage, fileBytes)
-            return storage.from(BackendStorage.PHOTOCARDS).publicUrl(pathInStorage)
+            storage.from(BackendStorage.PHOTOCARDS).upload(pathInStorage, fileBytes) { upsert = true }
+            val publicUrl = storage.from(BackendStorage.PHOTOCARDS).publicUrl(pathInStorage)
+            return "$publicUrl?t=${now()}"
         } catch (e: Exception) {
             android.util.Log.d(TAG, "Failed to upload photocard image: ", e)
             return null
@@ -79,8 +81,9 @@ class BackendStorageDao @Inject constructor(
         }
         val pathInStorage = "$uid/pc_$albumImageId.jpg"
         try {
-            storage.from(BackendStorage.ALBUMS).upload(pathInStorage, fileBytes)
-            return storage.from(BackendStorage.ALBUMS).publicUrl(pathInStorage)
+            storage.from(BackendStorage.ALBUMS).upload(pathInStorage, fileBytes) { upsert = true }
+            val publicUrl = storage.from(BackendStorage.ALBUMS).publicUrl(pathInStorage)
+            return "$publicUrl?t=${now()}"
         } catch (e: Exception) {
             android.util.Log.d(TAG, "Failed to upload album image: ", e)
             return null

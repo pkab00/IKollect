@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.vbshkn.ikollect.domain.base.BaseViewModel
+import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.domain.usecase.get.GetAllTagsUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetPhotocardProfileDataUseCase
 import com.vbshkn.ikollect.domain.usecase.update.UpdatePhotocardUseCase
@@ -41,11 +42,15 @@ class EditPhotocardProfileViewModel @Inject constructor(
                 sendEffect(EditPhotocardProfileContract.Effect.OpenGallery)
             }
 
+            is EditPhotocardProfileContract.Event.OnOpenCameraClicked -> {
+                sendEffect(EditPhotocardProfileContract.Effect.TryOpenCamera)
+            }
+
             is EditPhotocardProfileContract.Event.OnSaveChangesClicked -> viewModelScope.launch {
                 updatePhotocardUseCase(
                     id = photocardId,
                     image = uiState.value.image,
-                    oldImage = uiState.value.oldImage,
+                    oldImage = uiState.value.oldImageUrl,
                     photocardName = uiState.value.photocardName,
                     userNotes = uiState.value.userNotes,
                     oldTagIds = uiState.value.oldTagIds,
@@ -100,8 +105,11 @@ class EditPhotocardProfileViewModel @Inject constructor(
         onSuccess = { state, data ->
             state.copy(
                 isLoading = false,
-                image = data?.photocard?.imageUrl ?: "",
-                oldImage = data?.photocard?.imageUrl ?: "",
+                image = UserItemImage(
+                    uri = data?.photocard?.imageUrl ?: "",
+                    isCached = false
+                ),
+                oldImageUrl = data?.photocard?.imageUrl ?: "",
                 photocardName = data?.photocard?.displayName ?: "",
                 userNotes = data?.photocard?.userNotes ?: "",
                 oldTagIds = data?.photocard?.tags?.map { it.id }?.toSet() ?: emptySet(),

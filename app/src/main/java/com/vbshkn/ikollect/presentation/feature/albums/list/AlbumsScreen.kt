@@ -89,6 +89,7 @@ fun AlbumsScreen(
             topBar = {
                 CommonTopBar(
                     title = UiText.StringResource(R.string.screen_title_albums),
+                    counter = uiState.albums.size,
                     actions = {
                         IconButton({ onEvent(Event.OnStartScanningClicked) }) {
                             Icon(
