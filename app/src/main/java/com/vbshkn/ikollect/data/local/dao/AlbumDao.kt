@@ -77,12 +77,13 @@ interface AlbumDao {
     suspend fun insertAlbumWithArtists(
         albumEntity: AlbumEntity,
         artistIds: List<Long>
-    ) {
+    ) : Long {
         val generatedId = insertAlbum(albumEntity)
         val links = artistIds.map { artistId ->
             AlbumArtistCrossRef(albumId = generatedId, artistId = artistId, isSynchronized = false)
         }
         upsertArtistLinks(links)
+        return generatedId
     }
 
     @Update

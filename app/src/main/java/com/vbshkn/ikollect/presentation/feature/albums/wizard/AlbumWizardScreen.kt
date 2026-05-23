@@ -79,7 +79,7 @@ fun AlbumWizardScreen(
                 viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPreview(
                     UserItemImage(
                         uri = uri.toString(),
-                        isCached = false
+                        isCached = true
                     )
                 ))
             }
@@ -156,7 +156,7 @@ fun AlbumWizardScreen(
     )
     ScannerResultObserver(
         savedStateHandle = savedStateHandle,
-        onResult = { result -> viewModel.onEvent(AlbumWizardContract.Event.OnNewAlbumPreview(UserItemImage(uri = result, isCached = false))) }
+        onResult = { result -> viewModel.onEvent(AlbumWizardContract.Event.OnKomcaCodeChanged(result)) }
     )
     DialogHost(
         dialogState = uiState.dialogState,

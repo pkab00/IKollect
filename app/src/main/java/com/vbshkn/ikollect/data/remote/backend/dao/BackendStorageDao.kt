@@ -8,7 +8,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.storage.storage
-import java.io.File
 import javax.inject.Inject
 
 private const val TAG = "BackendStorageDao"
@@ -55,7 +54,7 @@ class BackendStorageDao @Inject constructor(
         }
     }
 
-    suspend fun upsertAlbumImage(uri: Uri, albumImageId: Long): String? {
+    suspend fun upsertAlbumImage(uri: Uri, albumId: Long): String? {
         supabase.auth.awaitInitialization()
         val uid = supabase.auth.currentUserOrNull()?.id
 
@@ -79,7 +78,7 @@ class BackendStorageDao @Inject constructor(
             android.util.Log.d(TAG, "Failed to upload album image: error reading file bytes", e)
             return null
         }
-        val pathInStorage = "$uid/pc_$albumImageId.jpg"
+        val pathInStorage = "$uid/pc_$albumId.jpg"
         try {
             storage.from(BackendStorage.ALBUMS).upload(pathInStorage, fileBytes) { upsert = true }
             val publicUrl = storage.from(BackendStorage.ALBUMS).publicUrl(pathInStorage)

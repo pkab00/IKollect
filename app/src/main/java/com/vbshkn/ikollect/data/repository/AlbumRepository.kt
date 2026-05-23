@@ -85,8 +85,8 @@ class AlbumRepository @Inject constructor(
     suspend fun insertToDatabase(
         album: AlbumEntity,
         artistIds: List<Long>
-    ) {
-        albumLocalDS.insertAlbumWithArtists(album, artistIds)
+    ) : Long {
+        return albumLocalDS.insertAlbumWithArtists(album, artistIds)
     }
 
     suspend fun updateAlbum(updated: AlbumEntity) {

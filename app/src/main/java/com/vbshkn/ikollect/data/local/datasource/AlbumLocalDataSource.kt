@@ -51,8 +51,8 @@ class AlbumLocalDataSource @Inject constructor(
     suspend fun insertAlbumWithArtists(
         albumEntity: AlbumEntity,
         artistIds: List<Long>
-    ) {
-        dao.insertAlbumWithArtists(albumEntity, artistIds)
+    ) : Long {
+        return dao.insertAlbumWithArtists(albumEntity, artistIds)
     }
 
     suspend fun updateAlbum(albumEntity: AlbumEntity) {

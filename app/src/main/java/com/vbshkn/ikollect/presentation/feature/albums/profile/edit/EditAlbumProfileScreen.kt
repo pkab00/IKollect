@@ -86,7 +86,7 @@ fun EditAlbumProfileScreen(
                     EditAlbumProfileContract.Event.OnImageChanged(
                         UserItemImage(
                             uri = uri.toString(),
-                            isCached = false
+                            isCached = true
                         )
                     )
                 )
