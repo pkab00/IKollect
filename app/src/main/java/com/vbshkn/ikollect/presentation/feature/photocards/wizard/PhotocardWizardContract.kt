@@ -23,6 +23,7 @@ sealed interface PhotocardWizardContract {
         data class OnPhotoSelected(val photo: UserItemImage) : Event
         data class OnPhotocardPreviewSelected(val preview: UserItemImage) : Event
         object OnShowSelectArtistTip : Event
+        data class OnArtistFilterSelected(val filter: ArtistFilter) : Event
         data class OnOwnerSelected(val id: Long, val isGroup: Boolean) : Event
         data class OnMemberSelected(val ids: List<Long>) : Event
         data class OnAlbumSelected(val id: Long) : Event

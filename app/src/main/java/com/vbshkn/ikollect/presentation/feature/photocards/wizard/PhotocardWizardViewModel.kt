@@ -1,6 +1,5 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 
-import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.usecase.get.GetAllTagsUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetArtistAlbumListUseCase
@@ -8,17 +7,15 @@ import com.vbshkn.ikollect.domain.usecase.get.GetArtistListUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetGroupMembersUseCase
 import com.vbshkn.ikollect.domain.usecase.save.SavePhotocardUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
-import com.vbshkn.ikollect.presentation.theme.inversePrimaryDark
+import com.vbshkn.ikollect.domain.business.ArtistFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PhotocardWizardViewModel @Inject constructor(
@@ -129,15 +126,19 @@ class PhotocardWizardViewModel @Inject constructor(
             is PhotocardWizardContract.Event.OnAddTagClicked -> updateState {
                 it.copy(enableTagSelector = true)
             }
+
             is PhotocardWizardContract.Event.OnDismissTagSelector -> updateState {
                 it.copy(enableTagSelector = false)
             }
+
             is PhotocardWizardContract.Event.OnTagSelected -> updateState { state ->
                 state.copy(
                     photocardCandidate = state.photocardCandidate.copy(
                         tagIds = if (event.tagId in state.photocardCandidate.tagIds) {
                             state.photocardCandidate.tagIds - event.tagId
-                        } else { state.photocardCandidate.tagIds + event.tagId }
+                        } else {
+                            state.photocardCandidate.tagIds + event.tagId
+                        }
                     )
                 )
             }
@@ -149,43 +150,73 @@ class PhotocardWizardViewModel @Inject constructor(
             is PhotocardWizardContract.Event.OnFinish -> {
                 savePhotocardUseCase(uiState.value.photocardCandidate)
             }
+
+            is PhotocardWizardContract.Event.OnArtistFilterSelected -> {
+                if (uiState.value.artistFilter != event.filter) {
+                    updateState { it.copy(artistFilter = event.filter) }
+                } else { updateState { it.copy(artistFilter = ArtistFilter.ALL) } }
+            }
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeArtists() = collectFlowIntoState(
-        flow = getArtistListUseCase(),
-        onSuccess = {state, data -> state.copy(artists = data.sortedBy { it.name }, isLoading = false)},
-        onLoading = {state -> state.copy(isLoading = true)},
-        onError = {state, e -> state.copy(isLoading = false)}
+        flow = combine(getArtistListUseCase(), uiState) {
+            artists, _ -> artists
+        }.flatMapLatest { result ->
+            when (result) {
+                is NetworkResult.Success -> {
+                    val filteredGroups = when (uiState.value.artistFilter) {
+                        ArtistFilter.GROUPS -> result.data.filter { it.isGroup }
+                        ArtistFilter.SOLOISTS -> result.data.filter { !it.isGroup }
+                        ArtistFilter.ALL -> result.data
+                    }
+                    flowOf(NetworkResult.Success(filteredGroups))
+                } else -> flowOf(result)
+            }
+        },
+        onSuccess = { state, data -> state.copy(artists = data.sortedBy { it.name }, isLoading = false) },
+        onLoading = { state -> state.copy(isLoading = true) },
+        onError = { state, e -> state.copy(isLoading = false) }
     )
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeMembers() = collectFlowIntoState(
-            flow = uiState
-                .map { it.photocardCandidate.ownerId }
-                .distinctUntilChanged()
-                .flatMapLatest { getGroupMembersUseCase(it) },
-            onSuccess = { state, data -> state.copy(members = data.sortedBy { it.name }, isLoading = false) },
-            onLoading = { state -> state.copy(isLoading = true) },
-            onError = { state, e -> state.copy(isLoading = false) }
-        )
+        flow = uiState
+            .map { it.photocardCandidate.ownerId }
+            .distinctUntilChanged()
+            .flatMapLatest { getGroupMembersUseCase(it) },
+        onSuccess = { state, data ->
+            state.copy(
+                members = data.sortedBy { it.name },
+                isLoading = false
+            )
+        },
+        onLoading = { state -> state.copy(isLoading = true) },
+        onError = { state, e -> state.copy(isLoading = false) }
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeAlbums() = collectFlowIntoState(
-            flow = uiState
-                .map { it.photocardCandidate.ownerId }
-                .distinctUntilChanged()
-                .flatMapLatest { getArtistAlbumListUseCase(it) },
-            onSuccess = { state, data -> state.copy(albums = data.sortedBy { it.timestamp }, isLoading = false) },
-            onLoading = { state -> state.copy(isLoading = true) },
-            onError = { state, e -> state.copy(isLoading = false) }
-        )
+        flow = uiState
+            .map { it.photocardCandidate.ownerId }
+            .distinctUntilChanged()
+            .flatMapLatest { getArtistAlbumListUseCase(it) },
+        onSuccess = { state, data ->
+            state.copy(
+                albums = data.sortedBy { it.timestamp },
+                isLoading = false
+            )
+        },
+        onLoading = { state -> state.copy(isLoading = true) },
+        onError = { state, e -> state.copy(isLoading = false) }
+    )
 
     private fun observeTags() = collectFlowIntoState(
         flow = getAllTagsUseCase(),
-        onSuccess = {state, data -> state.copy(tags = data, isLoading = false)},
-        onLoading = {state -> state.copy(isLoading = true)},
-        onError = {state, e -> state.copy(isLoading = false)}
+        onSuccess = { state, data -> state.copy(tags = data, isLoading = false) },
+        onLoading = { state -> state.copy(isLoading = true) },
+        onError = { state, e -> state.copy(isLoading = false) }
     )
 }

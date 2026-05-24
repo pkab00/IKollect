@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.albums.wizard
 
+import com.vbshkn.ikollect.domain.business.ArtistFilter
 import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate

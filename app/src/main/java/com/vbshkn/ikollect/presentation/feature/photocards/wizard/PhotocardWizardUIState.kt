@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 
+import com.vbshkn.ikollect.domain.business.ArtistFilter
 import com.vbshkn.ikollect.domain.model.list.AlbumListItem
 import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 import com.vbshkn.ikollect.domain.model.candidate.PhotocardCandidate
@@ -16,5 +17,8 @@ data class PhotocardWizardUIState(
     val artists: List<ArtistListItem> = emptyList(),
     val members: List<ArtistListItem> = emptyList(),
     val albums: List<AlbumListItem> = emptyList(),
-    val tags: List<TagItem> = emptyList()
+    val tags: List<TagItem> = emptyList(),
+    val artistFilter: ArtistFilter = ArtistFilter.ALL
 )
+
+

@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.vbshkn.ikollect.R
+import com.vbshkn.ikollect.domain.business.ArtistFilter
 import com.vbshkn.ikollect.domain.model.list.ArtistListItem
+import com.vbshkn.ikollect.presentation.composable.SelectableLabel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
@@ -57,33 +61,70 @@ fun SelectArtistScreen(viewModel: PhotocardWizardViewModel) {
                 content = {}
             )
         }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 8.dp)
+            ) {
+                items(
+                    items = listOf(
+                        ArtistFilter.GROUPS,
+                        ArtistFilter.SOLOISTS
+                    ),
+                    key = { it.name }
+                ) { filter ->
+                    SelectableLabel(
+                        text = when (filter) {
+                            ArtistFilter.GROUPS -> UiText.StringResource(R.string.title_groups)
+                            ArtistFilter.SOLOISTS -> UiText.StringResource(R.string.title_soloists)
+                            ArtistFilter.ALL -> UiText.DynamicString("")
+                        },
+                        selected = uiState.artistFilter == filter,
+                        onClick = { viewModel.onEvent(PhotocardWizardContract.Event.OnArtistFilterSelected(filter)) },
+                    )
+                }
+            }
+        }
         items(
             items = uiState.artists,
             key = { it.artistId }
         ) { artist ->
-            SelectableAlbum(
+            SelectableArtist(
                 artist = artist,
                 selectedArtistId = uiState.photocardCandidate.ownerId,
-                onEvent = viewModel::onEvent
+                onEvent = viewModel::onEvent,
+                modifier = Modifier.animateItem()
             )
         }
     }
 }
 
 @Composable
-private fun SelectableAlbum(
+private fun SelectableArtist(
     artist: ArtistListItem,
     selectedArtistId: Long?,
-    onEvent: (PhotocardWizardContract.Event) -> Unit
+    onEvent: (PhotocardWizardContract.Event) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     OutlinedCard(
-        onClick = { onEvent(PhotocardWizardContract.Event.OnOwnerSelected(artist.artistId, artist.isGroup)) },
+        onClick = {
+            onEvent(
+                PhotocardWizardContract.Event.OnOwnerSelected(
+                    artist.artistId,
+                    artist.isGroup
+                )
+            )
+        },
         border = CardDefaults.outlinedCardBorder(enabled = artist.artistId == selectedArtistId),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if (artist.artistId == selectedArtistId)
                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            else Color.Transparent
-        )
+            else Color.Transparent,
+        ),
+        modifier = modifier
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
