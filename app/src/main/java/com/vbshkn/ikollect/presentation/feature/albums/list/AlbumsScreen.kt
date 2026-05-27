@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -52,12 +54,14 @@ import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
 import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
 import com.vbshkn.ikollect.presentation.composable.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.composable.dialog.ErrorDialog
+import com.vbshkn.ikollect.presentation.composable.grid.AlbumsGrid
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
 fun AlbumsScreen(
     viewModel: AlbumsViewModel,
     onGoToWizard: (AlbumCandidate) -> Unit,
+    onGoToSearch: () -> Unit,
     onAlbumClick: (Long) -> Unit
 ) {
     val context = LocalContext.current
@@ -72,6 +76,7 @@ fun AlbumsScreen(
                 is Effect.ShowRefreshingErrorToast -> {
                     Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
                 }
+                is Effect.NavigateToSearch -> onGoToSearch()
             }
         }
     }
@@ -94,7 +99,13 @@ fun AlbumsScreen(
                         IconButton({ onEvent(Event.OnStartScanningClicked) }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_scanner),
-                                contentDescription = ""
+                                contentDescription = null
+                            )
+                        }
+                        IconButton({ onEvent(Event.OnSearchClicked) }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null
                             )
                         }
                     }
@@ -109,43 +120,22 @@ fun AlbumsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(10.dp)
             ) {
                 if (uiState.albums.isEmpty() && uiState.error != null) {
                     ErrorScreen()
                 } else if (uiState.albums.isEmpty()) {
                     NoAlbumsScreen()
                 } else {
-                    AlbumsGrid(uiState.albums, viewModel::onEvent)
+                    AlbumsGrid(
+                        items = uiState.albums,
+                        onClick = { album -> viewModel.onEvent(Event.OnAlbumClicked(album.albumId)) }
+                    )
                 }
             }
 
             if (uiState.isLoading) {
                 LoadingOverlay()
             }
-        }
-    }
-}
-
-@Composable
-fun AlbumsGrid(
-    albums: List<AlbumDetails>,
-    onEvent: (Event) -> Unit
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(
-            items = albums,
-            key = { it.albumId }
-        ) { album ->
-            AlbumCard(
-                album = album,
-                onClick = { onEvent(Event.OnAlbumClicked(album.albumId)) }
-            )
         }
     }
 }

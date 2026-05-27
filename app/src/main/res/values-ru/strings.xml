@@ -160,4 +160,5 @@
     <string name="language_system">Системный</string>
     <string name="settings_item_tabs_order">Порядок вкладок</string>
     <string name="profile_label_image">Изображение</string>
+    <string name="label_search">Поиск</string>
 </resources>

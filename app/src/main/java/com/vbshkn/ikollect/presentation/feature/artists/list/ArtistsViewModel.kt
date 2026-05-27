@@ -5,10 +5,15 @@ import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsContract.Eff
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.base.BaseViewModel
+import com.vbshkn.ikollect.domain.business.ArtistFilter
 import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetArtistListUseCase
+import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsContract.Effect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -25,34 +30,54 @@ class ArtistsViewModel @Inject constructor(
             is Event.OnPulledToRefresh -> viewModelScope.launch {
                 updateState { it.copy(isSyncing = true) }
                 val succeed = refreshDataUseCase()
-                if (!succeed) sendEffect(Effect.ShowRefreshingErrorToast)
+                if (!succeed) sendEffect(ShowRefreshingErrorToast)
                 updateState { it.copy(isSyncing = false) }
+            }
+
+            is Event.OnArtistClick -> {
+                sendEffect(NavigateToArtist(event.artistId))
+            }
+
+            is Event.OnSelectFilter -> {
+                if (uiState.value.artistFilter != event.filter) {
+                    updateState { it.copy(artistFilter = event.filter) }
+                }
+                else {
+                    updateState { it.copy(artistFilter = ArtistFilter.ALL) }
+                }
+            }
+
+            Event.OnSearchClick -> {
+                sendEffect(NavigateToSearch)
             }
         }
     }
 
     private fun collectArtistOverviews() = viewModelScope.launch {
-        getArtistListUseCase().collect { networkResult ->
-            when(networkResult) {
+        uiState
+            .distinctUntilChanged { old, new -> old.artistFilter == new.artistFilter }
+            .combine(getArtistListUseCase()) { state, result ->
+            when (result) {
+                is NetworkResult.Error -> updateState {
+                    it.copy(error = result.error, isLoading = false)
+                }
                 is NetworkResult.Loading -> updateState {
                     it.copy(isLoading = true)
                 }
-                is NetworkResult.Error -> updateState {
-                    it.copy(
-                        isLoading = false,
-                        error = networkResult.error
-                    )
-                }
-                is NetworkResult.Success -> updateState { state ->
-                    val all = networkResult.data
-                    val (groups, soloists) = all.partition { it.isGroup }
-                    state.copy(
-                        isLoading = false,
-                        groupOverviews = groups,
-                        soloistsOverviews = soloists
-                    )
+                is NetworkResult.Success -> {
+                    when (state.artistFilter) {
+                        ArtistFilter.GROUPS -> updateState { state ->
+                            state.copy(artists = result.data.filter { it.isGroup }, isLoading = false)
+                        }
+                        ArtistFilter.SOLOISTS -> updateState { state ->
+                            state.copy(artists = result.data.filter { !it.isGroup }, isLoading = false)
+                        }
+                        ArtistFilter.ALL -> updateState { state ->
+                            state.copy(artists = result.data, isLoading = false)
+                        }
+                    }
                 }
             }
-        }
+        }.collect()
     }
 }

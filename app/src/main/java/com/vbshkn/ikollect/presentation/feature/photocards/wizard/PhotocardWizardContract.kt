@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 
+import com.vbshkn.ikollect.domain.business.ArtistFilter
 import com.vbshkn.ikollect.domain.model.UserItemImage
 
 sealed interface PhotocardWizardContract {

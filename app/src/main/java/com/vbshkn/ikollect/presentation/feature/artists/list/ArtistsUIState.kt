@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.presentation.feature.artists.list
 
+import com.vbshkn.ikollect.domain.business.ArtistFilter
 import com.vbshkn.ikollect.domain.error.AppError
 import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 
@@ -7,6 +8,6 @@ data class ArtistsUIState(
     val isLoading: Boolean = false,
     val isSyncing: Boolean = false,
     val error: AppError? = null,
-    val groupOverviews: List<ArtistListItem> = emptyList(),
-    val soloistsOverviews: List<ArtistListItem> = emptyList()
+    val artists: List<ArtistListItem> = emptyList(),
+    val artistFilter: ArtistFilter = ArtistFilter.ALL
 )

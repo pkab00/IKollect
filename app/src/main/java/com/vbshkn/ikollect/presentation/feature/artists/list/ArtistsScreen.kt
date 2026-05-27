@@ -2,18 +2,20 @@ package com.vbshkn.ikollect.presentation.feature.artists.list
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,24 +26,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.presentation.composable.ArtistBox
-import com.vbshkn.ikollect.presentation.composable.CardGrid
+import com.vbshkn.ikollect.domain.business.ArtistFilter
 import com.vbshkn.ikollect.presentation.composable.CommonTopBar
-import com.vbshkn.ikollect.presentation.composable.EmptyCardGridFiller
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
+import com.vbshkn.ikollect.presentation.composable.SelectableLabel
+import com.vbshkn.ikollect.presentation.composable.grid.ArtistsGrid
+import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract
 import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsContract.Event
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
 fun ArtistsScreen(
     viewModel: ArtistsViewModel,
-    onShowAllGroupsClick: () -> Unit,
-    onShowAllSoloistsClick: () -> Unit,
-    onArtistClick: (Long) -> Unit
+    onNavigateToArtist: (Long) -> Unit,
+    onNavigateToSearch: () -> Unit
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -52,6 +55,9 @@ fun ArtistsScreen(
                 is ArtistsContract.Effect.ShowRefreshingErrorToast -> {
                     Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
                 }
+
+                is ArtistsContract.Effect.NavigateToArtist -> onNavigateToArtist(effect.artistId)
+                is ArtistsContract.Effect.NavigateToSearch -> onNavigateToSearch()
             }
         }
     }
@@ -61,65 +67,91 @@ fun ArtistsScreen(
         onRefresh = { viewModel.onEvent(Event.OnPulledToRefresh) }
     ) {
         Scaffold(
-            topBar = { CommonTopBar(title = UiText.StringResource(R.string.screen_title_artists)) },
+            topBar = {
+                CommonTopBar(
+                    title = UiText.StringResource(R.string.screen_title_artists),
+                    counter = uiState.artists.size,
+                    actions = {
+                        IconButton({ viewModel.onEvent(Event.OnSearchClick) }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
+            },
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
         ) { paddingValues ->
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(10.dp)
             ) {
-                item {
-                    SectionWrapper(
-                        title = stringResource(R.string.title_groups),
-                        onAction = onShowAllGroupsClick
+                if (uiState.artists.isEmpty() && !uiState.isLoading) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        val items = uiState.groupOverviews
-                        if (items.isEmpty()) {
-                            EmptyCardGridFiller()
-                        } else {
-                            CardGrid(height = 160.dp) {
-                                items(
-                                    items = items,
-                                    key = { it.artistId }
-                                ) { overview ->
-                                    ArtistBox(
-                                        overview = overview,
-                                        onClick = onArtistClick,
-                                        modifier = Modifier.width(120.dp)
-                                    )
-                                }
+                        Text(
+                            text = stringResource(R.string.message_no_albums_found),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            items(
+                                items = listOf(
+                                    ArtistFilter.GROUPS,
+                                    ArtistFilter.SOLOISTS
+                                ),
+                                key = { it.name }
+                            ) { filter ->
+                                SelectableLabel(
+                                    text = when (filter) {
+                                        ArtistFilter.GROUPS -> UiText.StringResource(R.string.title_groups)
+                                        ArtistFilter.SOLOISTS -> UiText.StringResource(R.string.title_soloists)
+                                        ArtistFilter.ALL -> UiText.DynamicString("")
+                                    },
+                                    imageVector = when (filter) {
+                                        ArtistFilter.GROUPS -> Icons.Default.Groups
+                                        ArtistFilter.SOLOISTS -> Icons.Default.Person
+                                        ArtistFilter.ALL -> null
+                                    },
+                                    selected = uiState.artistFilter == filter,
+                                    onClick = { viewModel.onEvent(Event.OnSelectFilter(filter)) },
+                                )
                             }
                         }
-                    }
-                }
-
-                item {
-                    SectionWrapper(
-                        title = stringResource(R.string.title_soloists),
-                        onAction = onShowAllSoloistsClick
-                    ) {
-                        val items = uiState.soloistsOverviews
-                        if (items.isEmpty()) {
-                            EmptyCardGridFiller()
-                        } else {
-                            CardGrid(height = 160.dp) {
-                                items(
-                                    items = items,
-                                    key = { it.artistId }
-                                ) { overview ->
-                                    ArtistBox(
-                                        overview = overview,
-                                        onClick = onArtistClick,
-                                        modifier = Modifier.size(120.dp)
-                                    )
-                                }
+                        if (uiState.artists.isEmpty()) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                Text(text = stringResource(R.string.filler_nothing_to_show))
                             }
+                        } else {
+                            ArtistsGrid(
+                                items = uiState.artists,
+                                onClick = { viewModel.onEvent(Event.OnArtistClick(it.artistId)) },
+                            )
                         }
                     }
                 }
@@ -128,35 +160,5 @@ fun ArtistsScreen(
         if (uiState.isLoading) {
             LoadingOverlay()
         }
-    }
-}
-
-@Composable
-private fun SectionWrapper(
-    title: String,
-    onAction: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = stringResource(R.string.label_show_all),
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.clickable { onAction() }
-            )
-        }
-        HorizontalDivider(Modifier.fillMaxWidth())
-        content()
     }
 }

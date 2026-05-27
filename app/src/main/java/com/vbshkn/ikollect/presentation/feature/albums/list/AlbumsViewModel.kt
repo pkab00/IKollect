@@ -54,6 +54,10 @@ class AlbumsViewModel @Inject constructor(
                 }
             }
 
+            is Event.OnSearchClicked -> {
+                sendEffect(NavigateToSearch)
+            }
+
             is Event.OnAlbumSavingConfirmed -> {
                 val candidate = uiState.value.scannedCandidate
                 if (candidate != null) {

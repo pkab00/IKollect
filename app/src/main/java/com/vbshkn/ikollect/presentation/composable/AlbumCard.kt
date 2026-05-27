@@ -31,7 +31,8 @@ import com.vbshkn.ikollect.util.UiText
 @Composable
 fun AlbumCard(
     album: AlbumDetails,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
         onClick = onClick,
@@ -39,6 +40,7 @@ fun AlbumCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
+        modifier = modifier
     ) {
         Column {
             // 1. ОБЛОЖКА АЛЬБОМА

@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.presentation.composable.profile
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -132,10 +133,12 @@ private fun LikeButton(
         shape = CircleShape,
         modifier = modifier
     ) {
-        Icon(
-            imageVector = if (isToggled) Icons.Default.Favorite else Icons.Rounded.FavoriteBorder,
-            contentDescription = null
-        )
+        AnimatedContent(targetState = isToggled) { isToggled ->
+            Icon(
+                imageVector = if (isToggled) Icons.Default.Favorite else Icons.Rounded.FavoriteBorder,
+                contentDescription = null
+            )
+        }
     }
 }
 

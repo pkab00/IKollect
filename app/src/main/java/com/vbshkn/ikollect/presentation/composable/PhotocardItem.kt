@@ -53,6 +53,7 @@ fun PhotocardItem(
     item: PhotocardListItem,
     height: Dp,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     onHold: () -> Unit = {}
 ) {
     var innerGradient: Brush by remember {
@@ -76,7 +77,8 @@ fun PhotocardItem(
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
     ) {
         OutlinedCard(
             shape = shape,

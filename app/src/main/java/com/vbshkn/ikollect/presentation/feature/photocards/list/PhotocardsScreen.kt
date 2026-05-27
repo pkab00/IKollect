@@ -1,6 +1,9 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.list
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsContract.Event
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsContract.Effect
 import androidx.compose.foundation.background
@@ -12,16 +15,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,13 +37,15 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.presentation.composable.CommonTopBar
 import com.vbshkn.ikollect.presentation.composable.PhotocardItem
 import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
+import com.vbshkn.ikollect.presentation.composable.grid.PhotocardsGrid
 import com.vbshkn.ikollect.util.UiText
 
 @Composable
 fun PhotocardsScreen(
     viewModel: PhotocardsViewModel,
     onNavigateToWizard: () -> Unit,
-    onNavigateToPhotocard: (Long) -> Unit
+    onNavigateToPhotocard: (Long) -> Unit,
+    onNavigateToSearch: () -> Unit
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -56,6 +58,7 @@ fun PhotocardsScreen(
                 is Effect.ShowRefreshingErrorToast -> {
                     Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
                 }
+                is Effect.GoToSearch -> onNavigateToSearch()
             }
         }
     }
@@ -76,6 +79,12 @@ fun PhotocardsScreen(
                                 contentDescription = ""
                             )
                         }
+                        IconButton({ viewModel.onEvent(Event.OnSearchClicked) }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null
+                            )
+                        }
                     }
                 )
             },
@@ -88,7 +97,6 @@ fun PhotocardsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(10.dp)
             ) {
                 if (uiState.error != null) {
                     LazyColumn(
@@ -105,8 +113,7 @@ fun PhotocardsScreen(
                             )
                         }
                     }
-                }
-                else if (uiState.photocards.isEmpty()) {
+                } else if (uiState.photocards.isEmpty()) {
                     LazyColumn(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
@@ -120,28 +127,19 @@ fun PhotocardsScreen(
                         }
                     }
                 } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(100.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(
-                            items = uiState.photocards,
-                            key = { it.photocardId }
-                        ) { photocard ->
-                            PhotocardItem(
-                                item = photocard,
-                                height = 150.dp,
-                                onClick = { viewModel.onEvent(Event.OnPhotocardClicked(photocard.photocardId)) },
-                                onHold = { viewModel.onEvent(Event.OnPhotocardPreviewPressed(photocard.imageUrl)) }
-                            )
-                        }
-                    }
+                    PhotocardsGrid(
+                        items = uiState.photocards,
+                        onClick = { viewModel.onEvent(Event.OnPhotocardClicked(it.photocardId)) },
+                        onHold = { viewModel.onEvent(Event.OnPhotocardPreviewPressed(it.imageUrl)) }
+                    )
                 }
             }
         }
-        if (uiState.fullScreenPreview != null) {
+        AnimatedVisibility(
+            visible = uiState.fullScreenPreview != null,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
             ImageZoomOverlay(
                 contentUrl = uiState.fullScreenPreview,
                 onDismiss = { viewModel.onEvent(Event.OnPhotocardPreviewReleased) }

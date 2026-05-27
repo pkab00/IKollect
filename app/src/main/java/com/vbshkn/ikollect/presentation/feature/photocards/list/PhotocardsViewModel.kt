@@ -22,7 +22,7 @@ class PhotocardsViewModel @Inject constructor(
     override fun onEvent(event: Event) {
         when (event) {
             is Event.OnWizardClicked -> {
-                sendEffect(Effect.GoToWizard)
+                sendEffect(GoToWizard)
             }
             is Event.OnPhotocardClicked -> {
                 sendEffect(GoToPhotocard(event.id))
@@ -39,6 +39,9 @@ class PhotocardsViewModel @Inject constructor(
                 if (!succeed) sendEffect(ShowRefreshingErrorToast)
                 updateState { it.copy(isSyncing = false) }
 
+            }
+            is Event.OnSearchClicked -> {
+                sendEffect(GoToSearch)
             }
         }
     }

@@ -6,8 +6,20 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Route {
     @Serializable data object Albums : Route
+    @Serializable sealed class AlbumsFlow : Route {
+        @Serializable data object Main : AlbumsFlow()
+        @Serializable data object Search : AlbumsFlow()
+    }
     @Serializable data object Photocards : Route
+    @Serializable sealed class PhotocardsFlow : Route {
+        @Serializable data object Main : PhotocardsFlow()
+        @Serializable data object Search : PhotocardsFlow()
+    }
     @Serializable data object Artists : Route
+    @Serializable sealed class ArtistsFlow : Route {
+        @Serializable data object Main : ArtistsFlow()
+        @Serializable data object Search : ArtistsFlow()
+    }
     @Serializable data object UserProfile : Route
     @Serializable data object AlbumCameraScreen : Route
 
@@ -26,11 +38,6 @@ sealed interface Route {
         @Serializable data class Edit(val id: Long) : PhotocardFlow()
     }
     @Serializable data class ArtistProfile(val id: Long) : Route
-    @Serializable sealed class ArtistsFlow : Route {
-        @Serializable data object Main : ArtistsFlow()
-        @Serializable data object AllGroups : ArtistsFlow()
-        @Serializable data object AllSoloists : ArtistsFlow()
-    }
     @Serializable data object Auth : Route
     @Serializable sealed class AuthFlow : Route {
         @Serializable data object Login : AuthFlow()

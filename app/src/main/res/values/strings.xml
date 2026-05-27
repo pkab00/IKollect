@@ -171,4 +171,5 @@
     <string name="language_russian" translatable="false">Русский</string>
     <string name="settings_item_tabs_order">Tabs order</string>
     <string name="profile_label_image">Image</string>
+    <string name="label_search">Search</string>
 </resources>

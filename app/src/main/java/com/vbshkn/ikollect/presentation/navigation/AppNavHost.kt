@@ -23,9 +23,11 @@ import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizar
 import com.vbshkn.ikollect.presentation.feature.userprofile.UserProfileScreen
 import com.vbshkn.ikollect.presentation.feature.userprofile.UserProfileViewModel
 import com.vbshkn.ikollect.presentation.navigation.graphs.albumProfileGraph
+import com.vbshkn.ikollect.presentation.navigation.graphs.albumsGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.artistsGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.authGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.photocardProfileGraph
+import com.vbshkn.ikollect.presentation.navigation.graphs.photocardsGraph
 import com.vbshkn.ikollect.presentation.navigation.graphs.settingsGraph
 import kotlin.reflect.typeOf
 
@@ -38,23 +40,6 @@ fun AppNavHost(
         navController = navController,
         startDestination = startRoute
     ) {
-        composable<Route.Albums> {
-            val viewModel = hiltViewModel<AlbumsViewModel>()
-            AlbumsScreen(
-                viewModel = viewModel,
-                onGoToWizard = { navController.navigate(Route.AlbumWizard(it)) },
-                onAlbumClick = { navController.navigate(Route.AlbumFlow.Profile(it)) }
-            )
-        }
-        composable<Route.Photocards> {
-            val viewModel = hiltViewModel<PhotocardsViewModel>()
-            PhotocardsScreen(
-                viewModel = viewModel,
-                onNavigateToWizard = { navController.navigate(Route.PhotocardWizard) },
-                onNavigateToPhotocard = { navController.navigate(Route.PhotocardFlow.Profile(it)) }
-            )
-        }
-
         composable<Route.UserProfile> {
             val viewModel = hiltViewModel<UserProfileViewModel>()
             UserProfileScreen(
@@ -130,6 +115,8 @@ fun AppNavHost(
         }
 
         with(navController) {
+            albumsGraph(this)
+            photocardsGraph(this)
             artistsGraph(this)
             albumProfileGraph(this)
             photocardProfileGraph(this)
