@@ -38,7 +38,7 @@
     <string name="dialog_body_request_camera">Для сканирования альбомов и фотокарт приложению необходим доступ к камере. Пожалуйста, предоставьте запрашиваемые разрешения.</string>
     <string name="dialog_title_failed_saving_photo">Ошибка сохранения</string>
     <string name="dialog_body_failed_saving_photo">Не удалось сохранить изображение.</string>
-    <string name="komca_scanner_tip">Наведите камеру на стикер KOMCA</string>
+    <string name="komca_scanner_tip">Наведите камеру на стикер KOMCA.</string>
     <string name="komca_scanner_confirm">Подтвердить номер?</string>
     <string name="add_details_title_komca">Номер KOMCA</string>
     <string name="komca_textfield_supporting_text">8-12 цифр с наклейки</string>
@@ -161,4 +161,5 @@
     <string name="settings_item_tabs_order">Порядок вкладок</string>
     <string name="profile_label_image">Изображение</string>
     <string name="label_search">Поиск</string>
+    <string name="barcode_scanner_tip">Наведите камеру на штрих-код.</string>
 </resources>

@@ -1,28 +1,17 @@
 package com.vbshkn.ikollect.presentation.feature.albums.list
 
+import android.Manifest.permission.CAMERA
 import android.widget.Toast
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Event
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Effect
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,40 +20,43 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.details.AlbumDetails
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
-import com.vbshkn.ikollect.presentation.composable.AlbumCard
 import com.vbshkn.ikollect.presentation.composable.CommonTopBar
 import com.vbshkn.ikollect.presentation.composable.LoadingOverlay
 import com.vbshkn.ikollect.presentation.composable.PullToRefreshContainer
-import com.vbshkn.ikollect.presentation.composable.SmallTextLabel
 import com.vbshkn.ikollect.presentation.composable.dialog.ConfirmDialog
 import com.vbshkn.ikollect.presentation.composable.dialog.ErrorDialog
 import com.vbshkn.ikollect.presentation.composable.grid.AlbumsGrid
+import com.vbshkn.ikollect.presentation.feature.wizard.dialog.CameraRationaleDialog
 import com.vbshkn.ikollect.util.UiText
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AlbumsScreen(
     viewModel: AlbumsViewModel,
     onGoToWizard: (AlbumCandidate) -> Unit,
     onGoToSearch: () -> Unit,
+    onGoToScanning: () -> Unit,
     onAlbumClick: (Long) -> Unit
 ) {
     val context = LocalContext.current
+    val permissionState = rememberPermissionState(CAMERA)
+    var pending by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onEvent: (Event) -> Unit = viewModel::onEvent
 
@@ -77,13 +69,36 @@ fun AlbumsScreen(
                     Toast.makeText(context, R.string.message_unable_to_refresh, Toast.LENGTH_SHORT).show()
                 }
                 is Effect.NavigateToSearch -> onGoToSearch()
+                is Effect.TryOpenBarcodeScanner -> when (permissionState.status) {
+                    is PermissionStatus.Denied -> {
+                        if (permissionState.status.shouldShowRationale) {
+                            pending = true
+                            onEvent(Event.OnDismissDialogClicked)
+                            onEvent(Event.OnShowCameraRationale)
+                        } else {
+                            pending = true
+                            permissionState.launchPermissionRequest()
+                        }
+                    }
+                    is PermissionStatus.Granted -> {
+                        onGoToScanning()
+                    }
+                }
             }
+        }
+    }
+
+    LaunchedEffect(permissionState.status) {
+        if (pending && permissionState.status is PermissionStatus.Granted) {
+            pending = false
+            onGoToScanning()
         }
     }
 
     DialogHost(
         dialogState = uiState.dialogState,
-        onEvent = onEvent
+        onEvent = onEvent,
+        onRequestPermission = { permissionState.launchPermissionRequest() }
     )
 
     PullToRefreshContainer(
@@ -96,7 +111,7 @@ fun AlbumsScreen(
                     title = UiText.StringResource(R.string.screen_title_albums),
                     counter = uiState.albums.size,
                     actions = {
-                        IconButton({ onEvent(Event.OnStartScanningClicked) }) {
+                        IconButton({ onEvent(Event.OnScanningClicked) }) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_scanner),
                                 contentDescription = null
@@ -179,25 +194,15 @@ fun ErrorScreen() {
 @Composable
 private fun DialogHost(
     dialogState: AlbumsDialogState,
-    onEvent: (Event) -> Unit
+    onEvent: (Event) -> Unit,
+    onRequestPermission: () -> Unit
 ) {
     when (dialogState) {
-        is AlbumsDialogState.ScanningErrorDialog -> {
-            ErrorDialog(
-                title = stringResource(R.string.error_title_scanning),
-                errorMessage = dialogState.errorMessage.asString(),
-                onDismiss = { onEvent(Event.OnDismissDialogClicked) },
-            )
-        }
-
-        is AlbumsDialogState.ScanningResultDialog -> {
-            ConfirmDialog(
-                title = stringResource(R.string.dialog_title_album_detected),
-                action = stringResource(R.string.dialog_action_next),
-                text = dialogState.message,
-                onConfirm = { onEvent(Event.OnAlbumSavingConfirmed) },
-                onDismiss = { onEvent(Event.OnDismissDialogClicked) },
-            )
+        is AlbumsDialogState.CameraRationaleDialog -> {
+            CameraRationaleDialog {
+                onEvent(Event.OnDismissDialogClicked)
+                onRequestPermission()
+            }
         }
 
         is AlbumsDialogState.None -> {}

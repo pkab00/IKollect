@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.secrets.gradle)
     alias(libs.plugins.kotlin.serialization)
     id("com.google.gms.google-services")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -102,6 +103,7 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+    implementation(libs.barcode.scanning)
 
     // --- COLLAPSING TOOLBAR (by onebone on github) ---
     implementation(libs.toolbar.compose)

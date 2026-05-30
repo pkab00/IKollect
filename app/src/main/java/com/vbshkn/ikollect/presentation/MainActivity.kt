@@ -56,9 +56,10 @@ fun IKollectApp(viewModel: MainViewModel) {
     val bachStackEntity by navController.currentBackStackEntryAsState()
     val currentDestination = bachStackEntity?.destination
     val hideBottomNavBar = currentDestination?.hierarchy?.any {
-                it.hasRoute<Route.AlbumWizard>()
+        it.hasRoute<Route.AlbumWizard>()
                 || it.hasRoute<Route.PhotocardWizard>()
                 || it.hasRoute<Route.AlbumCameraScreen>()
+                || it.hasRoute<Route.BarcodeScanner>()
                 || it.hasRoute<Route.PhotocardCameraScreen>()
                 || it.hasRoute<Route.KomcaScanner>()
                 || it.hasRoute<Route.Auth>()
@@ -97,8 +98,7 @@ fun IKollectApp(viewModel: MainViewModel) {
         val startRoute = settings?.navBarDestinations?.first()?.route
         if (startRoute == null) {
             LoadingOverlay()
-        }
-        else {
+        } else {
             AppNavHost(
                 navController = navController,
                 startRoute = remember { startRoute }

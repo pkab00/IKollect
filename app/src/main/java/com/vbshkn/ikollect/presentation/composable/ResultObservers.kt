@@ -14,13 +14,13 @@ fun CameraResultObserver(
     onResult: (UserItemImage) -> Unit
 ) {
     val cameraResult by savedStateHandle
-        .getStateFlow<String?>(CameraResultContract.CAMERA_RESULT, null)
+        .getStateFlow<String?>(CameraResultContract.PHOTO_CAMERA_RESULT, null)
         .collectAsStateWithLifecycle()
 
     LaunchedEffect(cameraResult) {
         if (cameraResult != null) {
             onResult(UserItemImage(uri = cameraResult!!, isCached = true))
-            savedStateHandle[CameraResultContract.CAMERA_RESULT] = null
+            savedStateHandle[CameraResultContract.PHOTO_CAMERA_RESULT] = null
         }
     }
 }
@@ -31,13 +31,13 @@ fun ScannerResultObserver(
     onResult: (String) -> Unit
 ) {
     val scannerResult by savedStateHandle
-        .getStateFlow<String?>(CameraResultContract.SCANNER_RESULT, null)
+        .getStateFlow<String?>(CameraResultContract.KOMCA_SCANNER_RESULT, null)
         .collectAsStateWithLifecycle()
 
     LaunchedEffect(scannerResult) {
         if (scannerResult != null) {
             onResult(scannerResult!!)
-            savedStateHandle[CameraResultContract.SCANNER_RESULT] = null
+            savedStateHandle[CameraResultContract.KOMCA_SCANNER_RESULT] = null
         }
     }
 }

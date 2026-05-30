@@ -2,6 +2,7 @@
 accompanistPermissions = "0.37.3"
 agp = "9.2.1"
 appcompat = "1.7.1"
+barcodeScanning = "17.3.0"
 bom = "3.6.0"
 cameraCore = "1.6.0"
 coilCompose = "3.4.0"
@@ -65,6 +66,7 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
 bom-supabase-kt = { module = "io.github.jan-tennert.supabase:bom", version.ref = "bom" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }

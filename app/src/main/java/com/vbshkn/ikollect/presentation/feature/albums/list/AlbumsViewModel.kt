@@ -34,36 +34,12 @@ class AlbumsViewModel @Inject constructor(
                 sendEffect(NavigateToAlbum(event.id))
             }
 
-            is Event.OnStartScanningClicked -> {
-                collectFlowIntoState(
-                    flow = scanAlbumBarcodeUseCase()
-                        .onCompletion { updateState { it.copy(isLoading = false) } },
-                    onSuccess = { state, data -> state.copy(scannedCandidate = data) },
-                    onLoading = { state -> state.copy(isLoading = true) },
-                    onError = { state, e -> state.copy(isLoading = false, error = e) }
-                ).invokeOnCompletion {
-                    if (uiState.value.scannedCandidate != null) {
-                        val artists = uiState.value.scannedCandidate?.artistCandidates?.joinToString { it.name }
-                        val release = uiState.value.scannedCandidate?.name
-                        showDialog(ScanningResultDialog("$artists - $release"))
-                    }
-                    else {
-                        val e = uiState.value.error ?: return@invokeOnCompletion
-                        showDialog(ScanningErrorDialog(handleErrors(e)))
-                    }
-                }
+            is Event.OnScanningClicked -> {
+                sendEffect(TryOpenBarcodeScanner)
             }
 
             is Event.OnSearchClicked -> {
                 sendEffect(NavigateToSearch)
-            }
-
-            is Event.OnAlbumSavingConfirmed -> {
-                val candidate = uiState.value.scannedCandidate
-                if (candidate != null) {
-                    dismissDialog()
-                    sendEffect(NavigateToSaveFlow(candidate))
-                }
             }
 
             is Event.OnDismissDialogClicked -> {
@@ -76,6 +52,10 @@ class AlbumsViewModel @Inject constructor(
                 if (!succeed) sendEffect(ShowRefreshingErrorToast)
                 updateState { it.copy(isSyncing = false) }
             }
+
+            is  Event.OnShowCameraRationale -> {
+                updateState { it.copy(dialogState = CameraRationaleDialog) }
+            }
         }
     }
 
@@ -86,35 +66,7 @@ class AlbumsViewModel @Inject constructor(
         onError = { state, e -> state.copy(isLoading = false, error = e) }
     )
 
-    private fun showDialog(dialogState: AlbumsDialogState) {
-        updateState { it.copy(dialogState = dialogState) }
-    }
-
     private fun dismissDialog() {
         updateState { it.copy(dialogState = None, scannedCandidate = null) }
-    }
-
-    private fun handleErrors(error: AppError): UiText {
-        return when (error) {
-            AppError.ConnectionFailed -> {
-                UiText.StringResource(R.string.error_body_connection_failed)
-            }
-
-            AppError.InvalidAlbumStyle -> {
-                UiText.StringResource(R.string.error_body_invalid_album_style)
-            }
-
-            AppError.ReleaseNotFound -> {
-                UiText.StringResource(R.string.error_body_release_not_found)
-            }
-
-            AppError.ScanningFailed -> {
-                UiText.StringResource(R.string.error_body_release_not_found)
-            }
-
-            else -> {
-                UiText.StringResource(R.string.error_body_unknown)
-            }
-        }
     }
 }

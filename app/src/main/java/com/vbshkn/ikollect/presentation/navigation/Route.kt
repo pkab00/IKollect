@@ -24,6 +24,7 @@ sealed interface Route {
     @Serializable data object AlbumCameraScreen : Route
 
     @Serializable data object KomcaScanner : Route
+    @Serializable data object BarcodeScanner : Route
     @Serializable data object PhotocardCameraScreen : Route
 
     @Serializable data object AlbumProfile : Route

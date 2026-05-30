@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.camera
+package com.vbshkn.ikollect.presentation.feature.camera.photocard_camera
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil3.Bitmap

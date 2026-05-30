@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.camera
+package com.vbshkn.ikollect.presentation.feature.camera.komca_scanner
 
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController

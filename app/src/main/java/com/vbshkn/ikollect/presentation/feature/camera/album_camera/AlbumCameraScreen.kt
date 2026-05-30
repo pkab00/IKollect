@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.camera
+package com.vbshkn.ikollect.presentation.feature.camera.album_camera
 
 import android.content.Context
 import android.net.Uri

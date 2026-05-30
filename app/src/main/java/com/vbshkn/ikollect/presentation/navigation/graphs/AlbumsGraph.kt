@@ -25,7 +25,8 @@ fun NavGraphBuilder.albumsGraph(navController: NavHostController) {
                 viewModel = viewModel,
                 onGoToWizard = { navController.navigate(Route.AlbumWizard(it)) },
                 onAlbumClick = { navController.navigate(Route.AlbumFlow.Profile(it)) },
-                onGoToSearch = { navController.navigate(Route.AlbumsFlow.Search) }
+                onGoToSearch = { navController.navigate(Route.AlbumsFlow.Search) },
+                onGoToScanning = { navController.navigate(Route.BarcodeScanner) }
             )
         }
 

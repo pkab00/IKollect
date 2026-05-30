@@ -6,18 +6,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
-import com.vbshkn.ikollect.presentation.feature.camera.AlbumCameraScreen
-import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsScreen
-import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsScreen
-import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsViewModel
+import com.vbshkn.ikollect.presentation.feature.camera.album_camera.AlbumCameraScreen
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardScreen
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileScreen
 import com.vbshkn.ikollect.presentation.feature.artists.profile.ArtistProfileViewModel
+import com.vbshkn.ikollect.presentation.feature.camera.barcode_scanner.BarcodeScannerScreen
+import com.vbshkn.ikollect.presentation.feature.camera.barcode_scanner.BarcodeScannerViewModel
 import com.vbshkn.ikollect.presentation.feature.camera.CameraResultContract
-import com.vbshkn.ikollect.presentation.feature.camera.KomcaScannerScreen
-import com.vbshkn.ikollect.presentation.feature.camera.PhotocardCameraScreen
-import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsViewModel
+import com.vbshkn.ikollect.presentation.feature.camera.komca_scanner.KomcaScannerScreen
+import com.vbshkn.ikollect.presentation.feature.camera.photocard_camera.PhotocardCameraScreen
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardScreen
 import com.vbshkn.ikollect.presentation.feature.userprofile.UserProfileScreen
@@ -55,14 +53,14 @@ fun AppNavHost(
         composable<Route.AlbumCameraScreen> {
             AlbumCameraScreen { image ->
                 navController.previousBackStackEntry
-                    ?.savedStateHandle[CameraResultContract.CAMERA_RESULT] = image
+                    ?.savedStateHandle[CameraResultContract.PHOTO_CAMERA_RESULT] = image
                 navController.popBackStack()
             }
         }
         composable<Route.PhotocardCameraScreen> {
             PhotocardCameraScreen { image ->
                 navController.previousBackStackEntry
-                    ?.savedStateHandle[CameraResultContract.CAMERA_RESULT] = image
+                    ?.savedStateHandle[CameraResultContract.PHOTO_CAMERA_RESULT] = image
                 navController.popBackStack()
             }
         }
@@ -70,10 +68,19 @@ fun AppNavHost(
             KomcaScannerScreen(
                 onNumberRecognized = { number ->
                     navController.previousBackStackEntry
-                        ?.savedStateHandle[CameraResultContract.SCANNER_RESULT] = number
+                        ?.savedStateHandle[CameraResultContract.KOMCA_SCANNER_RESULT] = number
                     navController.popBackStack()
                 }
             )
+        }
+
+        composable<Route.BarcodeScanner>  {
+            val viewModel = hiltViewModel<BarcodeScannerViewModel>()
+            BarcodeScannerScreen(viewModel) { candidate ->
+                navController.navigate(Route.AlbumWizard(candidate)) {
+                    popUpTo<Route.BarcodeScanner> { inclusive = true }
+                }
+            }
         }
 
         composable<Route.ArtistProfile> {
