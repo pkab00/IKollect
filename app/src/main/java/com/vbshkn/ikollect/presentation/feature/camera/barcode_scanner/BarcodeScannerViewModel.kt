@@ -4,17 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.data.remote.NetworkResult
-import com.vbshkn.ikollect.data.repository.AlbumRepository
+import com.vbshkn.ikollect.data.repository.AlbumRepositoryImpl
 import com.vbshkn.ikollect.domain.error.AppError
-import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -23,7 +20,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class BarcodeScannerViewModel @Inject constructor(
-    private val albumRepository: AlbumRepository
+    private val albumRepository: AlbumRepositoryImpl
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BarcodeScannerUiState())

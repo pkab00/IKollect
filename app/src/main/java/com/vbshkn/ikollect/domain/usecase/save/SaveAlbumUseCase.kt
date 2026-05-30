@@ -4,10 +4,13 @@ import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.mapper.DataMappers.toEntity
-import com.vbshkn.ikollect.data.repository.AlbumRepository
-import com.vbshkn.ikollect.data.repository.ArtistRepository
-import com.vbshkn.ikollect.data.repository.ImageRepository
+import com.vbshkn.ikollect.data.repository.AlbumRepositoryImpl
+import com.vbshkn.ikollect.data.repository.ArtistRepositoryImpl
+import com.vbshkn.ikollect.data.repository.ImageRepositoryImpl
 import com.vbshkn.ikollect.di.ApplicationScope
+import com.vbshkn.ikollect.domain.repository.AlbumRepository
+import com.vbshkn.ikollect.domain.repository.ArtistRepository
+import com.vbshkn.ikollect.domain.repository.ImageRepository
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardUIState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

@@ -1,9 +1,9 @@
 package com.vbshkn.ikollect.data.repository
 
-import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.model.AppUser
+import com.vbshkn.ikollect.domain.repository.AuthRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.auth.auth
@@ -12,21 +12,11 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.filter.FilterOperation
-import io.github.jan.supabase.postgrest.query.filter.FilterOperator
-import io.github.jan.supabase.realtime.PostgresAction
-import io.github.jan.supabase.realtime.channel
-import io.github.jan.supabase.realtime.decodeRecord
-import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.selectSingleValueAsFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
@@ -34,14 +24,14 @@ private const val TAG = "AuthRepository"
 private const val PUBLIC_SCHEMA = "public"
 private const val PROFILES_TABLE = "profiles"
 
-class AuthRepository @Inject constructor(
+class AuthRepositoryImpl @Inject constructor(
     private val supabase: SupabaseClient
-) {
+) : AuthRepository {
     private val auth = supabase.auth
     private val postgrest = supabase.from(PROFILES_TABLE)
 
     @OptIn(ExperimentalCoroutinesApi::class, SupabaseExperimental::class)
-    fun getUser(): Flow<NetworkResult<AppUser?>> = auth.sessionStatus
+    override fun getUser(): Flow<NetworkResult<AppUser?>> = auth.sessionStatus
         .flatMapLatest { status ->
             flow {
                 emit(NetworkResult.Loading)
@@ -102,7 +92,7 @@ class AuthRepository @Inject constructor(
             }
         }
 
-    suspend fun createUser(email: String, password: String, nickname: String) {
+    override suspend fun createUser(email: String, password: String, nickname: String) {
         auth.signUpWith(Email) {
             this.email = email
             this.password = password
@@ -114,25 +104,25 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    suspend fun signInWithEmail(email: String, password: String) {
+    override suspend fun signInWithEmail(email: String, password: String) {
         auth.signInWith(Email) {
             this.email = email
             this.password = password
         }
     }
 
-    suspend fun signInWithGoogle(idToken: String) {
+    override suspend fun signInWithGoogle(idToken: String) {
         auth.signInWith(IDToken) {
             this.idToken = idToken
             provider = Google
         }
     }
 
-    suspend fun signOut() {
+    override suspend fun signOut() {
         auth.signOut()
     }
 
-    suspend fun changeNickname(newNickname: String) {
+    override suspend fun changeNickname(newNickname: String) {
         val id = awaitAndGetUid()
         postgrest.update({
             set("nickname", newNickname)
@@ -141,21 +131,21 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    fun isUserSignedIn(): Boolean {
+    override fun isUserSignedIn(): Boolean {
         return auth.currentSessionOrNull() != null
     }
 
-    suspend fun sendPasswordResetEmail(email: String) {
+    override suspend fun sendPasswordResetEmail(email: String) {
         auth.resetPasswordForEmail(email)
     }
 
-    suspend fun updatePassword(newPassword: String) {
+    override suspend fun updatePassword(newPassword: String) {
         auth.updateUser {
             password = newPassword
         }
     }
 
-    suspend fun deleteUser() {
+    override suspend fun deleteUser() {
         val userId = auth.currentUserOrNull()?.id
         if (userId != null) {
             postgrest.delete { filter { eq("id", userId) } }
@@ -163,7 +153,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    suspend fun awaitAndGetUid(): String? {
+    override suspend fun awaitAndGetUid(): String? {
         auth.awaitInitialization()
         return auth.currentSessionOrNull()?.user?.id
     }

@@ -3,11 +3,14 @@ package com.vbshkn.ikollect.domain.usecase.save
 import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
-import com.vbshkn.ikollect.data.repository.ImageRepository
-import com.vbshkn.ikollect.data.repository.PhotocardRepository
-import com.vbshkn.ikollect.data.repository.TagRepository
+import com.vbshkn.ikollect.data.repository.ImageRepositoryImpl
+import com.vbshkn.ikollect.data.repository.PhotocardRepositoryImpl
+import com.vbshkn.ikollect.data.repository.TagRepositoryImpl
 import com.vbshkn.ikollect.di.ApplicationScope
 import com.vbshkn.ikollect.domain.model.candidate.PhotocardCandidate
+import com.vbshkn.ikollect.domain.repository.ImageRepository
+import com.vbshkn.ikollect.domain.repository.PhotocardRepository
+import com.vbshkn.ikollect.domain.repository.TagRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject

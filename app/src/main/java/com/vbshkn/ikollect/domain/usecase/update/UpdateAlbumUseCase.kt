@@ -2,9 +2,11 @@ package com.vbshkn.ikollect.domain.usecase.update
 
 import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
-import com.vbshkn.ikollect.data.repository.AlbumRepository
-import com.vbshkn.ikollect.data.repository.ImageRepository
+import com.vbshkn.ikollect.data.repository.AlbumRepositoryImpl
+import com.vbshkn.ikollect.data.repository.ImageRepositoryImpl
 import com.vbshkn.ikollect.domain.model.UserItemImage
+import com.vbshkn.ikollect.domain.repository.AlbumRepository
+import com.vbshkn.ikollect.domain.repository.ImageRepository
 import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject

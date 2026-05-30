@@ -1,6 +1,7 @@
 package com.vbshkn.ikollect.domain.usecase.delete
 
-import com.vbshkn.ikollect.data.repository.AlbumRepository
+import com.vbshkn.ikollect.data.repository.AlbumRepositoryImpl
+import com.vbshkn.ikollect.domain.repository.AlbumRepository
 import javax.inject.Inject
 
 class DeleteAlbumUseCase @Inject constructor(

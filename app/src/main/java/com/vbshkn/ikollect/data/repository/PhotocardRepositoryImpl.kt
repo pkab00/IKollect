@@ -7,52 +7,52 @@ import com.vbshkn.ikollect.data.mapper.DataMappers.toProfile
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.model.list.PhotocardListItem
 import com.vbshkn.ikollect.domain.model.profile.PhotocardProfileData
+import com.vbshkn.ikollect.domain.repository.PhotocardRepository
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class PhotocardRepository @Inject constructor(
+class PhotocardRepositoryImpl @Inject constructor(
     private val photocardLocalDS: PhotocardLocalDataSource
-) {
-    fun getAll(): Flow<NetworkResult<List<PhotocardListItem>>> {
+) : PhotocardRepository {
+    override fun getAll(): Flow<NetworkResult<List<PhotocardListItem>>> {
         return photocardLocalDS.getAll()
             .asLocalResult { photocards ->
                 photocards.map { it.toListItem() }
             }
     }
 
-    fun getFavorite(): Flow<NetworkResult<List<PhotocardListItem>>> {
+    override fun getFavorite(): Flow<NetworkResult<List<PhotocardListItem>>> {
         return photocardLocalDS.getFavorite()
             .asLocalResult { photocards ->
                 photocards.map { it.toListItem() }
             }
     }
 
-    fun getPhotocardProfile(id: Long): Flow<NetworkResult<PhotocardProfileData?>> {
+    override fun getPhotocardProfile(id: Long): Flow<NetworkResult<PhotocardProfileData?>> {
         return photocardLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
     }
 
-    fun getEntity(id: Long): Flow<PhotocardEntity?> {
+    override fun getEntity(id: Long): Flow<PhotocardEntity?> {
         return photocardLocalDS.getById(id)
     }
 
-    suspend fun updatePhotocard(updated: PhotocardEntity) {
+    override suspend fun updatePhotocard(updated: PhotocardEntity) {
         photocardLocalDS.update(updated)
     }
 
-    suspend fun insertWithArtists(
+    override suspend fun insertWithArtists(
         entity: PhotocardEntity,
         artistIds: List<Long>
     ): Long {
         return photocardLocalDS.insertPhotocardWithArtists(entity, artistIds)
     }
 
-    suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
+    override suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
         photocardLocalDS.setFavorite(id, !oldValue)
     }
 
-    suspend fun softDelete(id: Long) {
+    override suspend fun softDelete(id: Long) {
         photocardLocalDS.setDeleted(id)
     }
 }

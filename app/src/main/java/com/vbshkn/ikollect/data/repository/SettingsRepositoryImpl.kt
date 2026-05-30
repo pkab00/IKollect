@@ -5,25 +5,26 @@ import com.vbshkn.ikollect.data.local.datastore.LocalSettingsStorage
 import com.vbshkn.ikollect.data.local.datastore.LocalTabs
 import com.vbshkn.ikollect.data.local.datastore.LocalTheme
 import com.vbshkn.ikollect.data.mapper.toDomain
+import com.vbshkn.ikollect.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class SettingsRepository @Inject constructor(
+class SettingsRepositoryImpl @Inject constructor(
     private val localSettingsStorage: LocalSettingsStorage
-) {
-    fun getSettings() = localSettingsStorage.getSettingsFlow().map { it.toDomain() }
+) : SettingsRepository {
+    override fun getSettings() = localSettingsStorage.getSettingsFlow().map { it.toDomain() }
 
-    suspend fun getCurrentSettings() = localSettingsStorage.getCurrentSettings().toDomain()
+    override suspend fun getCurrentSettings() = localSettingsStorage.getCurrentSettings().toDomain()
 
-    suspend fun updateLanguage(language: LocalLanguage) {
+    override suspend fun updateLanguage(language: LocalLanguage) {
         localSettingsStorage.updateLanguage(language)
     }
 
-    suspend fun updateTheme(theme: LocalTheme) {
+    override suspend fun updateTheme(theme: LocalTheme) {
         localSettingsStorage.updateTheme(theme)
     }
 
-    suspend fun updateTabsOrder(order: List<LocalTabs>) {
+    override suspend fun updateTabsOrder(order: List<LocalTabs>) {
         localSettingsStorage.updateTabsOrder(order)
     }
 }

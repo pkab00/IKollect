@@ -1,6 +1,7 @@
 package com.vbshkn.ikollect.domain.usecase.get
 
-import com.vbshkn.ikollect.data.repository.ArtistRepository
+import com.vbshkn.ikollect.data.repository.ArtistRepositoryImpl
+import com.vbshkn.ikollect.domain.repository.ArtistRepository
 import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject
 

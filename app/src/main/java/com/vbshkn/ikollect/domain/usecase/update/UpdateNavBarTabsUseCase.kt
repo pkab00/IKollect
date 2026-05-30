@@ -1,7 +1,8 @@
 package com.vbshkn.ikollect.domain.usecase.update
 
 import com.vbshkn.ikollect.data.mapper.toData
-import com.vbshkn.ikollect.data.repository.SettingsRepository
+import com.vbshkn.ikollect.data.repository.SettingsRepositoryImpl
+import com.vbshkn.ikollect.domain.repository.SettingsRepository
 import com.vbshkn.ikollect.presentation.navigation.NavBarDestinations
 import javax.inject.Inject
 

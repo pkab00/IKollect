@@ -3,14 +3,15 @@ package com.vbshkn.ikollect.data.repository
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import com.vbshkn.ikollect.domain.repository.ImageRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 
-class ImageRepository @Inject constructor(
+class ImageRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
-) {
-    fun saveToInternalStorage(uriString: String): String {
+) : ImageRepository {
+    override fun saveToInternalStorage(uriString: String): String {
         val uri = uriString.toUri()
         val permanentName = "cover_${System.currentTimeMillis()}.jpg"
         val permanentFile = File(context.filesDir, permanentName)
@@ -34,7 +35,7 @@ class ImageRepository @Inject constructor(
         return Uri.fromFile(permanentFile).toString()
     }
 
-    fun deleteFromInternalStorage(uriString: String) {
+    override fun deleteFromInternalStorage(uriString: String) {
         try {
             val fileUri = uriString.toUri()
             val file = File(fileUri.path ?: throw IllegalArgumentException("Invalid URI: $fileUri"))
@@ -47,7 +48,7 @@ class ImageRepository @Inject constructor(
         }
     }
 
-    fun clearLocalStorage() {
+    override fun clearLocalStorage() {
         val localDir = context.filesDir
         localDir.listFiles()?.forEach { file ->
             file.delete()

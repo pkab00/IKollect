@@ -1,6 +1,7 @@
 package com.vbshkn.ikollect.domain.usecase.favorite
 
-import com.vbshkn.ikollect.data.repository.ArtistRepository
+import com.vbshkn.ikollect.data.repository.ArtistRepositoryImpl
+import com.vbshkn.ikollect.domain.repository.ArtistRepository
 import javax.inject.Inject
 
 class ToggleFavoriteArtistUseCase @Inject constructor(

@@ -1,7 +1,8 @@
 package com.vbshkn.ikollect.domain.usecase.update
 
 import com.vbshkn.ikollect.data.local.datastore.LocalTheme
-import com.vbshkn.ikollect.data.repository.SettingsRepository
+import com.vbshkn.ikollect.data.repository.SettingsRepositoryImpl
+import com.vbshkn.ikollect.domain.repository.SettingsRepository
 import javax.inject.Inject
 
 class UpdateAppThemeUseCase @Inject constructor(

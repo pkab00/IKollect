@@ -7,23 +7,24 @@ import com.vbshkn.ikollect.data.local.model.entity.PhotocardTagCrossRef
 import com.vbshkn.ikollect.data.mapper.DataMappers.toDomain
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.model.TagItem
+import com.vbshkn.ikollect.domain.repository.TagRepository
 import com.vbshkn.ikollect.util.asLocalResult
 import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class TagRepository @Inject constructor(
+class TagRepositoryImpl @Inject constructor(
     private val tagLocalDS: TagLocalDataSource,
     private val db: AppDatabase
-) {
-    fun getAll(): Flow<NetworkResult<List<TagItem>>> {
+) : TagRepository {
+    override fun getAll(): Flow<NetworkResult<List<TagItem>>> {
         return tagLocalDS.getAll()
             .asLocalResult { list ->
                 list.map { it.toDomain() }
             }
     }
 
-    suspend fun linkPhotocard(
+    override suspend fun linkPhotocard(
         photocardId: Long,
         tagIds: List<Long>,
     ) {
@@ -33,7 +34,7 @@ class TagRepository @Inject constructor(
         tagLocalDS.insertTagLinks(tagRelations)
     }
     
-    suspend fun updateLinks(
+    override suspend fun updateLinks(
         photocardId: Long,
         oldTagIds: List<Long>,
         newTagIds: List<Long>

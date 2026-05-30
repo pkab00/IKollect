@@ -9,6 +9,7 @@ import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.data.remote.datasource.ArtistRemoteDataSource
 import com.vbshkn.ikollect.domain.model.list.ArtistListItem
 import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
+import com.vbshkn.ikollect.domain.repository.ArtistRepository
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -17,11 +18,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class ArtistRepository @Inject constructor(
+class ArtistRepositoryImpl @Inject constructor(
     private val artistLocalDS: ArtistLocalDataSource,
     private val artistRemoteDS: ArtistRemoteDataSource
-) {
-    fun getAll(): Flow<List<ArtistEntity>> {
+) : ArtistRepository {
+    override fun getAll(): Flow<List<ArtistEntity>> {
         return artistLocalDS.getAll()
     }
 
@@ -29,7 +30,7 @@ class ArtistRepository @Inject constructor(
         return artistLocalDS.getById(id)
     }
 
-    fun getGroupMembers(groupId: Long): Flow<NetworkResult<List<ArtistListItem>>> {
+    override fun getGroupMembers(groupId: Long): Flow<NetworkResult<List<ArtistListItem>>> {
         return artistLocalDS
             .getGroupWithMembers(groupId)
             .asLocalResult { groupWithMembers ->
@@ -37,27 +38,27 @@ class ArtistRepository @Inject constructor(
             }
     }
 
-    fun getListItems(): Flow<NetworkResult<List<ArtistListItem>>> {
+    override fun getListItems(): Flow<NetworkResult<List<ArtistListItem>>> {
         return artistLocalDS
             .getAll()
             .asLocalResult { list -> list.map { it.toListItem() } }
     }
 
-    fun getFavorite(): Flow<NetworkResult<List<ArtistListItem>>> {
+    override fun getFavorite(): Flow<NetworkResult<List<ArtistListItem>>> {
         return artistLocalDS
             .getFavorite()
             .asLocalResult { list -> list.map { it.toListItem() } }
     }
 
-    fun getArtistProfile(id: Long): Flow<NetworkResult<ArtistProfileData?>> {
+    override fun getArtistProfile(id: Long): Flow<NetworkResult<ArtistProfileData?>> {
         return artistLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
     }
 
-    suspend fun insertToDatabase(entity: ArtistEntity) {
+    override suspend fun insertToDatabase(entity: ArtistEntity) {
         artistLocalDS.insert(entity)
     }
 
-    suspend fun addGroupMembers(
+    override suspend fun addGroupMembers(
         groupId: Long,
         memberIds: List<Long>
     ) {
@@ -77,7 +78,7 @@ class ArtistRepository @Inject constructor(
         }.awaitAll()
     }
 
-    suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
+    override suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
         artistLocalDS.setFavorite(id, !oldValue)
     }
 }

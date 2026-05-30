@@ -3,24 +3,18 @@ package com.vbshkn.ikollect.presentation.feature.albums.list
 import androidx.lifecycle.viewModelScope
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Event
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Effect
-import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.error.AppError
 import com.vbshkn.ikollect.domain.usecase.get.GetAllAlbumsUseCase
-import com.vbshkn.ikollect.domain.usecase.ScanAlbumBarcodeUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsContract.Effect.*
 import com.vbshkn.ikollect.presentation.feature.albums.list.AlbumsDialogState.*
-import com.vbshkn.ikollect.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
     private val getAllAlbumsUseCase: GetAllAlbumsUseCase,
-    private val scanAlbumBarcodeUseCase: ScanAlbumBarcodeUseCase,
     private val refreshDataUseCase: RefreshDataUseCase
 ) : BaseViewModel<AlbumsUIState, Event, Effect>(initialState = AlbumsUIState()) {
 
