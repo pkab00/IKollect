@@ -14,7 +14,7 @@ sealed interface ArtistProfileContract {
         data class OnArtistCardClicked(val id: Long) : Event
         data class OnAlbumCardClicked(val id: Long) : Event
         data class OnPhotocardCardClicked(val id: Long) : Event
-        data class OnLikeClicked(val id: Long, val isLiked: Boolean) : Event
+        data class OnLikeClicked(val id: Long) : Event
         object OnPulledToRefresh : Event
     }
 }

@@ -7,7 +7,7 @@ import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.business.ArtistFilter
 import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
-import com.vbshkn.ikollect.domain.usecase.get.GetArtistListUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAllArtistsUseCase
 import com.vbshkn.ikollect.presentation.feature.artists.list.ArtistsContract.Effect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ArtistsViewModel @Inject constructor(
-    private val getArtistListUseCase: GetArtistListUseCase,
+    private val getAllArtistsUseCase: GetAllArtistsUseCase,
     private val refreshDataUseCase: RefreshDataUseCase
 ) : BaseViewModel<ArtistsUIState, Event, Effect>(initialState = ArtistsUIState()) {
     init {
@@ -56,7 +56,7 @@ class ArtistsViewModel @Inject constructor(
     private fun collectArtistOverviews() = viewModelScope.launch {
         uiState
             .distinctUntilChanged { old, new -> old.artistFilter == new.artistFilter }
-            .combine(getArtistListUseCase()) { state, result ->
+            .combine(getAllArtistsUseCase()) { state, result ->
             when (result) {
                 is NetworkResult.Error -> updateState {
                     it.copy(error = result.error, isLoading = false)

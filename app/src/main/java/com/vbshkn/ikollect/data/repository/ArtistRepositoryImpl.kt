@@ -22,10 +22,6 @@ class ArtistRepositoryImpl @Inject constructor(
     private val artistLocalDS: ArtistLocalDataSource,
     private val artistRemoteDS: ArtistRemoteDataSource
 ) : ArtistRepository {
-    override fun getAll(): Flow<List<ArtistEntity>> {
-        return artistLocalDS.getAll()
-    }
-
     private fun getById(id: Long): Flow<ArtistEntity?> {
         return artistLocalDS.getById(id)
     }
@@ -78,7 +74,8 @@ class ArtistRepositoryImpl @Inject constructor(
         }.awaitAll()
     }
 
-    override suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
-        artistLocalDS.setFavorite(id, !oldValue)
+    override suspend fun toggleFavorite(id: Long) {
+        val current = artistLocalDS.getById(id).first()?.isFavorite ?: return
+        artistLocalDS.setFavorite(id, !current)
     }
 }

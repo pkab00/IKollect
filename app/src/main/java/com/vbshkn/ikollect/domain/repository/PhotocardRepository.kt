@@ -19,7 +19,7 @@ interface PhotocardRepository {
         artistIds: List<Long>
     ): Long
 
-    suspend fun toggleFavorite(id: Long, oldValue: Boolean)
+    suspend fun toggleFavorite(id: Long)
 
     suspend fun softDelete(id: Long)
 }

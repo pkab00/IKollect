@@ -17,6 +17,7 @@ import com.vbshkn.ikollect.domain.model.profile.AlbumProfileData
 import com.vbshkn.ikollect.domain.repository.AlbumRepository
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -53,10 +54,17 @@ class AlbumRepositoryImpl @Inject constructor(
         return albumLocalDS.getById(id)
     }
 
-    override fun getAllAlbums(): Flow<NetworkResult<List<AlbumDetails>>> {
+    override fun getAllDetails(): Flow<NetworkResult<List<AlbumDetails>>> {
         return albumLocalDS.getAllWithArtists()
             .asLocalResult { albums ->
                 albums.map { it.toDetails() }
+            }
+    }
+
+    override fun getListItems(): Flow<NetworkResult<List<AlbumListItem>>> {
+        return albumLocalDS.getAll()
+            .asLocalResult { albums ->
+                albums.map { it.toListItem() }
             }
     }
 
@@ -67,7 +75,7 @@ class AlbumRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun getAllByArtist(artistId: Long): Flow<NetworkResult<List<AlbumListItem>>> {
+    override fun getListItemsByArtist(artistId: Long): Flow<NetworkResult<List<AlbumListItem>>> {
         return albumLocalDS.getAllByArtist(artistId)
             .asLocalResult { artistsWithAlbums ->
                 artistsWithAlbums
@@ -91,8 +99,9 @@ class AlbumRepositoryImpl @Inject constructor(
         albumLocalDS.updateAlbum(updated)
     }
 
-    override suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
-        albumLocalDS.setFavorite(id, !oldValue)
+    override suspend fun toggleFavorite(id: Long) {
+        val current = albumLocalDS.getById(id).first()?.isFavorite ?: return
+        albumLocalDS.setFavorite(id, !current)
     }
 
     override suspend fun softDelete(id: Long) {

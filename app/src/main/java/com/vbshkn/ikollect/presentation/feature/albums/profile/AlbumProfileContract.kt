@@ -12,7 +12,7 @@ sealed interface AlbumProfileContract {
         object OnBackClicked : Event
         object OnOwnerClicked : Event
         object OnEditClicked : Event
-        data class OnLikeClicked(val id: Long, val isLiked: Boolean) : Event
+        data class OnLikeClicked(val id: Long) : Event
         data class OnArtistCardClicked(val id: Long) : Event
         data class OnPhotocardCardClicked(val id: Long) : Event
         object OnPulledToRefresh : Event

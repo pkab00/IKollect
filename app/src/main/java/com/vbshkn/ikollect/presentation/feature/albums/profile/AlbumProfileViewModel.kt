@@ -56,7 +56,7 @@ class AlbumProfileViewModel @Inject constructor(
                 updateState { it.copy(isSyncing = false) }
             }
             is Event.OnLikeClicked -> viewModelScope.launch {
-                toggleFavoriteAlbumUseCase(event.id, event.isLiked)
+                toggleFavoriteAlbumUseCase(event.id)
             }
             is Event.OnDeletionConfirmed -> viewModelScope.launch {
                 deleteAlbumUseCase(albumId)

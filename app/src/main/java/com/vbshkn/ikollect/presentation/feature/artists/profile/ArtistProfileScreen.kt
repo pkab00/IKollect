@@ -73,7 +73,7 @@ fun ArtistProfileScreen(
             onNavigate = { viewModel.onEvent(Event.OnBackClicked) },
             onLikeToggled = {
                 profile?.artist?.let {
-                    viewModel.onEvent(Event.OnLikeClicked(it.artistId, it.isFavorite))
+                    viewModel.onEvent(Event.OnLikeClicked(it.artistId))
                 }
             },
             imageUrl = profile?.artist?.profileImage,

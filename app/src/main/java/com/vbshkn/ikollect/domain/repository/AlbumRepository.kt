@@ -11,9 +11,10 @@ import kotlinx.coroutines.flow.Flow
 interface AlbumRepository {
     fun getAlbumCandidate(barcode: String): Flow<NetworkResult<AlbumCandidate>>
     fun getEntity(id: Long): Flow<AlbumEntity?>
-    fun getAllAlbums(): Flow<NetworkResult<List<AlbumDetails>>>
+    fun getAllDetails(): Flow<NetworkResult<List<AlbumDetails>>>
+    fun getListItems(): Flow<NetworkResult<List<AlbumListItem>>>
     fun getFavoriteAlbums(): Flow<NetworkResult<List<AlbumDetails>>>
-    fun getAllByArtist(artistId: Long): Flow<NetworkResult<List<AlbumListItem>>>
+    fun getListItemsByArtist(artistId: Long): Flow<NetworkResult<List<AlbumListItem>>>
     fun getAlbumProfile(id: Long): Flow<NetworkResult<AlbumProfileData?>>
 
     suspend fun insertToDatabase(
@@ -23,7 +24,7 @@ interface AlbumRepository {
 
     suspend fun updateAlbum(updated: AlbumEntity)
 
-    suspend fun toggleFavorite(id: Long, oldValue: Boolean)
+    suspend fun toggleFavorite(id: Long)
 
     suspend fun softDelete(id: Long)
 }

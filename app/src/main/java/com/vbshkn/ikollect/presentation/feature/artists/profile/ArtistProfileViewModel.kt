@@ -50,7 +50,7 @@ class ArtistProfileViewModel @Inject constructor(
                 updateState { it.copy(isSyncing = false) }
             }
             is Event.OnLikeClicked -> viewModelScope.launch {
-                toggleFavoriteArtistUseCase(event.id, event.isLiked)
+                toggleFavoriteArtistUseCase(event.id)
             }
         }
     }

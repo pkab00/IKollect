@@ -7,7 +7,7 @@ import javax.inject.Inject
 class ToggleFavoritePhotocardUseCase @Inject constructor(
     private val photocardRepository: PhotocardRepository
 ) {
-    suspend operator fun invoke(id: Long, current: Boolean) {
-        photocardRepository.toggleFavorite(id, current)
+    suspend operator fun invoke(id: Long) {
+        photocardRepository.toggleFavorite(id)
     }
 }

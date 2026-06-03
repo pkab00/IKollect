@@ -7,7 +7,7 @@ import javax.inject.Inject
 class ToggleFavoriteAlbumUseCase @Inject constructor(
     private val albumRepository: AlbumRepository
 ) {
-    suspend operator fun invoke(id: Long, current: Boolean) {
-        albumRepository.toggleFavorite(id, current)
+    suspend operator fun invoke(id: Long) {
+        albumRepository.toggleFavorite(id)
     }
 }

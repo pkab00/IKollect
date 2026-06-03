@@ -7,9 +7,8 @@ import com.vbshkn.ikollect.domain.model.profile.ArtistProfileData
 import kotlinx.coroutines.flow.Flow
 
 interface ArtistRepository {
-    fun getAll(): Flow<List<ArtistEntity>>
-    fun getGroupMembers(groupId: Long): Flow<NetworkResult<List<ArtistListItem>>>
     fun getListItems(): Flow<NetworkResult<List<ArtistListItem>>>
+    fun getGroupMembers(groupId: Long): Flow<NetworkResult<List<ArtistListItem>>>
     fun getFavorite(): Flow<NetworkResult<List<ArtistListItem>>>
     fun getArtistProfile(id: Long): Flow<NetworkResult<ArtistProfileData?>>
 
@@ -20,5 +19,5 @@ interface ArtistRepository {
         memberIds: List<Long>
     )
 
-    suspend fun toggleFavorite(id: Long, oldValue: Boolean)
+    suspend fun toggleFavorite(id: Long)
 }

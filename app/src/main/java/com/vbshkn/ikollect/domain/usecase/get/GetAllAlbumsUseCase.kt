@@ -1,7 +1,6 @@
 package com.vbshkn.ikollect.domain.usecase.get
 
 import com.vbshkn.ikollect.data.remote.NetworkResult
-import com.vbshkn.ikollect.data.repository.AlbumRepositoryImpl
 import com.vbshkn.ikollect.domain.model.details.AlbumDetails
 import com.vbshkn.ikollect.domain.repository.AlbumRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +10,6 @@ class GetAllAlbumsUseCase @Inject constructor(
     private val albumRepository: AlbumRepository
 ) {
     operator fun invoke(): Flow<NetworkResult<List<AlbumDetails>>> {
-        return albumRepository.getAllAlbums()
+        return albumRepository.getAllDetails()
     }
 }

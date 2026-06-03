@@ -10,7 +10,7 @@ import javax.inject.Inject
 class OpenRealtimeSocket @Inject constructor(
     private val supabase: SupabaseClient,
     @ApplicationScope private val scope: CoroutineScope
-){
+) {
     operator fun invoke() = scope.launch {
         supabase.realtime.connect()
     }

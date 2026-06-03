@@ -2,8 +2,8 @@ package com.vbshkn.ikollect.presentation.feature.photocards.wizard
 
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.usecase.get.GetAllTagsUseCase
-import com.vbshkn.ikollect.domain.usecase.get.GetArtistAlbumListUseCase
-import com.vbshkn.ikollect.domain.usecase.get.GetArtistListUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAllAlbumsByArtistUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAllArtistsUseCase
 import com.vbshkn.ikollect.domain.usecase.get.GetGroupMembersUseCase
 import com.vbshkn.ikollect.domain.usecase.save.SavePhotocardUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
@@ -19,9 +19,9 @@ import kotlinx.coroutines.flow.map
 
 @HiltViewModel
 class PhotocardWizardViewModel @Inject constructor(
-    private val getArtistListUseCase: GetArtistListUseCase,
+    private val getAllArtistsUseCase: GetAllArtistsUseCase,
     private val getGroupMembersUseCase: GetGroupMembersUseCase,
-    private val getArtistAlbumListUseCase: GetArtistAlbumListUseCase,
+    private val getAllAlbumsByArtistUseCase: GetAllAlbumsByArtistUseCase,
     private val getAllTagsUseCase: GetAllTagsUseCase,
     private val savePhotocardUseCase: SavePhotocardUseCase
 ) : BaseViewModel<
@@ -161,7 +161,7 @@ class PhotocardWizardViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeArtists() = collectFlowIntoState(
-        flow = combine(getArtistListUseCase(), uiState) {
+        flow = combine(getAllArtistsUseCase(), uiState) {
             artists, _ -> artists
         }.flatMapLatest { result ->
             when (result) {
@@ -202,7 +202,7 @@ class PhotocardWizardViewModel @Inject constructor(
         flow = uiState
             .map { it.photocardCandidate.ownerId }
             .distinctUntilChanged()
-            .flatMapLatest { getArtistAlbumListUseCase(it) },
+            .flatMapLatest { getAllAlbumsByArtistUseCase(it) },
         onSuccess = { state, data ->
             state.copy(
                 albums = data.sortedBy { it.timestamp },

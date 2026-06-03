@@ -113,7 +113,7 @@ fun AlbumProfileScreen(
             topBarState = topBarState,
             onNavigate = { viewModel.onEvent(Event.OnBackClicked) },
             onLikeToggled = {
-                profile?.album?.let { viewModel.onEvent(Event.OnLikeClicked(it.albumId, it.isFavorite)) }
+                profile?.album?.let { viewModel.onEvent(Event.OnLikeClicked(it.albumId)) }
             },
             actions = { animatedColor ->
                 IconButton(onClick = { viewModel.onEvent(Event.OnEditClicked) }) {

@@ -99,7 +99,7 @@ fun PhotocardProfileScreen(
             onNavigate = { viewModel.onEvent(Event.OnBackClicked) },
             onLikeToggled = {
                 profile?.photocard?.let {
-                    viewModel.onEvent(Event.OnLikeClicked(it.photocardId, it.isFavorite))
+                    viewModel.onEvent(Event.OnLikeClicked(it.photocardId))
                 }
             },
             actions = { animatedColor ->

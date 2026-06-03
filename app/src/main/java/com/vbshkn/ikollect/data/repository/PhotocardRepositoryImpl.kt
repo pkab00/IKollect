@@ -10,6 +10,7 @@ import com.vbshkn.ikollect.domain.model.profile.PhotocardProfileData
 import com.vbshkn.ikollect.domain.repository.PhotocardRepository
 import com.vbshkn.ikollect.util.asLocalResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class PhotocardRepositoryImpl @Inject constructor(
@@ -48,8 +49,9 @@ class PhotocardRepositoryImpl @Inject constructor(
         return photocardLocalDS.insertPhotocardWithArtists(entity, artistIds)
     }
 
-    override suspend fun toggleFavorite(id: Long, oldValue: Boolean) {
-        photocardLocalDS.setFavorite(id, !oldValue)
+    override suspend fun toggleFavorite(id: Long) {
+        val current = photocardLocalDS.getById(id).first()?.isFavorite ?: return
+        photocardLocalDS.setFavorite(id, !current)
     }
 
     override suspend fun softDelete(id: Long) {

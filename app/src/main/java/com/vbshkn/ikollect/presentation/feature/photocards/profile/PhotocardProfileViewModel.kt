@@ -62,7 +62,7 @@ class PhotocardProfileViewModel @Inject constructor(
             }
 
             is Event.OnLikeClicked -> viewModelScope.launch {
-                toggleFavoritePhotocardUseCase(event.id, event.isLiked)
+                toggleFavoritePhotocardUseCase(event.id)
             }
 
             is Event.OnDeleteClicked -> {
