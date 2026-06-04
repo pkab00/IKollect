@@ -8,8 +8,12 @@ data class EditAlbumProfileUIState(
     val error: AppError? = null,
     val dialogState: EditAlbumProfileDialogState = EditAlbumProfileDialogState.None,
 
-    val image: UserItemImage? = null,
+    val id: Long? = null,
     val oldImageUrl: String? = null,
+    val oldAlbumName: String = "",
+    val oldAlbumVersion: String = "",
+
+    val image: UserItemImage? = null,
     val albumName: String = "",
     val albumVersion: String = "",
     val komcaNumber: String = "",

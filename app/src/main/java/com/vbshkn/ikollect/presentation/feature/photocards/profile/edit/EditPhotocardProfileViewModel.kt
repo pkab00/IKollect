@@ -47,15 +47,7 @@ class EditPhotocardProfileViewModel @Inject constructor(
             }
 
             is EditPhotocardProfileContract.Event.OnSaveChangesClicked -> viewModelScope.launch {
-                updatePhotocardUseCase(
-                    id = photocardId,
-                    image = uiState.value.image,
-                    oldImage = uiState.value.oldImageUrl,
-                    photocardName = uiState.value.photocardName,
-                    userNotes = uiState.value.userNotes,
-                    oldTagIds = uiState.value.oldTagIds,
-                    selectedTagIds = uiState.value.selectedTagIds
-                )
+                updatePhotocardUseCase(uiState.value)
                 sendEffect(EditPhotocardProfileContract.Effect.NavigateBack)
             }
 
@@ -111,6 +103,7 @@ class EditPhotocardProfileViewModel @Inject constructor(
                 ),
                 oldImageUrl = data?.photocard?.imageUrl ?: "",
                 photocardName = data?.photocard?.displayName ?: "",
+                oldPhotocardName = data?.photocard?.displayName ?: "",
                 userNotes = data?.photocard?.userNotes ?: "",
                 oldTagIds = data?.photocard?.tags?.map { it.id }?.toSet() ?: emptySet(),
                 selectedTagIds = data?.photocard?.tags?.map { it.id }?.toSet() ?: emptySet()

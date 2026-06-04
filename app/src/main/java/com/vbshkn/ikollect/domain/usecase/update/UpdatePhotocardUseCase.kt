@@ -9,6 +9,7 @@ import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.domain.repository.ImageRepository
 import com.vbshkn.ikollect.domain.repository.PhotocardRepository
 import com.vbshkn.ikollect.domain.repository.TagRepository
+import com.vbshkn.ikollect.presentation.feature.photocards.profile.edit.EditPhotocardProfileUIState
 import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -19,44 +20,38 @@ class UpdatePhotocardUseCase @Inject constructor(
     private val imageRepository: ImageRepository,
     private val db: AppDatabase
 ) {
-    suspend operator fun invoke(
-        id: Long,
-        image: UserItemImage?,
-        oldImage: String?,
-        photocardName: String,
-        userNotes: String,
-        oldTagIds: Set<Long>,
-        selectedTagIds: Set<Long>
-    ) = db.withTransaction {
+    suspend operator fun invoke(state: EditPhotocardProfileUIState) = db.withTransaction {
+        val entityToModify = state.id?.let { photocardRepository.getEntity(it).first() }
+            ?: return@withTransaction
+
         var imagePath: String?
-        if (image?.uri != oldImage) {
-            imagePath = image?.let {
+        if (state.image?.uri != state.oldImageUrl) {
+            imagePath = state.image?.let {
                 if (it.isCached) imageRepository.saveToInternalStorage(it.uri)
                 else it.uri
             }
-            oldImage?.let {
+            state.oldImageUrl?.let {
                 imageRepository.deleteFromInternalStorage(it)
             }
         }
         else {
-            imagePath = oldImage
+            imagePath = state.oldImageUrl
         }
 
-        val updatedEntity = photocardRepository
-            .getEntity(id).first()?.copy(
+        val updatedEntity = entityToModify.copy(
                 imageUrl = imagePath,
-                displayName = photocardName,
-                userNote = userNotes,
+                displayName = state.photocardName.ifBlank { state.oldPhotocardName },
+                userNote = state.userNotes,
                 isSynchronized = false,
                 updatedAt = now()
-            ) ?: return@withTransaction
+            )
 
         photocardRepository.updatePhotocard(updatedEntity)
 
         tagRepository.updateLinks(
-            photocardId = id,
-            oldTagIds = oldTagIds.toList(),
-            newTagIds = selectedTagIds.toList()
+            photocardId = state.id,
+            oldTagIds = state.oldTagIds.toList(),
+            newTagIds = state.selectedTagIds.toList()
         )
     }
 }

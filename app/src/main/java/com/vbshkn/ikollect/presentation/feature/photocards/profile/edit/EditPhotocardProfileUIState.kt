@@ -10,8 +10,10 @@ data class EditPhotocardProfileUIState(
     val enableTagSelector: Boolean = false,
     val dialogState: EditPhotocardProfileDialogState = EditPhotocardProfileDialogState.None,
 
+    val id: Long? = null,
     val image: UserItemImage? = null,
     val oldImageUrl: String? = null,
+    val oldPhotocardName: String = "",
     val photocardName: String = "",
     val userNotes: String = "",
     val oldTagIds: Set<Long> = emptySet(),

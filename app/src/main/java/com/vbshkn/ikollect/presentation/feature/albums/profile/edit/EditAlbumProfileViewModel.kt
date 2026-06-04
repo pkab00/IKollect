@@ -40,15 +40,7 @@ class EditAlbumProfileViewModel @Inject constructor(
             }
 
             is EditAlbumProfileContract.Event.OnSaveChangesClicked -> viewModelScope.launch {
-                updateAlbumUseCase(
-                    id = albumId,
-                    name = uiState.value.albumName,
-                    version = uiState.value.albumVersion,
-                    komcaNumber = uiState.value.komcaNumber,
-                    userNotes = uiState.value.userNotes,
-                    image = uiState.value.image,
-                    oldImage = uiState.value.oldImageUrl
-                )
+                updateAlbumUseCase(uiState.value)
                 sendEffect(EditAlbumProfileContract.Effect.NavigateBack)
             }
 
@@ -96,8 +88,11 @@ class EditAlbumProfileViewModel @Inject constructor(
         onSuccess = { state, data ->
             state.copy(
                 isLoading = false,
+                id = albumId,
                 image = UserItemImage(uri = data?.album?.coverImage ?: "", isCached = false),
                 oldImageUrl = data?.album?.coverImage ?: "",
+                oldAlbumName = data?.album?.name ?: "",
+                oldAlbumVersion = data?.album?.version ?: "",
                 albumName = data?.album?.name ?: "",
                 albumVersion = data?.album?.version ?: "",
                 komcaNumber = data?.album?.komcaNumber ?: "",
