@@ -149,7 +149,6 @@ class AuthRepositoryImpl @Inject constructor(
         val userId = auth.currentUserOrNull()?.id
         if (userId != null) {
             postgrest.delete { filter { eq("id", userId) } }
-            // Для полного удаления аккаунта (Auth) потребуется админский доступ или Edge Function
         }
     }
 

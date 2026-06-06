@@ -6,9 +6,8 @@ import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.domain.repository.ImageRepository
 import com.vbshkn.ikollect.domain.repository.PhotocardRepository
 import com.vbshkn.ikollect.domain.repository.TagRepository
-import com.vbshkn.ikollect.domain.usecase.mockRoomTransactions
+import com.vbshkn.ikollect.mockRoomTransactions
 import com.vbshkn.ikollect.presentation.feature.photocards.profile.edit.EditPhotocardProfileUIState
-import io.mockk.Called
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -17,7 +16,6 @@ import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

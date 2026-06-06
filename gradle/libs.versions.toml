@@ -7,6 +7,7 @@ bom = "3.6.0"
 cameraCore = "1.6.0"
 coilCompose = "3.4.0"
 converterKotlinxSerialization = "3.0.0"
+core = "1.7.0"
 coreKtx = "1.18.0"
 datastorePreferences = "1.2.1"
 firebaseBom = "34.12.0"
@@ -37,6 +38,7 @@ playServicesCodeScanner = "16.1.0"
 playServicesMlkitTextRecognition = "19.0.1"
 reorderable = "3.1.0"
 retrofit = "3.0.0"
+robolectric = "4.16.1"
 roomRuntime = "2.8.4"
 android_gradle_plugin = "9.2.0"
 devtools_ksp = "2.3.6"
@@ -60,6 +62,7 @@ androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
 androidx-compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+androidx-core = { module = "androidx.test:core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltNavigationCompose" }
@@ -110,6 +113,7 @@ play-services-auth = { module = "com.google.android.gms:play-services-auth", ver
 play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 play-services-mlkit-text-recognition = { module = "com.google.android.gms:play-services-mlkit-text-recognition", version.ref = "playServicesMlkitTextRecognition" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 supabase-realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt", version.ref = "bom" }
 supabase-storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "storageKt" }
 supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }

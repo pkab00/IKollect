@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.domain.usecase
 
+import com.vbshkn.ikollect.mockSupabaseModules
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.realtime.realtime
 import io.mockk.Runs
@@ -11,7 +12,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

@@ -1,8 +1,6 @@
 package com.vbshkn.ikollect.domain.usecase.save
 
-import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
-import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.domain.model.candidate.AlbumCandidate
 import com.vbshkn.ikollect.domain.model.candidate.ArtistCandidate
@@ -10,7 +8,7 @@ import com.vbshkn.ikollect.domain.model.candidate.VersionCandidate
 import com.vbshkn.ikollect.domain.repository.AlbumRepository
 import com.vbshkn.ikollect.domain.repository.ArtistRepository
 import com.vbshkn.ikollect.domain.repository.ImageRepository
-import com.vbshkn.ikollect.domain.usecase.mockRoomTransactions
+import com.vbshkn.ikollect.mockRoomTransactions
 import com.vbshkn.ikollect.presentation.feature.albums.wizard.AlbumWizardUIState
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -18,12 +16,10 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

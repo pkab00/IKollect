@@ -5,7 +5,7 @@ import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.domain.model.UserItemImage
 import com.vbshkn.ikollect.domain.repository.AlbumRepository
 import com.vbshkn.ikollect.domain.repository.ImageRepository
-import com.vbshkn.ikollect.domain.usecase.mockRoomTransactions
+import com.vbshkn.ikollect.mockRoomTransactions
 import com.vbshkn.ikollect.presentation.feature.albums.profile.edit.EditAlbumProfileUIState
 import io.mockk.Runs
 import io.mockk.coEvery
