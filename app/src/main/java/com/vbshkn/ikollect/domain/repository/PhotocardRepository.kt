@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface PhotocardRepository {
     fun getAll(): Flow<NetworkResult<List<PhotocardListItem>>>
     fun getFavorite(): Flow<NetworkResult<List<PhotocardListItem>>>
+    fun getByTag(tagId: Long): Flow<NetworkResult<List<PhotocardListItem>>>
     fun getPhotocardProfile(id: Long): Flow<NetworkResult<PhotocardProfileData?>>
     fun getEntity(id: Long): Flow<PhotocardEntity?>
 

@@ -30,6 +30,13 @@ class PhotocardRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun getByTag(tagId: Long): Flow<NetworkResult<List<PhotocardListItem>>> {
+        return photocardLocalDS.getAllByTag(tagId)
+            .asLocalResult { photocards ->
+                photocards.map { it.toListItem() }
+            }
+    }
+
     override fun getPhotocardProfile(id: Long): Flow<NetworkResult<PhotocardProfileData?>> {
         return photocardLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
     }

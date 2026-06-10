@@ -6,18 +6,28 @@ import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsContra
 import com.vbshkn.ikollect.domain.usecase.get.GetAllPhotocardsUseCase
 import com.vbshkn.ikollect.domain.base.BaseViewModel
 import com.vbshkn.ikollect.domain.usecase.RefreshDataUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetAllTagsUseCase
+import com.vbshkn.ikollect.domain.usecase.get.GetPhotocardsByTagUseCase
 import com.vbshkn.ikollect.presentation.feature.photocards.list.PhotocardsContract.Effect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PhotocardsViewModel @Inject constructor(
     private val getAllPhotocardsUseCase: GetAllPhotocardsUseCase,
-    private val refreshDataUseCase: RefreshDataUseCase
+    private val refreshDataUseCase: RefreshDataUseCase,
+    private val getAllTagsUseCase: GetAllTagsUseCase,
+    private val getPhotocardsByTagUseCase: GetPhotocardsByTagUseCase
 ) : BaseViewModel<PhotocardsUIState, Event, Effect>(initialState = PhotocardsUIState()) {
 
-    init { observePhotocards() }
+    init {
+        observeTags()
+        observePhotocards()
+    }
 
     override fun onEvent(event: Event) {
         when (event) {
@@ -43,12 +53,34 @@ class PhotocardsViewModel @Inject constructor(
             is Event.OnSearchClicked -> {
                 sendEffect(GoToSearch)
             }
+            is Event.OnTagSelected -> {
+                if (event.tag == uiState.value.selectedTag) {
+                    updateState { it.copy(selectedTag = null) }
+                } else {
+                    updateState { it.copy(selectedTag = event.tag) }
+                }
+            }
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observePhotocards() = collectFlowIntoState(
-        flow = getAllPhotocardsUseCase(),
+        flow = uiState.flatMapLatest {
+            val selectedTag = it.selectedTag
+            if (selectedTag == null) {
+                getAllPhotocardsUseCase()
+            } else {
+                getPhotocardsByTagUseCase(selectedTag.id)
+            }
+        },
         onSuccess = { state, data -> state.copy(isLoading = false, photocards = data) },
+        onLoading = { state -> state.copy(isLoading = true) },
+        onError = { state, e -> state.copy(isLoading = false, error = e) }
+    )
+
+    private fun observeTags() = collectFlowIntoState(
+        flow = getAllTagsUseCase(),
+        onSuccess = { state, data -> state.copy(isLoading = false, tags = data) },
         onLoading = { state -> state.copy(isLoading = true) },
         onError = { state, e -> state.copy(isLoading = false, error = e) }
     )

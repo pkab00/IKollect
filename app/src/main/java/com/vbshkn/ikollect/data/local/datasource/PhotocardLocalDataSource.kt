@@ -23,6 +23,10 @@ class PhotocardLocalDataSource @Inject constructor(
         return dao.getById(id)
     }
 
+    fun getAllByTag(tagId: Long): Flow<List<PhotocardEntity>> {
+        return dao.getAllByTag(tagId)
+    }
+
     fun getAllWithArtists(): Flow<List<PhotocardMinimalDetail>> {
         return dao.getAllWithArtists()
     }

@@ -26,6 +26,15 @@ interface PhotocardDao {
     @Query("SELECT * FROM PhotocardEntity WHERE isSynchronized = 0")
     fun getUnSynchronized(): Flow<List<PhotocardEntity>>
 
+    @Query(
+        """
+            SELECT * FROM PhotocardEntity
+            INNER JOIN PhotocardTagCrossRef ON PhotocardEntity.photocardId = PhotocardTagCrossRef.photocardId
+            WHERE PhotocardTagCrossRef.tagId = :tagId AND PhotocardEntity.isDeleted = 0
+        """
+    )
+    fun getAllByTag(tagId: Long): Flow<List<PhotocardEntity>>
+
     @Query("SELECT * FROM PhotocardEntity WHERE photocardId = :id AND isDeleted = 0")
     fun getById(id: Long): Flow<PhotocardEntity?>
 
