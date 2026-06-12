@@ -1,16 +1,12 @@
 package com.vbshkn.ikollect.presentation.feature.settings
 
-import com.vbshkn.ikollect.data.local.datastore.LocalLanguage
-import com.vbshkn.ikollect.data.local.datastore.LocalTheme
-import com.vbshkn.ikollect.presentation.navigation.NavBarDestinations
-
 sealed interface SettingsContract {
     sealed interface Effect {
-        object GoBack : Effect
-        object GoToThemeSettings : Effect
-        object GoToLanguageSettings : Effect
-        object GoToTabsSettings : Effect
-
+        object NavigateBack : Effect
+        object NavigateToThemeSettings : Effect
+        object NavigateToLanguageSettings : Effect
+        object NavigateToTabsSettings : Effect
+        object NavigateToTagSettings : Effect
     }
     sealed interface Event {
         object OnBackClicked : Event
@@ -19,12 +15,10 @@ sealed interface SettingsContract {
         object OnChangeThemeClicked : Event
         object OnChangeLanguageClicked : Event
         object OnConfigureTabsClicked : Event
+        object OnManageTagsClicked : Event
         data object OnLogOutConfirmed : Event
         data object OnDismissDialog : Event
         data class OnNicknameFieldChanged(val newValue: String) : Event
         data class OnNewNicknameSelected(val newNickname: String) : Event
-        data class OnNewThemeSelected(val newTheme: LocalTheme) : Event
-        data class OnNewLanguageSelected(val newLanguage: LocalLanguage) : Event
-        data class OnTabsReordered(val newOrder: List<NavBarDestinations>) : Event
     }
 }

@@ -173,4 +173,14 @@
     <string name="profile_label_image">Image</string>
     <string name="label_search">Search</string>
     <string name="barcode_scanner_tip">Focus the camera on the barcode.</string>
+    <string name="settings_section_features">Features</string>
+    <string name="settings_item_manage_tags">Manage tags</string>
+    <string name="tag_settings_title_custom">Custom tags</string>
+    <string name="tag_settings_subtitle_custom">Select a tag to edit or delete it.</string>
+    <string name="tag_settings_title_system">System tags</string>
+    <string name="title_edit_tag">Edit tag</string>
+    <string name="title_create_tag">Create tag</string>
+    <string name="label_done">Done</string>
+    <string name="title_tag_name">Name</string>
+    <string name="title_tag_color">Color</string>
 </resources>

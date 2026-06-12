@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface TagRepository {
     fun getAll(): Flow<NetworkResult<List<TagItem>>>
 
+    suspend fun insert(tagItem: TagItem)
+
     suspend fun linkPhotocard(
         photocardId: Long,
         tagIds: List<Long>,

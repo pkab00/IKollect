@@ -37,24 +37,28 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToThemeSettings: () -> Unit,
     onNavigateToLanguageSettings: () -> Unit,
-    onNavigateToTabsSettings: () -> Unit
+    onNavigateToTabsSettings: () -> Unit,
+    onNavigateToTagSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                Effect.GoBack -> onNavigateBack()
-                Effect.GoToThemeSettings -> onNavigateToThemeSettings()
-                Effect.GoToLanguageSettings -> onNavigateToLanguageSettings()
-                Effect.GoToTabsSettings -> onNavigateToTabsSettings()
+                Effect.NavigateBack -> onNavigateBack()
+                Effect.NavigateToThemeSettings -> onNavigateToThemeSettings()
+                Effect.NavigateToLanguageSettings -> onNavigateToLanguageSettings()
+                Effect.NavigateToTabsSettings -> onNavigateToTabsSettings()
+                Effect.NavigateToTagSettings -> onNavigateToTagSettings()
             }
         }
     }
 
     DialogHost(uiState, viewModel::onEvent)
     Scaffold(
-        topBar = { SettingsTopBar(viewModel::onEvent) },
+        topBar = {
+            SettingsTopBar({ viewModel.onEvent(Event.OnBackClicked) })
+        },
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
@@ -92,6 +96,13 @@ fun SettingsScreen(
                         onClick = { viewModel.onEvent(Event.OnLogOutClicked) }
                     )
                 }
+            }
+            item {
+                SettingsCategoryHeader(title = stringResource(R.string.settings_section_features))
+                ClickableSettingItem(
+                    title = stringResource(R.string.settings_item_manage_tags),
+                    onClick = { viewModel.onEvent(Event.OnManageTagsClicked) }
+                )
             }
         }
     }

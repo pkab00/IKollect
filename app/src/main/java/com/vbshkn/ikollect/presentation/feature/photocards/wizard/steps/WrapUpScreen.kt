@@ -1,49 +1,33 @@
 package com.vbshkn.ikollect.presentation.feature.photocards.wizard.steps
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vbshkn.ikollect.R
-import com.vbshkn.ikollect.domain.model.TagItem
-import com.vbshkn.ikollect.presentation.composable.TagLabel
+import com.vbshkn.ikollect.presentation.composable.TagContainer
 import com.vbshkn.ikollect.presentation.composable.TagSelectionSheet
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardContract
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardUIState
 import com.vbshkn.ikollect.presentation.feature.photocards.wizard.PhotocardWizardViewModel
 import com.vbshkn.ikollect.presentation.feature.wizard.WizardItemWrapper
 import com.vbshkn.ikollect.util.UiText
-import kotlinx.coroutines.launch
 
 @Composable
 fun WrapUpScreen(viewModel: PhotocardWizardViewModel) {
@@ -68,9 +52,10 @@ fun WrapUpScreen(viewModel: PhotocardWizardViewModel) {
             WizardItemWrapper(
                 title = UiText.StringResource(R.string.photocard_wizard_subtitle_tags),
                 content = {
-                    PhotocardTags(
-                        selectedTags = uiState.tags.filter { it.id in uiState.photocardCandidate.tagIds },
-                        onEvent = viewModel::onEvent
+                    TagContainer(
+                        tags = uiState.tags.filter { it.id in uiState.photocardCandidate.tagIds },
+                        onTagClick = { viewModel.onEvent(PhotocardWizardContract.Event.OnTagSelected(it.id)) },
+                        onNewTagClick = { viewModel.onEvent(PhotocardWizardContract.Event.OnAddTagClicked) }
                     )
                 }
             )
@@ -126,62 +111,6 @@ private fun PhotocardDisplayName(
         singleLine = true,
         shape = RoundedCornerShape(12.dp)
     )
-}
-
-@Composable
-fun PhotocardTags(
-    selectedTags: List<TagItem>,
-    onEvent: (PhotocardWizardContract.Event) -> Unit
-) {
-    Surface(
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-        ),
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp)
-    ) {
-        LazyVerticalGrid(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            columns = GridCells.Adaptive(70.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-        ) {
-            items(
-                items = selectedTags,
-                key = { it.id }
-            ) { tag ->
-                TagLabel(
-                    tag = tag,
-                    isSelected = false,
-                    onClick = { onEvent(PhotocardWizardContract.Event.OnTagSelected(tag.id)) },
-                    modifier = Modifier
-                        .size(30.dp)
-                        .animateItem()
-                )
-            }
-            item {
-                Surface(
-                    border = BorderStroke(0.5f.dp, MaterialTheme.colorScheme.primary),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clickable { onEvent(PhotocardWizardContract.Event.OnAddTagClicked) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Add,
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        }
-    }
 }
 
 @Composable

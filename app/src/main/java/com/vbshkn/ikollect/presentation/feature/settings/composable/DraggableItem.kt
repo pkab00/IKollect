@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.settings
+package com.vbshkn.ikollect.presentation.feature.settings.composable
 
 
 import androidx.compose.foundation.layout.fillMaxWidth

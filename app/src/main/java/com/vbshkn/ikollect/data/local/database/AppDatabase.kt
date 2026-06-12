@@ -31,7 +31,6 @@ import com.vbshkn.ikollect.data.local.model.entity.TagEntity
     version = 1,
     exportSchema = false
 )
-@TypeConverters(ColorConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun artistDao(): ArtistDao
     abstract fun albumDao(): AlbumDao

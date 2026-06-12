@@ -17,7 +17,7 @@ import com.vbshkn.ikollect.presentation.feature.settings.SettingsContract.Event
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsTopBar(
-    onEvent: (Event) -> Unit,
+    onNavigateBack: () -> Unit,
     title: String = stringResource(R.string.title_settings)
 ) {
 
@@ -29,7 +29,7 @@ fun SettingsTopBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = { onEvent(Event.OnBackClicked) }) {
+            IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null

@@ -1,27 +1,35 @@
 package com.vbshkn.ikollect.data.repository
 
+import android.content.Context
 import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.local.datasource.TagLocalDataSource
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardTagCrossRef
 import com.vbshkn.ikollect.data.mapper.DataMappers.toDomain
+import com.vbshkn.ikollect.data.mapper.DataMappers.toEntity
 import com.vbshkn.ikollect.data.remote.NetworkResult
 import com.vbshkn.ikollect.domain.model.TagItem
 import com.vbshkn.ikollect.domain.repository.TagRepository
 import com.vbshkn.ikollect.util.asLocalResult
 import com.vbshkn.ikollect.util.now
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class TagRepositoryImpl @Inject constructor(
     private val tagLocalDS: TagLocalDataSource,
-    private val db: AppDatabase
+    private val db: AppDatabase,
+    @ApplicationContext private val context: Context
 ) : TagRepository {
     override fun getAll(): Flow<NetworkResult<List<TagItem>>> {
         return tagLocalDS.getAll()
             .asLocalResult { list ->
                 list.map { it.toDomain() }
             }
+    }
+
+    override suspend fun insert(tagItem: TagItem) {
+        tagLocalDS.insert(tagItem.toEntity(context))
     }
 
     override suspend fun linkPhotocard(

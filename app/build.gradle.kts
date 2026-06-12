@@ -13,13 +13,13 @@ plugins {
 android {
     namespace = "com.vbshkn.ikollect"
     compileSdk {
-        version = release(36)
+        version = release(37)
     }
 
     defaultConfig {
         applicationId = "com.vbshkn.ikollect"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.palette)
     implementation(libs.androidx.compose.material.icons.extended)
+    ksp(libs.kotlin.metadata.jvm)
 
     // --- HILT ---
     implementation(libs.hilt.android)
@@ -79,7 +80,6 @@ dependencies {
     // --- RETROFIT ---
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.logging.interceptor)
     implementation(libs.converter.gson)
 
@@ -130,6 +130,9 @@ dependencies {
 
     // --- REORDERABLE (by Calvin-LL on github) ---
     implementation(libs.reorderable)
+
+    // --- ColorPicker Compose (by skydoves on github) ---
+    implementation(libs.colorpicker.compose)
 
     // Core JUnit 5 Engine for running tests
     testImplementation(libs.junit.jupiter.api)

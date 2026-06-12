@@ -11,7 +11,7 @@ data class TagEntity (
     val tagId: Long = 0,
     val isSystemTag: Boolean = false,
     val tagName: String,
-    val tagColor: Color,
+    val tagColor: Long,
     val isSynchronized: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),

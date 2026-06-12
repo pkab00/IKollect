@@ -162,4 +162,14 @@
     <string name="profile_label_image">Изображение</string>
     <string name="label_search">Поиск</string>
     <string name="barcode_scanner_tip">Наведите камеру на штрих-код.</string>
+    <string name="settings_section_features">Функции</string>
+    <string name="settings_item_manage_tags">Управление тэгами</string>
+    <string name="tag_settings_title_custom">Пользовательские тэги</string>
+    <string name="tag_settings_subtitle_custom">Выберите тэг чтобы изменить или удалить его.</string>
+    <string name="tag_settings_title_system">Системные тэги</string>
+    <string name="title_edit_tag">Изменить тэг</string>
+    <string name="title_create_tag">Создать тэг</string>
+    <string name="label_done">Готово</string>
+    <string name="title_tag_name">Название</string>
+    <string name="title_tag_color">Цвет</string>
 </resources>

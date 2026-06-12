@@ -51,6 +51,7 @@ sealed interface Route {
         @Serializable data object Theme : SettingsFlow()
         @Serializable data object Language : SettingsFlow()
         @Serializable data object Tabs : SettingsFlow()
+        @Serializable data object Tags : SettingsFlow()
     }
 
     @Serializable data class AlbumWizard(val candidate: AlbumCandidate) : Route

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.settings
+package com.vbshkn.ikollect.presentation.feature.settings.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,11 +9,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -21,10 +18,14 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.data.local.datastore.LocalTheme
 import com.vbshkn.ikollect.data.mapper.toDomain
 import com.vbshkn.ikollect.data.mapper.toUiText
+import com.vbshkn.ikollect.presentation.feature.settings.SettingsContract
+import com.vbshkn.ikollect.presentation.feature.settings.SettingsTopBar
+import com.vbshkn.ikollect.presentation.feature.settings.SettingsViewModel
+import com.vbshkn.ikollect.presentation.feature.settings.composable.SelectableItem
 
 @Composable
 fun ThemeSettingsScreen(
-    viewModel: SettingsViewModel,
+    viewModel: ThemeSettingsViewModel,
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -34,8 +35,7 @@ fun ThemeSettingsScreen(
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is SettingsContract.Effect.GoBack -> onNavigateBack()
-                else -> {}
+                ThemeSettingsContract.Effect.NavigateBack -> onNavigateBack()
             }
         }
     }
@@ -43,7 +43,7 @@ fun ThemeSettingsScreen(
     Scaffold(
         topBar = {
             SettingsTopBar(
-                onEvent = viewModel::onEvent,
+                onNavigateBack = { viewModel.onEvent(ThemeSettingsContract.Event.OnNavigateBackClicked) },
                 title = stringResource(R.string.settings_item_theme)
             )
         },
@@ -63,7 +63,7 @@ fun ThemeSettingsScreen(
                 SelectableItem(
                     text = theme.toUiText().asString(),
                     isSelected = settings?.theme == theme.toDomain(),
-                    onSelected = { viewModel.onEvent(SettingsContract.Event.OnNewThemeSelected(theme)) }
+                    onSelected = { viewModel.onEvent(ThemeSettingsContract.Event.OnNewThemeSelected(theme)) }
                 )
             }
         }

@@ -1,4 +1,4 @@
-package com.vbshkn.ikollect.presentation.feature.settings
+package com.vbshkn.ikollect.presentation.feature.settings.language
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,21 +18,24 @@ import com.vbshkn.ikollect.R
 import com.vbshkn.ikollect.data.local.datastore.LocalLanguage
 import com.vbshkn.ikollect.data.mapper.toDomain
 import com.vbshkn.ikollect.data.mapper.toUiText
+import com.vbshkn.ikollect.presentation.feature.settings.SettingsContract
+import com.vbshkn.ikollect.presentation.feature.settings.SettingsTopBar
+import com.vbshkn.ikollect.presentation.feature.settings.SettingsViewModel
+import com.vbshkn.ikollect.presentation.feature.settings.composable.SelectableItem
 
 @Composable
 fun LanguageSettingsScreen(
-    viewModel: SettingsViewModel,
+    viewModel: LanguageSettingsViewModel,
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val settings = state.settings
-    val languages = remember { LocalLanguage.entries.toList() }
+    val languages = state.languages
 
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is SettingsContract.Effect.GoBack -> onNavigateBack()
-                else -> {}
+                LanguageSettingsContract.Effect.NavigateBack -> onNavigateBack()
             }
         }
     }
@@ -40,7 +43,7 @@ fun LanguageSettingsScreen(
     Scaffold(
         topBar = {
             SettingsTopBar(
-                onEvent = viewModel::onEvent,
+                onNavigateBack = { viewModel.onEvent(LanguageSettingsContract.Event.OnNavigateBackClicked) },
                 title = stringResource(R.string.settings_item_language)
             )
         },
@@ -60,7 +63,11 @@ fun LanguageSettingsScreen(
                 SelectableItem(
                     text = language.toUiText().asString(),
                     isSelected = settings?.language == language.toDomain(),
-                    onSelected = { viewModel.onEvent(SettingsContract.Event.OnNewLanguageSelected(language)) }
+                    onSelected = {
+                        viewModel.onEvent(
+                            LanguageSettingsContract.Event.OnNewLanguageSelected(language)
+                        )
+                    }
                 )
             }
         }

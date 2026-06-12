@@ -1,9 +1,8 @@
-package com.vbshkn.ikollect.presentation.feature.settings
+package com.vbshkn.ikollect.presentation.feature.settings.composable
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem

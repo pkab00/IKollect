@@ -43,7 +43,7 @@ object RoomModule {
                     tagId = -(index + 1).toLong(),
                     isSystemTag = true,
                     tagName = pair.first,
-                    tagColor = Color(pair.second),
+                    tagColor = pair.second,
                     isSynchronized = true
                 )
             }

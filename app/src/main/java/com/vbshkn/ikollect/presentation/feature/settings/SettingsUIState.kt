@@ -10,7 +10,6 @@ data class SettingsUIState(
     val isRefreshing: Boolean = false,
     val dialogState: SettingsDialogState = SettingsDialogState.None,
 
-    val settings: AppSettings? = null,
     val newNickname: String? = null,
     val nicknameValidationError: ValidationError.NicknameError? = null
 )

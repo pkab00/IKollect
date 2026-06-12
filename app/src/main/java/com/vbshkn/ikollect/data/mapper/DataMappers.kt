@@ -1,5 +1,8 @@
 package com.vbshkn.ikollect.data.mapper
 
+import android.content.Context
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
 import com.vbshkn.ikollect.data.local.model.entity.ArtistEntity
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardEntity
@@ -200,7 +203,16 @@ object DataMappers {
                 if (resId != null) UiText.StringResource(resId)
                 else UiText.DynamicString(this.tagName)
             } else UiText.DynamicString(this.tagName),
-            color = this.tagColor
+            color = Color(this.tagColor)
+        )
+    }
+
+    fun TagItem.toEntity(context: Context): TagEntity {
+        return TagEntity(
+            tagId = this.id,
+            isSystemTag = this.isSystem,
+            tagName = this.name.asString(context),
+            tagColor = this.color.toArgb().toLong()
         )
     }
 }

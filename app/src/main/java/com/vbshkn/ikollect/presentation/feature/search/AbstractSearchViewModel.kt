@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 abstract class AbstractSearchViewModel<T : Searchable>
     : BaseViewModel<SearchUiState<T>, Event, Effect>(initialState = SearchUiState()) {
@@ -49,7 +50,7 @@ abstract class AbstractSearchViewModel<T : Searchable>
     protected fun observeSearchResults(searchResultsFlow: Flow<NetworkResult<List<T>>>) {
         viewModelScope.launch {
             searchQuery
-                .debounce(300)
+                .debounce(300.milliseconds)
                 .combine(searchResultsFlow) { query, result ->
                 when (result) {
                     is NetworkResult.Success -> {

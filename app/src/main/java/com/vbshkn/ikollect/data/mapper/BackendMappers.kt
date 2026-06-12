@@ -82,7 +82,7 @@ object BackendMappers {
             tagId = this.tagId ?: 0L,
             isSystemTag = this.isSystemTag,
             tagName = this.tagName,
-            tagColor = Color(this.tagColor),
+            tagColor = this.tagColor,
             createdAt = this.createdAt.toTimeMillis(),
             updatedAt = this.updatedAt.toTimeMillis(),
             isDeleted = this.isDeleted
@@ -229,7 +229,7 @@ object BackendMappers {
             userId = userId,
             isSystemTag = false,
             tagName = this.tagName,
-            tagColor = this.tagColor.value.toLong(),
+            tagColor = this.tagColor,
             createdAt = this.createdAt.toTimestamptz(),
             updatedAt = this.updatedAt.toTimestamptz(),
             isDeleted = this.isDeleted
