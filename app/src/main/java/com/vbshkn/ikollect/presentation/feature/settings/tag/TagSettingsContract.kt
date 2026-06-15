@@ -13,5 +13,6 @@ sealed interface TagSettingsContract {
         data object OnDismissDialogClicked : Event
         data class OnSaveNewTagConfirmed(val tag: TagItem) : Event
         data class OnEditTagConfirmed(val tag: TagItem) : Event
+        data class OnDeleteTagConfirmed(val tag: TagItem) : Event
     }
 }

@@ -97,6 +97,7 @@ class EditPhotocardProfileViewModel @Inject constructor(
         onSuccess = { state, data ->
             state.copy(
                 isLoading = false,
+                id = data?.photocard?.photocardId,
                 image = UserItemImage(
                     uri = data?.photocard?.imageUrl ?: "",
                     isCached = false

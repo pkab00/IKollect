@@ -20,6 +20,9 @@ interface ArtistDao {
     @Query("SELECT * FROM ArtistEntity WHERE isDeleted = 0 ORDER BY name ASC")
     fun getAll(): Flow<List<ArtistEntity>>
 
+    @Query("SELECT * FROM ArtistEntity WHERE isDeleted = 0 ORDER BY name ASC")
+    fun getAllShot(): List<ArtistEntity>
+
     @Query("SELECT * FROM ArtistEntity WHERE isDeleted = 0 AND isFavorite = 1 ORDER BY name ASC")
     fun getFavorite(): Flow<List<ArtistEntity>>
 
@@ -30,7 +33,7 @@ interface ArtistDao {
     fun getSoloists(): Flow<List<ArtistEntity>>
 
     @Query("SELECT * FROM ArtistEntity WHERE isSynchronized = 0")
-    fun getUnSynchronized(): Flow<List<ArtistEntity>>
+    fun getUnSynchronizedShot(): List<ArtistEntity>
 
     @Query("SELECT * FROM ArtistEntity WHERE artistId = :id and isDeleted = 0 LIMIT 1")
     fun getById(id: Long): Flow<ArtistEntity?>
@@ -95,6 +98,23 @@ interface ArtistDao {
         """
     )
     suspend fun setDeleted(id: Long, time: Long = now())
+
+    @Query("""
+    UPDATE ArtistEntity 
+    SET isDeleted = 1, isSynchronized = 0, updatedAt = :now 
+    WHERE isGroup = 1 
+      AND (SELECT COUNT(*) FROM PhotocardEntity WHERE ownerId = artistId) = 0
+""")
+    suspend fun softDeleteUnusedGroups(now: Long = now())
+
+    @Query("""
+    UPDATE ArtistEntity 
+    SET isDeleted = 1, isSynchronized = 0, updatedAt = :now 
+    WHERE isGroup = 0 
+      AND (SELECT COUNT(*) FROM PhotocardEntity WHERE ownerId = artistId) = 0
+      AND (SELECT COUNT(*) FROM PhotocardArtistCrossRef WHERE artistId = artistId) = 0
+""")
+    suspend fun softDeleteUnusedSoloists(now: Long = now())
 
     @Query(
         """

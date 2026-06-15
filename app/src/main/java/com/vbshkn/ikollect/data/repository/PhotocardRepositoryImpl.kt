@@ -38,7 +38,15 @@ class PhotocardRepositoryImpl @Inject constructor(
     }
 
     override fun getPhotocardProfile(id: Long): Flow<NetworkResult<PhotocardProfileData?>> {
-        return photocardLocalDS.getWithFullDetail(id).asLocalResult { it?.toProfile() }
+        return photocardLocalDS.getWithFullDetail(id)
+            .asLocalResult {
+                it?.let { fullDetail ->
+                    val filteredTags = fullDetail.photocard.tags.filter { tag -> !tag.isDeleted }
+                    fullDetail
+                        .copy(photocard = fullDetail.photocard.copy(tags = filteredTags))
+                        .toProfile()
+                }
+            }
     }
 
     override fun getEntity(id: Long): Flow<PhotocardEntity?> {

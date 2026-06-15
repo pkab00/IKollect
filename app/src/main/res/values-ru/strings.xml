@@ -172,4 +172,6 @@
     <string name="label_done">Готово</string>
     <string name="title_tag_name">Название</string>
     <string name="title_tag_color">Цвет</string>
+    <string name="title_recent_colors">Недавние</string>
+    <string name="label_delete">Удалить</string>
 </resources>

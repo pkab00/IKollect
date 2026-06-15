@@ -34,7 +34,7 @@ fun TagSettingsScreen(
     }
 
     DialogHost(
-        dialogState = uiState.dialogState,
+        uiState = uiState,
         onEvent = viewModel::onEvent
     )
 
@@ -84,18 +84,22 @@ fun TagSettingsScreen(
 
 @Composable
 private fun DialogHost(
-    dialogState: TagSettingsDialogState,
+    uiState: TagSettingsUiState,
     onEvent: (TagSettingsContract.Event) -> Unit
 ) {
-    when (dialogState) {
+    when (uiState.dialogState) {
         is TagSettingsDialogState.CreateTagDialog -> EditTagDialog(
             title = UiText.StringResource(R.string.title_create_tag),
+            allTagColors = uiState.customTags.map { it.color },
             onDone = { onEvent(TagSettingsContract.Event.OnSaveNewTagConfirmed(it)) },
             onDismissRequest = { onEvent(TagSettingsContract.Event.OnDismissDialogClicked) }
         )
         is TagSettingsDialogState.EditTagDialog -> EditTagDialog(
             title = UiText.StringResource(R.string.title_edit_tag),
-            onDone = {},
+            editedTag = uiState.dialogState.selectedTag,
+            allTagColors = uiState.customTags.map { it.color },
+            onDone = { onEvent(TagSettingsContract.Event.OnEditTagConfirmed(it)) },
+            onDelete = { onEvent(TagSettingsContract.Event.OnDeleteTagConfirmed(it)) },
             onDismissRequest = { onEvent(TagSettingsContract.Event.OnDismissDialogClicked) }
         )
         is TagSettingsDialogState.None -> {}

@@ -204,29 +204,27 @@ class SyncManager @Inject constructor(
     private suspend fun uploadAllToBackend(userId: String) {
         // LOADING LOCAL DATA
         val localPackage = try {
-            database.withTransaction {
-                val localAlbumArtist = crossRefDao.getAlbumArtist().first()
-                val localArtistArtist = crossRefDao.getArtistArtist().first()
-                val localPhotocardArtist = crossRefDao.getPhotocardArtist().first()
-                val localPhotocardTag = crossRefDao.getPhotocardTag().first()
-                val localAlbums = albumDao.getAll().first()
-                val localArtists = artistDao.getAll().first()
-                val localPhotocards = photocardDao.getAll().first()
-                val localTags = tagDao.getAll().first()
-                val localSettings = settingsStorage.getCurrentSettings()
+            val localAlbumArtist = crossRefDao.getAlbumArtist()
+            val localArtistArtist = crossRefDao.getArtistArtist()
+            val localPhotocardArtist = crossRefDao.getPhotocardArtist()
+            val localPhotocardTag = crossRefDao.getPhotocardTag()
+            val localAlbums = albumDao.getAllShot()
+            val localArtists = artistDao.getAllShot()
+            val localPhotocards = photocardDao.getAllShot()
+            val localTags = tagDao.getAllShot()
+            val localSettings = settingsStorage.getCurrentSettings()
 
-                LocalDataPackage(
-                    localAlbumArtist,
-                    localArtistArtist,
-                    localPhotocardArtist,
-                    localPhotocardTag,
-                    localAlbums,
-                    localArtists,
-                    localPhotocards,
-                    localTags,
-                    localSettings
-                )
-            }
+            LocalDataPackage(
+                localAlbumArtist,
+                localArtistArtist,
+                localPhotocardArtist,
+                localPhotocardTag,
+                localAlbums,
+                localArtists,
+                localPhotocards,
+                localTags,
+                localSettings
+            )
         } catch (e: Exception) {
             Log.d(TAG, "Failed to download local data: ", e)
             return
@@ -366,58 +364,28 @@ class SyncManager @Inject constructor(
     }
 
     private suspend fun softDeleteUnusedArtists(): HandshakeResult {
-        var result: HandshakeResult = HandshakeResult.FullSuccess
-
-        try {
-            database.withTransaction {
-                val localGroups = artistDao.getGroups().first()
-                localGroups.forEach {
-                    if (artistDao.countAllOwnedItems(it.artistId) == 0L) {
-                        artistDao.update(
-                            it.copy(
-                                isDeleted = true,
-                                isSynchronized = false,
-                                updatedAt = now()
-                            )
-                        )
-                    }
-                }
-
-                val localSoloists = artistDao.getSoloists().first()
-                localSoloists.forEach {
-                    if (artistDao.countAllOwnedItems(it.artistId) == 0L && artistDao.countArtistArtistCrossRefs(
-                            it.artistId
-                        ) == 0L
-                    ) {
-                        artistDao.update(
-                            it.copy(
-                                isDeleted = true,
-                                isSynchronized = false,
-                                updatedAt = now()
-                            )
-                        )
-                    }
-                }
-            }
+        return try {
+            artistDao.softDeleteUnusedGroups()
+            artistDao.softDeleteUnusedSoloists()
+            HandshakeResult.FullSuccess
         } catch (e: Exception) {
             Log.d(TAG, "Failed to soft delete unused local artists: ", e)
-            result = HandshakeResult.Fail
+            HandshakeResult.Fail
         }
-        return result
     }
 
     private suspend fun uploadLocalChanges(userId: String): HandshakeResult {
         var result: HandshakeResult = HandshakeResult.FullSuccess
         val localPackage = try {
             database.withTransaction {
-                val localAlbumArtist = crossRefDao.getAlbumArtistUnSynchronized().first()
-                val localArtistArtist = crossRefDao.getArtistArtistUnSynchronized().first()
-                val localPhotocardArtist = crossRefDao.getPhotocardArtistUnSynchronized().first()
-                val localPhotocardTag = crossRefDao.getPhotocardTagUnSynchronized().first()
-                val localAlbums = albumDao.getUnSynchronized().first()
-                val localArtists = artistDao.getUnSynchronized().first()
-                val localPhotocards = photocardDao.getUnSynchronized().first()
-                val localTags = tagDao.getUnSynchronized().first()
+                val localAlbumArtist = crossRefDao.getAlbumArtistUnSynchronized()
+                val localArtistArtist = crossRefDao.getArtistArtistUnSynchronized()
+                val localPhotocardArtist = crossRefDao.getPhotocardArtistUnSynchronized()
+                val localPhotocardTag = crossRefDao.getPhotocardTagUnSynchronized()
+                val localAlbums = albumDao.getUnSynchronizedShot()
+                val localArtists = artistDao.getUnSynchronizedShot()
+                val localPhotocards = photocardDao.getUnSynchronizedShot()
+                val localTags = tagDao.getUnSynchronizedShot()
                 val localSettings = settingsStorage.getCurrentSettings()
 
                 LocalDataPackage(

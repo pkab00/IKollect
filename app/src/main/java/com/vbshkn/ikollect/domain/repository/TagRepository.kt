@@ -9,6 +9,10 @@ interface TagRepository {
 
     suspend fun insert(tagItem: TagItem)
 
+    suspend fun update(tagItem: TagItem)
+
+    suspend fun delete(tagItem: TagItem)
+
     suspend fun linkPhotocard(
         photocardId: Long,
         tagIds: List<Long>,

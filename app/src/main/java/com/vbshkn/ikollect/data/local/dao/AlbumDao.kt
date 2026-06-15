@@ -21,8 +21,11 @@ interface AlbumDao {
     @Query("SELECT * FROM AlbumEntity WHERE isDeleted = 0")
     fun getAll(): Flow<List<AlbumEntity>>
 
+    @Query("SELECT * FROM AlbumEntity WHERE isDeleted = 0")
+    fun getAllShot(): List<AlbumEntity>
+
     @Query("SELECT * FROM AlbumEntity WHERE isSynchronized = 0")
-    fun getUnSynchronized(): Flow<List<AlbumEntity>>
+    fun getUnSynchronizedShot(): List<AlbumEntity>
 
     @Query("SELECT * FROM AlbumEntity WHERE isDeleted = 0")
     fun getDeleted(): Flow<List<AlbumEntity>>

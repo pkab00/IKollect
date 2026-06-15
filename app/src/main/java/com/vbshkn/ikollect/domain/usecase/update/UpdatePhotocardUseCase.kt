@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.domain.usecase.update
 
+import android.util.Log
 import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.database.AppDatabase
 import com.vbshkn.ikollect.data.repository.ImageRepositoryImpl
@@ -21,8 +22,9 @@ class UpdatePhotocardUseCase @Inject constructor(
     private val db: AppDatabase
 ) {
     suspend operator fun invoke(state: EditPhotocardProfileUIState) = db.withTransaction {
-        val entityToModify = state.id?.let { photocardRepository.getEntity(it).first() }
-            ?: return@withTransaction
+        val entityToModify = state.id?.let {
+            photocardRepository.getEntity(it).first()
+        } ?: return@withTransaction
 
         var imagePath: String?
         if (state.image?.uri != state.oldImageUrl) {
@@ -47,6 +49,9 @@ class UpdatePhotocardUseCase @Inject constructor(
             )
 
         photocardRepository.updatePhotocard(updatedEntity)
+
+        Log.d("SSS", state.oldTagIds.joinToString())
+        Log.d("SSS", state.selectedTagIds.joinToString())
 
         tagRepository.updateLinks(
             photocardId = state.id,

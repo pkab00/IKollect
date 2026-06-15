@@ -32,6 +32,14 @@ class TagRepositoryImpl @Inject constructor(
         tagLocalDS.insert(tagItem.toEntity(context))
     }
 
+    override suspend fun update(tagItem: TagItem) {
+        tagLocalDS.update(tagItem.toEntity(context))
+    }
+
+    override suspend fun delete(tagItem: TagItem) {
+        tagLocalDS.softDelete(tagItem.toEntity(context))
+    }
+
     override suspend fun linkPhotocard(
         photocardId: Long,
         tagIds: List<Long>,
