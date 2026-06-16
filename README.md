@@ -15,7 +15,7 @@ can always sign in via your e-mail or Google account to access your collection f
 ## Supported Languages
 - &#127468;&#127463; **English**
 - &#127479;&#127482; **Russian**
-- &#127472;&#127479;; **Korean** *(coming soon)*
+- &#127472;&#127479; **Korean** *(coming soon)*
 - &#127471;&#127477; **Japanese** *(coming soon)*
 - &#127464;&#127475; **Traditional Chinese** *(coming soon)*
 
@@ -34,6 +34,7 @@ Android Palette library (matching UI elements with item covers).
 * **Third-Party UI Extensions** — Integrated specialized community libraries to enhance user UX:
   * [compose-collapsing-toolbar](https://github.com/onebone/compose-collapsing-toolbar) (by *onebone*) — For smooth collapsing toolbar animations.
   * [reorderable](https://github.com/Calvin-LL/reorderable) (by *Calvin-LL*) — For fluid drag-and-drop item reordering within lists.
+  * [colorpicker-compose](https://github.com/skydoves/colorpicker-compose) (by *skydoves*) — For a simple way of picking tag colors.
 
 ### 💾 Data & Cloud Backend
 * **Offline-First Architecture** — Seamless user experience regardless of network state, with transparent synchronization.
@@ -56,3 +57,13 @@ and process merchandise data.
 * **MockK** — Idiomatic Kotlin mocking library used to isolate business logic in Use Cases and Repositories.
 * **Turbine** — Specialized library for clean and compact testing of Kotlin asynchronous Flows and StateFlows.
 * **Kotlinx Coroutines Test** — Execution environment providing deterministic control over asynchronous coroutine scopes.
+
+## Current State
+* The app still requires more complex module and functional testing for all of its layers.
+* Introducing support for three more languages is planned.
+* It is proposed to search for or develop an API for creating a global catalogue of photocards.
+
+---
+![Static Badge](https://img.shields.io/badge/Contact-808080)
+![Static Badge](https://img.shields.io/badge/Telegram-0088CC?style=flat-square&logo=telegram&logoColor=white&link=https%3A%2F%2Ft.me%2Fvbshkn)
+[![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:vadim.bushukinl@gmail.com)
