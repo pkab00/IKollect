@@ -17,8 +17,10 @@ import com.vbshkn.ikollect.presentation.auth.GoogleAuthUIClient
 import com.vbshkn.ikollect.presentation.feature.auth.AuthContract.Effect.*
 import com.vbshkn.ikollect.util.UiText.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -57,6 +59,7 @@ class AuthViewModel @Inject constructor(
                 val loginError = logInUseCase(uiState.value.email, uiState.value.password)
                 if (loginError == null) {
                     syncManager.performInitialSync().join()
+                    delay(1000.milliseconds)
                     sendEffect(ExitAuthFlow)
                 } else {
                     when (loginError) {
@@ -106,6 +109,7 @@ class AuthViewModel @Inject constructor(
             is Event.OnSignInWithGoogleSucceed -> viewModelScope.launch {
                 updateState { it.copy(isLoading = true) }
                 syncManager.performInitialSync().join()
+                delay(1000.milliseconds)
                 updateState { it.copy(isLoading = false) }
                 sendEffect(ExitAuthFlow)
             }
