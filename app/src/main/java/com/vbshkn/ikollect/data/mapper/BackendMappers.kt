@@ -1,6 +1,5 @@
 package com.vbshkn.ikollect.data.mapper
 
-import androidx.compose.ui.graphics.Color
 import com.vbshkn.ikollect.data.local.datastore.LocalSettings
 import com.vbshkn.ikollect.data.local.model.entity.AlbumArtistCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.AlbumEntity
@@ -24,6 +23,8 @@ import com.vbshkn.ikollect.util.nowTimestamp
 import kotlin.time.Instant
 
 object BackendMappers {
+    const val NULL_UID = "00000000-0000-0000-0000-000000000000"
+
     // BACKEND ||==================================>>> ENTITY
 
     fun AlbumArtistCrossRefBackend.toEntity(): AlbumArtistCrossRef {
@@ -151,6 +152,7 @@ object BackendMappers {
             photocardId = this.photocardId,
             tagId = this.tagId,
             ownerId = userId,
+            creatorId = if (this.tagId < 0) NULL_UID else userId,
             createdAt = this.createdAt.toTimestamptz(),
             updatedAt = this.updatedAt.toTimestamptz(),
             isDeleted = this.isDeleted

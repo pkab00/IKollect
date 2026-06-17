@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -21,10 +22,10 @@ class ServiceLogStorage @Inject constructor(
         val LAST_SYNC_TIMESTAMP = stringPreferencesKey("last_sync_timestamp")
     }
 
-    fun getLastSyncTimestamp(): Flow<String?> {
+    suspend fun getLastSyncTimestamp(): String? {
         return context.localDataStore.data.map { preferences ->
             preferences[Keys.LAST_SYNC_TIMESTAMP]
-        }
+        }.first()
     }
 
     suspend fun updateLastSyncTimestamp(new: String) {

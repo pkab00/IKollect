@@ -57,7 +57,7 @@ object RoomModule {
         database = Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "ikollect_db"
+            AppDatabase.DATABASE_NAME
         )
             .fallbackToDestructiveMigration(true)
             .addCallback(object : RoomDatabase.Callback() {
@@ -70,6 +70,8 @@ object RoomModule {
                     db.execSQL(AppDatabase.TRIGGER_ALBUMS_SOFT_DELETE_CASCADE)
                     db.execSQL(AppDatabase.TRIGGER_PHOTOCARDS_SOFT_DELETE_CASCADE)
                     db.execSQL(AppDatabase.TRIGGER_ARTISTS_SOFT_DELETE_CASCADE)
+                    db.execSQL(AppDatabase.TRIGGER_UPDATE_TAGS_SOFT_DELETE_CASCADE)
+                    db.execSQL(AppDatabase.TRIGGER_INSERT_TAGS_SOFT_DELETE_CASCADE)
                 }
             })
             .build()

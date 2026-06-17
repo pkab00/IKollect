@@ -9,6 +9,7 @@ import androidx.room.Update
 import androidx.room.Upsert
 import com.vbshkn.ikollect.data.local.model.entity.PhotocardTagCrossRef
 import com.vbshkn.ikollect.data.local.model.entity.TagEntity
+import com.vbshkn.ikollect.util.now
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -43,8 +44,14 @@ interface TagDao {
     @Delete
     suspend fun delete(entity: TagEntity)
 
-    @Query("UPDATE TagEntity SET isDeleted = 1 WHERE tagId = :tagId")
-    suspend fun softDelete(tagId: Long)
+    @Query("""
+        UPDATE TagEntity SET
+        isDeleted = 1,
+        isSynchronized = 0,
+        updatedAt = :updatedAt
+        WHERE tagId = :tagId
+    """)
+    suspend fun softDelete(tagId: Long, updatedAt: Long = now())
 
     @Delete
     suspend fun deleteLink(link: PhotocardTagCrossRef)

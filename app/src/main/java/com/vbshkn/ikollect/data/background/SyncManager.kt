@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.data.background
 
+import android.content.Context
 import android.util.Log
 import androidx.room.withTransaction
 import com.vbshkn.ikollect.data.local.dao.AlbumDao
@@ -43,20 +44,25 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.time.Instant
 import androidx.core.net.toUri
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import javax.inject.Singleton
 
 private const val TAG = "SyncManager"
 
+@Singleton
 class SyncManager @Inject constructor(
+    @ApplicationScope private val scope: CoroutineScope,
+    @ApplicationContext private val context: Context,
     private val database: AppDatabase,
     private val supabase: SupabaseClient,
-    @ApplicationScope private val scope: CoroutineScope,
     private val albumDao: AlbumDao,
     private val artistDao: ArtistDao,
     private val photocardDao: PhotocardDao,
@@ -66,6 +72,10 @@ class SyncManager @Inject constructor(
     private val serviceLogStorage: ServiceLogStorage,
     private val settingsStorage: LocalSettingsStorage
 ) {
+    companion object {
+        private val handshakeMutex = Mutex()
+    }
+
     fun performInitialSync() = scope.launch {
         supabase.auth.awaitInitialization()
         if (supabase.auth.currentSessionOrNull() == null) {
@@ -174,30 +184,35 @@ class SyncManager @Inject constructor(
         val localPhotocardTagCF = backPackage.photocardTagCR.map { it.toEntity() }
         val localSettings = backPackage.settings.settings
 
-        database.openHelper.writableDatabase.execSQL("PRAGMA foreign_keys = OFF")
-        database.withTransaction {
-            try {
+        try {
+            database.withTransaction {
                 // CLEANING THE LOCAL DB
-                crossRefDao.clearAll()
-                photocardDao.clearAll()
-                albumDao.clearAll()
-                artistDao.clearAll()
-                tagDao.clearAll()
+                clearLocalDatabase()
 
                 // INSERT TO THE LOCAL DATABASE
                 artistDao.insertAll(localArtists)
                 tagDao.insertAll(localTags)
                 albumDao.insertAll(localAlbums)
                 photocardDao.insertAll(localPhotocards)
+
                 artistDao.insertGroupLinks(localArtistArtistCF)
                 albumDao.upsertArtistLinks(localAlbumArtistCF)
                 photocardDao.insertArtistLinks(localPhotocardArtistCF)
                 tagDao.upsertTagLinks(localPhotocardTagCF)
-                localSettings?.let { settingsStorage.update(it) }
                 Log.d(TAG, "Download from remote completed")
-            } finally {
-                database.openHelper.writableDatabase.execSQL("PRAGMA foreign_keys = ON")
             }
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to clear the database: ", e)
+        }
+        localSettings?.let { settingsStorage.update(it) }
+    }
+
+    private fun clearLocalDatabase() {
+        try {
+            database.clearAllTables()
+            Log.i(TAG, "Local database cleared.")
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to clear local database: ", e)
         }
     }
 
@@ -324,43 +339,51 @@ class SyncManager @Inject constructor(
     // ================================ HANDSHAKE =================================================
 
     suspend fun performHandshake(userId: String): HandshakeResult {
-        Log.i(TAG, "Starting scheduled handshake...")
-        val startPoint = now()
-        val lastSyncTimestamp = serviceLogStorage.getLastSyncTimestamp().first()
-            ?: Instant.fromEpochMilliseconds(0).toString()
-        Log.d(TAG, "Last sync at $lastSyncTimestamp")
-
-        Log.i(TAG, "Step 0: Looking for unused artists to delete...")
-        val zeroStepSucceed = softDeleteUnusedArtists()
-        Log.i(TAG, "Step 1: Local -> Remote")
-        val firstStepSucceed = uploadLocalChanges(userId)
-        Log.i(TAG, "Step 2: Local <- Remote")
-        val (secondStepSucceed, finishTimestamp) = downloadRemoteChanges(lastSyncTimestamp)
-        Log.i(TAG, "Step 3: Clear Deleted")
-        val thirdStepSucceed = clearDeleted()
-
-        // Updating last sync timestamp
-        // Decreasing it a lil bit just to avoid blind zone
-        val finishPoint = now()
-        val totalSeconds = (finishPoint - startPoint) / 1000f
-        finishTimestamp?.let {
-            serviceLogStorage.updateLastSyncTimestamp(finishTimestamp.toTimestamptz())
-            Log.i(
-                TAG,
-                "Handshake finished at ${finishTimestamp.toTimestamptz()}\nTook $totalSeconds seconds to perform"
-            )
+        if (handshakeMutex.isLocked) {
+            Log.d(TAG, "Sync is already in process. Skipping...")
+            return HandshakeResult.Skip
         }
 
-        val results = listOf(zeroStepSucceed, firstStepSucceed, secondStepSucceed, thirdStepSucceed)
-        val result = if (results.all { it is HandshakeResult.FullSuccess }) {
-            HandshakeResult.FullSuccess
-        } else if (results.all { it is HandshakeResult.Fail }) {
-            HandshakeResult.Fail
-        } else {
-            HandshakeResult.PartialSuccess
+        handshakeMutex.withLock {
+            Log.i(TAG, "Starting scheduled handshake...")
+            val startPoint = now()
+            val lastSyncTimestamp = serviceLogStorage.getLastSyncTimestamp()
+                ?: Instant.fromEpochMilliseconds(0).toString()
+            Log.d(TAG, "Last sync at $lastSyncTimestamp")
+
+            Log.i(TAG, "Step 0: Looking for unused artists to delete...")
+            val zeroStepSucceed = softDeleteUnusedArtists()
+            Log.i(TAG, "Step 1: Local -> Remote")
+            val firstStepSucceed = uploadLocalChanges(userId)
+            Log.i(TAG, "Step 2: Local <- Remote")
+            val (secondStepSucceed, finishTimestamp) = downloadRemoteChanges(lastSyncTimestamp)
+            Log.i(TAG, "Step 3: Clear Deleted")
+            val thirdStepSucceed = clearDeleted()
+
+            // Updating last sync timestamp
+            // Decreasing it a lil bit just to avoid blind zone
+            val finishPoint = now()
+            val totalSeconds = (finishPoint - startPoint) / 1000f
+            finishTimestamp?.let {
+                serviceLogStorage.updateLastSyncTimestamp(finishTimestamp.toTimestamptz())
+                Log.i(
+                    TAG,
+                    "Handshake finished at ${finishTimestamp.toTimestamptz()}\nTook $totalSeconds seconds to perform"
+                )
+            }
+
+            val results =
+                listOf(zeroStepSucceed, firstStepSucceed, secondStepSucceed, thirdStepSucceed)
+            val result = if (results.all { it is HandshakeResult.FullSuccess }) {
+                HandshakeResult.FullSuccess
+            } else if (results.all { it is HandshakeResult.Fail }) {
+                HandshakeResult.Fail
+            } else {
+                HandshakeResult.PartialSuccess
+            }
+            Log.i(TAG, "Result: ${result.javaClass.simpleName}")
+            return result
         }
-        Log.i(TAG, "Result: ${result.javaClass.simpleName}")
-        return result
     }
 
     private suspend fun softDeleteUnusedArtists(): HandshakeResult {
@@ -422,7 +445,6 @@ class SyncManager @Inject constructor(
             photocards = localPackage.photocards.map {
                 val uri = it.imageUrl?.toUri()
                 if (uri?.scheme == "file") {
-                    Log.d("TTT", "Need to update photocard $uri with id ${it.photocardId}")
                     val newPath = backendStorageDao.upsertPhotocardImage(uri, it.photocardId)
                     val copy = it.copy(imageUrl = newPath ?: it.imageUrl)
                     photocardDao.updatePhotocard(copy)
@@ -520,10 +542,6 @@ class SyncManager @Inject constructor(
                     .upsert(backendPhotocardArtistCR) { select() }
                     .decodeList<PhotocardArtistCrossRefBackend>()
                     .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
-                val photocardTagUpd = supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG)
-                    .upsert(backendPhotocardTagCR) { select() }
-                    .decodeList<PhotocardTagCrossRefBackend>()
-                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
                 database.withTransaction {
                     photocardDao.updateAll(localPackage.photocards.map {
                         it.copy(
@@ -537,12 +555,6 @@ class SyncManager @Inject constructor(
                             updatedAt = photocardArtistUpd
                         )
                     })
-                    crossRefDao.updatePhotocardTag(localPackage.photocardTagCR.map {
-                        it.copy(
-                            isSynchronized = true,
-                            updatedAt = photocardTagUpd
-                        )
-                    })
                 }
                 Log.d(TAG, "Photocards were synchronized as planned, local flags updated")
             } catch (e: Exception) {
@@ -552,8 +564,13 @@ class SyncManager @Inject constructor(
         }
         if (backendTags.isNotEmpty() || backendPhotocardTagCR.isNotEmpty()) {
             try {
-                val tagsUpd = supabase.from(BackendTables.TAGS).upsert(backendTags) { select() }
+                val tagsUpd = supabase.from(BackendTables.TAGS)
+                    .upsert(backendTags) { select() }
                     .decodeList<TagBackend>()
+                    .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
+                val photocardTagUpd = supabase.from(BackendTables.CROSSREF.PHOTOCARD_TAG)
+                    .upsert(backendPhotocardTagCR) { select() }
+                    .decodeList<PhotocardTagCrossRefBackend>()
                     .maxOfOrNull { it.updatedAt.toTimeMillis() } ?: now()
                 database.withTransaction {
                     tagDao.updateAll(localPackage.tags.map {
@@ -563,6 +580,12 @@ class SyncManager @Inject constructor(
                         )
                     })
                 }
+                crossRefDao.updatePhotocardTag(localPackage.photocardTagCR.map {
+                    it.copy(
+                        isSynchronized = true,
+                        updatedAt = photocardTagUpd
+                    )
+                })
                 Log.d(TAG, "Tags were synchronized as planned, local flags updated")
             } catch (e: Exception) {
                 Log.d(TAG, "Failed to update tags: ", e)
@@ -719,8 +742,8 @@ class SyncManager @Inject constructor(
         val localSettings = backPackage.settings.settings
 
         // UPDATE THE LOCAL DATABASE
-        database.withTransaction {
-            try {
+        try {
+            database.withTransaction {
                 artistDao.upsertAll(localArtists)
                 tagDao.upsertAll(localTags)
                 albumDao.upsertAll(localAlbums)
@@ -729,14 +752,13 @@ class SyncManager @Inject constructor(
                 albumDao.upsertArtistLinks(localAlbumArtistCF)
                 photocardDao.insertArtistLinks(localPhotocardArtistCF)
                 tagDao.upsertTagLinks(localPhotocardTagCF)
-                localSettings?.let { settingsStorage.update(it) }
                 Log.d(TAG, "Download from remote completed")
-
-            } catch (e: Exception) {
-                Log.d(TAG, "Failed to save remote data: ", e)
-                result = HandshakeResult.Fail
             }
+        } catch (e: Exception) {
+            Log.d(TAG, "Failed to save remote data: ", e)
+            result = HandshakeResult.Fail
         }
+        localSettings?.let { settingsStorage.update(it) }
 
         val allTimes = mutableListOf<Long>()
         with(allTimes) {
@@ -803,4 +825,5 @@ sealed interface HandshakeResult {
     object FullSuccess : HandshakeResult
     object PartialSuccess : HandshakeResult
     object Fail : HandshakeResult
+    object Skip : HandshakeResult
 }

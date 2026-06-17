@@ -1,5 +1,6 @@
 package com.vbshkn.ikollect.data.local.database
 
+import android.content.Context
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
@@ -39,13 +40,14 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun crossRefDao(): CrossRefDao
 
     companion object {
+        const val DATABASE_NAME = "ikollect_db"
         val TRIGGER_ALBUMS_SOFT_DELETE_CASCADE: String = """
                             CREATE TRIGGER IF NOT EXISTS albums_soft_delete_cascade
                             AFTER UPDATE OF isDeleted ON AlbumEntity
                             FOR EACH ROW WHEN NEW.isDeleted = 1
                             BEGIN
                                 UPDATE AlbumArtistCrossRef
-                                SET isDeleted = 1 WHERE albumId = OLD.albumId;
+                                SET isDeleted = 1, isSynchronized = 0 WHERE albumId = OLD.albumId;
                             END;
                         """.trimIndent()
         val TRIGGER_PHOTOCARDS_SOFT_DELETE_CASCADE = """
@@ -54,9 +56,9 @@ abstract class AppDatabase : RoomDatabase() {
                             FOR EACH ROW WHEN NEW.isDeleted = 1
                             BEGIN
                                 UPDATE PhotocardArtistCrossRef
-                                SET isDeleted = 1 WHERE photocardId = OLD.albumId;
+                                SET isDeleted = 1, isSynchronized = 0 WHERE photocardId = OLD.photocardId;
                                 UPDATE PhotocardTagCrossRef
-                                SET isDeleted = 1 WHERE photocardId = OLD.albumId;
+                                SET isDeleted = 1, isSynchronized = 0 WHERE photocardId = OLD.photocardId;
                             END;
                         """.trimIndent()
 
@@ -66,11 +68,32 @@ abstract class AppDatabase : RoomDatabase() {
                             FOR EACH ROW WHEN NEW.isDeleted = 1
                             BEGIN
                                 UPDATE ArtistArtistCrossRef
-                                SET isDeleted = 1 WHERE groupId = OLD.artistId OR memberId = OLD.artistId;
+                                SET isDeleted = 1, isSynchronized = 0 WHERE groupId = OLD.artistId OR memberId = OLD.artistId;
                                 UPDATE AlbumArtistCrossRef
-                                SET isDeleted = 1 WHERE artistId = OLD.artistId;
+                                SET isDeleted = 1, isSynchronized = 0 WHERE artistId = OLD.artistId;
                                 UPDATE PhotocardArtistCrossRef
-                                SET isDeleted = 1 WHERE artistId = OLD.artistId;
+                                SET isDeleted = 1, isSynchronized = 0 WHERE artistId = OLD.artistId;
+                            END;
+                        """.trimIndent()
+        val TRIGGER_UPDATE_TAGS_SOFT_DELETE_CASCADE = """
+                            CREATE TRIGGER IF NOT EXISTS update_tags_soft_delete_cascade
+                            AFTER UPDATE OF isDeleted ON TagEntity
+                            FOR EACH ROW WHEN NEW.isDeleted = 1 AND NEW.isSystemTag = 0
+                            BEGIN
+                                UPDATE PhotocardTagCrossRef
+                                SET isDeleted = 1, isSynchronized = 0 
+                                WHERE tagId = OLD.tagId;
+                            END;
+                        """.trimIndent()
+        val TRIGGER_INSERT_TAGS_SOFT_DELETE_CASCADE = """
+                            CREATE TRIGGER IF NOT EXISTS insert_tags_soft_delete_cascade
+                            AFTER INSERT ON PhotocardTagCrossRef
+                            FOR EACH ROW 
+                            WHEN EXISTS (SELECT 1 FROM PhotocardEntity WHERE photocardId = NEW.photocardId AND isDeleted = 1)
+                            BEGIN
+                                UPDATE PhotocardTagCrossRef 
+                                SET isDeleted = 1, isSynchronized = 0 
+                                WHERE rowid = NEW.rowid;
                             END;
                         """.trimIndent()
     }

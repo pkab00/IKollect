@@ -14,15 +14,15 @@ class TagLocalDataSource @Inject constructor(
     }
 
     suspend fun insert(entity: TagEntity) {
-        dao.insert(entity)
+        dao.insert(entity.copy(isSynchronized = false))
     }
 
     suspend fun update(entity: TagEntity) {
-        dao.update(entity)
+        dao.update(entity.copy(isSynchronized = false))
     }
 
     suspend fun insertTagLinks(links: List<PhotocardTagCrossRef>) {
-        dao.upsertTagLinks(links)
+        dao.upsertTagLinks(links.map { it.copy(isSynchronized = false) })
     }
 
     suspend fun delete(entity: TagEntity) {
