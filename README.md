@@ -65,5 +65,5 @@ and process merchandise data.
 
 ---
 ![Static Badge](https://img.shields.io/badge/Contact-808080)
-![Static Badge](https://img.shields.io/badge/Telegram-0088CC?style=flat-square&logo=telegram&logoColor=white&link=https%3A%2F%2Ft.me%2Fvbshkn)
+[![Static Badge](https://img.shields.io/badge/Telegram-0088CC?style=flat-square&logo=telegram&logoColor=white)](https://t.me/vbshkn)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:vadim.bushukinl@gmail.com)
