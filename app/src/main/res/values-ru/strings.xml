@@ -41,14 +41,14 @@
     <string name="komca_scanner_tip">Наведите камеру на стикер KOMCA.</string>
     <string name="komca_scanner_confirm">Подтвердить номер?</string>
     <string name="add_details_title_komca">Номер KOMCA</string>
-    <string name="komca_textfield_supporting_text">8-12 цифр с наклейки</string>
+    <string name="komca_textfield_supporting_text">8–12 цифр с наклейки</string>
     <string name="dialog_about_komca_title">О KOMCA</string>
     <string name="dialog_about_komca_body">Каждый экземляр музыкального альбома, произведённый в Корее, имеет стикер KOMCA. Это наклейка жёлтого или белого цвета с уникальным номером вашего экзмпляра. Обычно она расположена на задней части упаковки. Если на вашем альбомне нет стикера KOMCA, оставьте поле пустым.</string>
     <string name="komca_textfield_number_too_short">Слишком короткий номер.</string>
     <string name="wizard_title_wrapup">Почти готово</string>
     <string name="wizard_title_notes">Заметки</string>
     <string name="album_notes_placeholder">Добавьте заметки об альбоме (необязательно)</string>
-    <string name="wizard_cant_find_version">Не вижу свою версию...</string>
+    <string name="wizard_cant_find_version">Не вижу свою версию…</string>
     <string name="wizard_title_version_name">Версия</string>
     <string name="supporting_text_version">Введите название версии.</string>
     <string name="screen_title_artists">Артисты</string>
@@ -119,7 +119,7 @@
     <string name="navigation_profile">Профиль</string>
     <string name="screen_title_user_profile">Ваш профиль</string>
     <string name="action_login">Войти</string>
-    <string name="filler_login">Войдите. чтобы связать свою коллекцию с аккаунтом Google.</string>
+    <string name="filler_login">Войдите или создайте новый аккаунт для онлайн-доступа к своей коллекции.</string>
     <string name="title_registration">Регистрация</string>
     <string name="subtitle_create_new_account">Создайте новый аккаунт</string>
     <string name="label_password">Пароль</string>
@@ -140,7 +140,7 @@
     <string name="action_google_sign_in">Войти с помощью Google</string>
     <string name="label_nickname">Никнейм</string>
     <string name="nickname_validation_error_empty">Введите никнейм.</string>
-    <string name="nickname_validation_error_format">Никнейм должен включать 3-25 букв, цифр или специальных символов (-, _).</string>
+    <string name="nickname_validation_error_format">Никнейм должен включать 3–25 букв, цифр или специальных символов (-, _).</string>
     <string name="message_unable_to_refresh">Не удалось обновить данные. Проверьте подключение к сети.</string>
     <string name="confirm_delete_dialog_title">Подтвердить удаление?</string>
     <string name="confirm_delete_dialog_body">Это действие невозможно отменить.</string>

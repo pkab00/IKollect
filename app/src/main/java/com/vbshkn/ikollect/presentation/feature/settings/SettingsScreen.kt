@@ -83,6 +83,13 @@ fun SettingsScreen(
                     onClick = { viewModel.onEvent(Event.OnConfigureTabsClicked) }
                 )
             }
+            item {
+                SettingsCategoryHeader(title = stringResource(R.string.settings_section_features))
+                ClickableSettingItem(
+                    title = stringResource(R.string.settings_item_manage_tags),
+                    onClick = { viewModel.onEvent(Event.OnManageTagsClicked) }
+                )
+            }
             if (uiState.user != null) {
                 item {
                     SettingsCategoryHeader(title = stringResource(R.string.settings_section_account))
@@ -96,13 +103,6 @@ fun SettingsScreen(
                         onClick = { viewModel.onEvent(Event.OnLogOutClicked) }
                     )
                 }
-            }
-            item {
-                SettingsCategoryHeader(title = stringResource(R.string.settings_section_features))
-                ClickableSettingItem(
-                    title = stringResource(R.string.settings_item_manage_tags),
-                    onClick = { viewModel.onEvent(Event.OnManageTagsClicked) }
-                )
             }
         }
     }
